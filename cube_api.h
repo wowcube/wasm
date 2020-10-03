@@ -44,3 +44,33 @@ struct FB_drawLine_1_0 {
     uint32_t x1, y1, x2, y2;
     uint16_t color;
 };
+
+struct Event_1_0 {
+    enum Event{
+        eTick,
+        eGEO,
+        eMessage,
+    } type;
+
+    enum EGeoFlags{
+        egfTRBL = 0x1,
+        egfGyro = 0x2,
+        egfAccel = 0x4,
+    };
+
+    union {
+        uint32_t time;
+        unsigned char geo_flags; // combination of EGeoFlags
+        size_t msg_size;
+    };
+};
+
+struct Get_Message_1_0
+{
+    void* data; // must be pre-allocated by receiver to msg_size
+};
+
+struct Get_TRBL_1_0
+{
+
+};
