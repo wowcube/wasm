@@ -1,8 +1,13 @@
+#pragma once
+
 #include "stddef.h"
 #include "stdint.h"
 
-//must never be called with local pointers, use NativeInvoke
+//must never be called with local pointers, use NativeInvoke function or similar technics
 int native_invoke(const char* cmd, void* buff, size_t size);
+
+
+#pragma pack(push, 1)
 
 typedef struct {
     enum Event{
@@ -105,13 +110,5 @@ typedef struct {
     int32_t angle;
     uint8_t mirror;
 } DrawBitmap_1_0;
-/**
- * Draw RLE compressed sprite located in internal flash memory
- */
-void FB_drawInternalRLEBitmapOnDisplay(
-    const int displayNumber,
-    const uint16_t* resAddr,
-    const uint16_t x0,
-    const uint16_t y0,
-    const uint16_t angle,
-    const uint8_t mirror);
+
+#pragma pack(pop)

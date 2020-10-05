@@ -1,3 +1,4 @@
+#pragma once
 #include "natives.h"
 #include <typeinfo>
 
