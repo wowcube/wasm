@@ -17,9 +17,13 @@ void OnGeoChanged(unsigned char geo_flags)
 
 void OnMessage(size_t size)
 {
-    void* data = malloc(size);
-    NativeInvoke(Get_Message_1_0{data});
-    free(data);
+    Get_Message_1_0 msg = {};
+    msg.data = malloc(size);
+    NativeInvoke(msg);
+    NativeInvoke(Print_1_0{(char*)msg.data});
+    free(msg.data);
+    char answer[] = "I am fine too!";
+    NativeInvoke(Send_Message_1_0{msg.from_cid, answer, sizeof(answer)});
 }
 
 extern "C" int run() // native cube code searches for this function and runs as a main()
