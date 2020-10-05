@@ -3,7 +3,11 @@
 void OnTick(uint32_t time)
 {
     for (int display = 0; display < 3; ++display)
-        NativeInvoke(FB_drawLine_1_0{display, 0,0,240,240, fColor(1.,0,0)});
+    {
+        NativeInvoke(Fill_1_0{0x0});
+        NativeInvoke(DrawLine_1_0{display, 0,0,240,240, fColor(1.,0,0)});
+        NativeInvoke(Flush_1_0{display});
+    }
 }
 
 void OnGeoChanged(unsigned char geo_flags)

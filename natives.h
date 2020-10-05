@@ -4,24 +4,6 @@
 //must never be called with local pointers, use NativeInvoke
 int native_invoke(const char* cmd, void* buff, size_t size);
 
-uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
-    return ((int)(r*0x1F) << 11)|((int)(g*0x3F)<<5)|(int)(b*0x1F);
-}
-
-typedef struct
-{
-    int displayNumber;
-    uint32_t x, y;
-    uint16_t color;
-    uint8_t alpha;
-} FB_drawPixelAlpha_1_0;
-
-typedef struct {
-    int displayNumber;
-    uint32_t x1, y1, x2, y2;
-    uint16_t color;
-} FB_drawLine_1_0;
-
 typedef struct {
     enum Event{
         eTick,
@@ -64,3 +46,72 @@ typedef struct
 {
     const char* buff; //null terminated string
 } Print_1_0;
+
+uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
+    return ((int)(r*0x1F) << 11)|((int)(g*0x3F)<<5)|(int)(b*0x1F);
+}
+
+typedef struct
+{
+    int displayNumber;
+    uint32_t x, y;
+    uint16_t color;
+    uint8_t alpha;
+} DrawPixelAlpha_1_0;
+
+typedef struct {
+    int displayNumber;
+    uint32_t x1, y1, x2, y2;
+    uint16_t color;
+} DrawLine_1_0;
+
+typedef struct {
+    int displayNumber;
+    uint16_t color;
+} Fill_1_0;
+
+typedef struct {
+    int displayNumber;
+    uint32_t x, y, w, h;
+    uint16_t color;
+} FillRect_1_0;
+
+typedef struct {
+    int displayNumber;
+    uint32_t x, y, r;
+    uint16_t color;
+    uint8_t pen_width;
+} FillCircle_1_0;
+
+typedef struct {
+    int displayNumber;
+    const char* str;
+    uint32_t x, y;
+    uint16_t color;
+    uint32_t scale;
+    int32_t angle;
+} DrawText_1_0;
+
+typedef struct {
+    int displayNumber;
+} Flush_1_0;
+
+typedef struct {
+    int displayNumber;
+    const char* addr;
+    enum {edbRLE, edb565, edbJPG} format;
+    uint32_t x, y;
+    uint32_t scale;  // ignored so far
+    int32_t angle;
+    uint8_t mirror;
+} DrawBitmap_1_0;
+/**
+ * Draw RLE compressed sprite located in internal flash memory
+ */
+void FB_drawInternalRLEBitmapOnDisplay(
+    const int displayNumber,
+    const uint16_t* resAddr,
+    const uint16_t x0,
+    const uint16_t y0,
+    const uint16_t angle,
+    const uint8_t mirror);
