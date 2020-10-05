@@ -6,7 +6,6 @@
 //must never be called with local pointers, use NativeInvoke function or similar technics
 int native_invoke(const char* cmd, void* buff, size_t size);
 
-
 #pragma pack(push, 1)
 
 typedef struct {
@@ -23,8 +22,8 @@ typedef struct {
     };
 
     union {
-        uint32_t time;      // when eTick
-        uint8_t geo_flags;  // combination of EGeoFlags when eGEO
+        uint32_t time;      // when eTick, RTOS_getTimeMs
+        enum EGeoFlags geo_flags;  // combination of EGeoFlags when eGEO
         size_t msg_size;    // when eMessage
     };
 } Event_1_0;
@@ -49,7 +48,7 @@ typedef struct
 
 typedef struct
 {
-    const char* buff; //null terminated string
+    const char* buff; //null terminated string, must be globally/statically allocated to work
 } Print_1_0;
 
 uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
