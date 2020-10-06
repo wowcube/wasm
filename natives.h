@@ -8,6 +8,13 @@ int native_invoke(const char* cmd, void* buff, size_t size);
 
 #pragma pack(push, 1)
 
+typedef enum {
+    egfTRBL = 0x1,  // Get_TRBL_1_0
+    egfGyro = 0x2,  // Get_Gyro_1_0
+    egfAccel = 0x4, // Get_Accel_1_0
+} EGeoFlags;
+
+
 typedef struct {
     enum Event{
         eTick,
@@ -15,15 +22,9 @@ typedef struct {
         eMessage,
     } type;
 
-    enum EGeoFlags{
-        egfTRBL = 0x1,  // Get_TRBL_1_0
-        egfGyro = 0x2,  // Get_Gyro_1_0
-        egfAccel = 0x4, // Get_Accel_1_0
-    };
-
     union {
         uint32_t time;      // when eTick, RTOS_getTimeMs
-        enum EGeoFlags geo_flags;  // combination of EGeoFlags when eGEO
+        EGeoFlags geo_flags;  // combination of EGeoFlags when eGEO
         size_t msg_size;    // when eMessage
     };
 } Event_1_0;
@@ -89,7 +90,7 @@ typedef struct {
 
 typedef struct {
     int displayNumber;
-    const char* str;
+    const char* str;  // MUST be global or static!
     uint32_t x, y;
     uint16_t color;
     uint32_t scale;
@@ -100,14 +101,16 @@ typedef struct {
     int displayNumber;
 } Flush_1_0;
 
+typedef enum {edbRLE, edb565, edbJPG} EBMPFormat;
+
 typedef struct {
     int displayNumber;
-    const char* addr;
-    enum {edbRLE, edb565, edbJPG} format;
+    const void* addr;  // MUST be global or static!
+    EBMPFormat format;
     uint32_t x, y;
     uint32_t scale;  // ignored so far
     int32_t angle;
-    uint8_t mirror;
+    uint8_t mirror; // 0 bit - flip by X, 1 bit - flip by Y, can be both
 } DrawBitmap_1_0;
 
 #pragma pack(pop)

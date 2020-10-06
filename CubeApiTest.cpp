@@ -9,17 +9,9 @@ protected:
         CEventLoop::OnTick(time);
         for (int display = 0; display < 3; ++display)
         {
-            NativeInvoke(DrawLine_1_0{display, 0,0,240,240, fColor(1.,0,0)});
-            NativeInvoke(Flush_1_0{display});
-        }
-    }
-
-    virtual void OnGeoChanged(unsigned char geo_flags)
-    {
-        if (geo_flags & Event_1_0::egfTRBL)
-        {
-            Get_TRBL_1_0 trbl = {};
-            NativeInvoke(trbl);
+            CDisplay disp(display);
+            disp.Fill();
+            disp.DrawLine(0,0,240,240);
         }
     }
 
@@ -33,7 +25,7 @@ protected:
 public:
     virtual int Main()
     {
-        NativePrint("Hello WOW'd");
+        NativePrint("Hello WOWd");
         return CEventLoop::Main();
     }
 };
