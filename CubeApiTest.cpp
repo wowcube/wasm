@@ -1,5 +1,6 @@
 #include "cube_api.h"
 #include <cstdio>
+#define WASM_EXPORT __attribute__((used)) __attribute__((visibility ("default")))
 
 class CEventLoopEx: public CEventLoop
 {
@@ -10,8 +11,12 @@ protected:
         for (int display = 0; display < 3; ++display)
         {
             CDisplay disp(display);
-            disp.Fill();
-            disp.DrawLine(0,0,240,240);
+            disp.Fill(fColor(1,1,1));
+            disp.DrawLine(0,0,240,240, 100);
+            disp.FillRect(10, 40, 100, 100, 250);
+
+            NativePrint("Draw for display %d\n", display);
+
         }
     }
 
@@ -30,7 +35,7 @@ public:
     }
 };
 
-extern "C" int run() // native cube code searches for this function and runs as a main()
+extern "C" int WASM_EXPORT run() // native cube code searches for this function and runs as a main()
 {
     //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();

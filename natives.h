@@ -4,6 +4,11 @@
 #include "stdint.h"
 
 //must never be called with local pointers, use NativeInvoke function or similar technics
+#ifdef __cplusplus
+extern "C"
+#else
+extern
+#endif
 int native_invoke(const char* cmd, void* buff, size_t size);
 
 #pragma pack(push, 1)
@@ -50,6 +55,7 @@ typedef struct
 typedef struct
 {
     const char* buff; //null terminated string, must be globally/statically allocated to work
+    size_t size;
 } Print_1_0;
 
 uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
@@ -90,11 +96,11 @@ typedef struct {
 
 typedef struct {
     int displayNumber;
-    const char* str;  // MUST be global or static!
+    int32_t angle;
+    uint32_t scale;
     uint32_t x, y;
     uint16_t color;
-    uint32_t scale;
-    int32_t angle;
+    const char* str;  // MUST be global or static!
 } DrawText_1_0;
 
 typedef struct {
