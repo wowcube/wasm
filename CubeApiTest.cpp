@@ -4,6 +4,7 @@
 
 class CEventLoopEx: public CEventLoop
 {
+    int m_nPos = 0;
 protected:
     virtual void OnTick(uint32_t time)
     {
@@ -13,10 +14,10 @@ protected:
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
             disp.DrawLine(0,0,240,240, 100);
-            disp.FillRect(10, 40, 100, 100, 250);
+            disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
+            ++m_nPos %= 240;
 
-            NativePrint("Draw for display %d\n", display);
-
+            NativePrint("Draw for display %d, time: %d\n", display, time);
         }
     }
 
