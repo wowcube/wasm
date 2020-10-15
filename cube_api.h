@@ -77,7 +77,7 @@ public:
     {
         static char buff[1024] = {};
         strcpy(buff, text);
-        return NativeInvoke(DrawText_1_0{m_nDisplay, angle, scale, x, y, color, (char*)buff});
+        return NativeInvoke(DrawText_1_0{(uint8_t)m_nDisplay, color, x, y, scale, angle, buff});
     }
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)

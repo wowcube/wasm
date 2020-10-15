@@ -95,11 +95,11 @@ typedef struct {
 } FillCircle_1_0;
 
 typedef struct {
-    int displayNumber;
-    int32_t angle;
-    uint32_t scale;
-    uint32_t x, y;
+    uint8_t displayNumber;
     uint16_t color;
+    uint32_t x, y;
+    uint32_t scale;
+    int32_t angle;
     const char* str;  // MUST be global or static!
 } DrawText_1_0;
 
