@@ -13,8 +13,12 @@ protected:
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
             disp.DrawLine(0,0,240,240, 100);
+            disp.DrawLine(240,0 ,0,240, 100);
             disp.FillRect(10, 40, 100, 100, 250);
-
+            disp.DrawPixelAlpha(66, 66, 255, 2);
+            disp.DrawText(120, 0, "Hellow WOWd", 255, 12, 0);
+            disp.FillCircle(120,120, 30, 100, 2);
+            disp.Flush();
             NativePrint("Draw for display %d\n", display);
 
         }
