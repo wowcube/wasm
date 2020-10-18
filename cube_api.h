@@ -29,7 +29,7 @@ int NativePrint(const char* fmt, ...)
     va_start(ap, fmt);
     static char buff[1024] = {};
     vsprintf(buff, fmt, ap);
-    int res = NativeInvoke(Print_1_0{(char*)buff});
+    int res = NativeInvoke(Print_1_0{(char*)buff, 1024});
     va_end(ap);
     return res;
 }
@@ -78,7 +78,7 @@ public:
     {
         static char buff[1024] = {};
         strcpy(buff, text);
-        return NativeInvoke(DrawText_1_0{m_nDisplay, buff, x, y, color, scale, angle});
+        return NativeInvoke(DrawText_1_0{(uint8_t)m_nDisplay, color, x, y, scale, angle, buff});
     }
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)
