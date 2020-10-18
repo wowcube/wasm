@@ -37,6 +37,7 @@ int NativePrint(const char* fmt, ...)
 class CBitmap
 {
 public:
+    bool Load(void* ptr, size_t size, EBMPFormat fmt);
     const void* GetAddr() const {return nullptr;} // FIXME: implement
     EBMPFormat GetFormat() const {return edbRLE;}
 };
