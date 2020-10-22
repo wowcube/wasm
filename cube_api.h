@@ -103,8 +103,9 @@ protected:
 class CEventLoop
 {
 protected:
-    virtual void OnTick(uint32_t time)
+    virtual bool OnTick(uint32_t time)
     {
+        return true;
     }
 
     virtual void OnGeoChanged(unsigned char geo_flags)
@@ -136,7 +137,8 @@ public:
         {
             switch (event.type){
                 case Event_1_0::eTick:
-                    OnTick(event.time);
+                    if (!OnTick(event.time))
+                        return 0;
                     break;
                 case Event_1_0::eGEO:
                     OnGeoChanged(event.geo_flags);
