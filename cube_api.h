@@ -37,9 +37,15 @@ int NativePrint(const char* fmt, ...)
 class CBitmap
 {
 public:
-    bool Load(void* ptr, size_t size, EBMPFormat fmt);
-    const void* GetAddr() const {return nullptr;} // FIXME: implement
+    bool Load(void* ptr, size_t size, int fmt) {
+        data = load_bitmap(ptr, size, fmt);
+        NativePrint("!!!!!!!!!!!!!!!!!!!!!! display with ptr %p \n", data);
+        return data != nullptr;
+    }
+    const void* GetAddr() const {return data;} // FIXME: implement
     EBMPFormat GetFormat() const {return edbRLE;}
+private:
+    void *data = nullptr;
 };
 
 class CDisplay
@@ -83,7 +89,7 @@ public:
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)
     {
-        return NativeInvoke(DrawBitmap_1_0{m_nDisplay, bmp.GetAddr(), bmp.GetFormat(), x, y, scale, angle, mirror});
+        return NativeInvoke(DrawBitmap_1_0{(uint8_t)m_nDisplay, (uint8_t)bmp.GetFormat(), mirror, x, y, scale, angle, bmp.GetAddr()});
     }
 
     int Flush()

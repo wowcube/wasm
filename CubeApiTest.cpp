@@ -1,5 +1,7 @@
 #include "cube_api.h"
 #include <cstdio>
+#include "Resources/happy.res.h"
+
 #define WASM_EXPORT __attribute__((used)) __attribute__((visibility ("default")))
 
 class CEventLoopEx: public CEventLoop
@@ -19,7 +21,14 @@ protected:
             disp.DrawPixelAlpha(66, 66, 255, 2);
             disp.DrawText(120, 0, "Hellow WOWd", 255, 12, 0);
             disp.FillCircle(120,120, 30, 100, 2);
+            if (display == 2) {
+                CBitmap b;
+                if (b.Load(happy_jpg, happy_jpg_len, (int)EBMPFormat::edbJPG)) {
+                    disp.DrawBitmap(0, 0, b, 1, 0, 0);
+                }
+            }
             disp.Flush();
+
             NativePrint("Draw for display %d, time: %d\n", display, time);
         }
     }

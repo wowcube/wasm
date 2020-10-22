@@ -11,6 +11,13 @@ extern
 #endif
 int native_invoke(const char* cmd, void* buff, size_t size);
 
+#ifdef __cplusplus
+extern "C"
+#else
+extern
+#endif
+void *load_bitmap(void* ptr, size_t size, int fmt);
+
 #pragma pack(push, 1)
 
 typedef enum {
@@ -110,13 +117,13 @@ typedef struct {
 typedef enum {edbRLE, edb565, edbJPG} EBMPFormat;
 
 typedef struct {
-    int displayNumber;
-    const void* addr;  // MUST be global or static!
-    EBMPFormat format;
+    uint8_t displayNumber;
+    uint8_t format;
+    uint8_t mirror; // 0 bit - flip by X, 1 bit - flip by Y, can be both
     uint32_t x, y;
     uint32_t scale;  // ignored so far
     int32_t angle;
-    uint8_t mirror; // 0 bit - flip by X, 1 bit - flip by Y, can be both
+    const void* addr;  // MUST be global or static!
 } DrawBitmap_1_0;
 
 #pragma pack(pop)
