@@ -3,13 +3,20 @@
 #include "stddef.h"
 #include "stdint.h"
 
-//must never be called with local pointers, use NativeInvoke function or similar technics
 #ifdef __cplusplus
-extern "C"
+    #define WASM_EXPORT extern "C" __attribute__((used)) __attribute__((visibility ("default")))
 #else
-extern
+    #define WASM_EXPORT extern __attribute__((used)) __attribute__((visibility ("default")))
 #endif
-int native_invoke(const char* cmd, void* buff, size_t size);
+
+#ifdef __EMSCRIPTEN__
+    #define WASM_MAGIC_RESOLVE
+#else
+    #define WASM_MAGIC_RESOLVE  __attribute__((weak))
+#endif
+
+//must never be called with local pointers, use NativeInvoke function or similar technics
+WASM_EXPORT int WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff, size_t size);
 
 #pragma pack(push, 1)
 

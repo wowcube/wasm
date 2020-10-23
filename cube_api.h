@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <cstdlib>
+
 
 template<class T>
 int NativeInvoke(const T& val) // calls native by struct name

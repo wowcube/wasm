@@ -1,7 +1,5 @@
 #include "cube_api.h"
 #include <cstdio>
-#include <cstdlib>
-#define WASM_EXPORT __attribute__((used)) __attribute__((visibility ("default")))
 
 
 const int g = 10;
@@ -77,7 +75,7 @@ public:
     }
 };
 
-extern "C" int WASM_EXPORT run() // native cube code searches for this function and runs as a main()
+WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
     //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();
