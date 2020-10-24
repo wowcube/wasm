@@ -1,11 +1,41 @@
 #include "cube_api.h"
 #include <cstdio>
 
+template<uint16_t _size, class T>
+class CCubeNet
+{
+public:
+    static const uint16_t width = _size * 4;
+    static const uint16_t height = _size * 3;
+    static const uint16_t size = _size;
+
+    T& At(int16_t x, int16_t y)
+    {
+        x %= width;
+        y %= height;
+        int16_t nx = 0;
+        int16_t ny = 0;
+        if (size < y < 2*size || size < x < 2*size) // direct mapping on the cross
+        {
+            nx = x;
+            ny = y;
+        } else if (x < size && y < size) {// leftmost upper quadrant
+            nx = size*2 - y;
+            ny = x;
+        }
+        return m_values[ny][nx];
+    }
+
+protected:
+    T m_values[height][width];
+};
 
 const int g = 10;
 const int k = 240 / g;
 char b[k*k] = {};
 
+const uint16_t pixel = 10;
+CCubeNet<240*2/pixel, bool> g_cube;
 
 class CEventLoopEx: public CEventLoop
 {
@@ -17,7 +47,11 @@ protected:
         {
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
-            Update(disp);
+
+            for (uint16_t y = 0; y < g_cube.height; ++y)
+                for (uint16_t x = 0; x < g_cube.width; ++x)
+                    disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
+            //Update(disp);
             /*
             disp.DrawLine(0,0,240,240, 100);
             disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
@@ -26,7 +60,7 @@ protected:
             disp.Flush();
             */
             ++m_nPos %= 240;
-            disp.DrawText(120, 120, "Life!", fColor(1,1,1), 240, m_nPos % 360);
+            disp.DrawText(120, 120, "Life!", fColor(1,0,1), 240, m_nPos % 360);
             NativePrint("Draw for display %d, time: %d\n", display, time);
         }
         return CEventLoop::OnTick(time);
@@ -41,6 +75,10 @@ protected:
     {
         for (int y = k * k; y--;)
             b[y] = rand() % 2;
+
+        for (uint16_t y = 0; y < g_cube.height; ++y)
+            for (uint16_t x = 0; x < g_cube.width; ++x)
+                g_cube.At(x, y) = !!(rand() % 2);
     }
 
     void Update(CDisplay& disp) {
