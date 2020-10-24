@@ -8,15 +8,15 @@
 
 
 template<class T>
-int NativeInvoke(const T& val) // calls native by struct name
+int32_t NativeInvoke(const T& val) // calls native by struct name
 {
-    static T global_value;
+    static T global_value; //only static/global memory can pass the native boundary
     global_value = val;
     return native_invoke(typeid(T).name(), &global_value, sizeof(T));
 }
 
 template<class T>
-int NativeInvoke(T& val) // with return args
+int32_t NativeInvoke(T& val) // with return args
 {
     static T global_value;
     global_value = val;
@@ -31,7 +31,7 @@ int NativePrint(const char* fmt, ...)
     va_start(ap, fmt);
     static char buff[1024] = {};
     vsprintf(buff, fmt, ap);
-    int res = NativeInvoke(Print_1_0{(char*)buff, 1024});
+    int32_t res = NativeInvoke(Print_1_0{(char*)buff, 1024});
     va_end(ap);
     return res;
 }

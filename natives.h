@@ -15,8 +15,14 @@
     #define WASM_MAGIC_RESOLVE  __attribute__((weak))
 #endif
 
-//must never be called with local pointers, use NativeInvoke function or similar technics
-WASM_EXPORT int WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff, size_t size);
+//IMPORTANT: must never be called with local pointers, use NativeInvoke function or similar techniques
+//this is the only function for communication with native
+
+WASM_EXPORT int32_t WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff, size_t size); // return value meaning might differer depending on the cmd
+//for simple cases it might be used as cmd="GetTemperatureOnMars", buff = nullptr, size = 0, and the temperature will be returned as the native_invoke return value
+//the complex cases should pass the input arguments and receive the output arguments, the return value of the function should be treated as the error code
+//by default, 0 means "no problem"
+
 
 #pragma pack(push, 1)
 
@@ -125,5 +131,15 @@ typedef struct {
     int32_t angle;
     uint8_t mirror; // 0 bit - flip by X, 1 bit - flip by Y, can be both
 } DrawBitmap_1_0;
+
+
+typedef struct {
+    const void* source;  // MUST be global or static!
+    uint16_t source_size;
+    EBMPFormat source_format;
+    void* target;  // MUST be global or static! If null is given, target_size will be calculated
+    uint16_t target_size;
+    EBMPFormat target_format;
+} Transform_1_0;
 
 #pragma pack(pop)
