@@ -44,30 +44,34 @@ class CEventLoopEx: public CEventLoop
 protected:
     virtual bool OnTick(uint32_t time)
     {
-        for (int display = 0; display < 1; ++display)
+        for (int display = 0; display < 3; ++display)
         {
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
 
-            for (uint16_t y = 0; y < g_cube.height; ++y)
-                for (uint16_t x = 0; x < g_cube.width; ++x)
-                    disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
-            //Update(disp);
-            /*
-            disp.DrawLine(0,0,240,240, 100);
-            disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
-            disp.DrawPixelAlpha(66, 66, 255, 2);
-            disp.FillCircle(120,120, 30, 100, 2);
-            if (display == 2) {
-                CBitmap b;
-                if (b.Load(happy_bmp, happy_bmp_len, (int)EBMPFormat::edb565)) {
-                    NativePrint("TRY DRAW BITMAP %d", b.getSize());
-                    disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
+            if (display == 0)
+                Update(disp);
+
+            if (display == 1)
+                for (uint16_t y = 0; y < g_cube.height; ++y)
+                    for (uint16_t x = 0; x < g_cube.width; ++x)
+                        disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
+
+            if (display == 2)
+            {
+                disp.DrawLine(0,0,240,240, 100);
+                disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
+                disp.DrawPixelAlpha(66, 66, 255, 2);
+                disp.FillCircle(120,120, 30, 100, 2);
+                if (display == 2) {
+                    CBitmap b;
+                    if (b.Load(happy_bmp, happy_bmp_len, (int)EBMPFormat::edb565)) {
+                        NativePrint("TRY DRAW BITMAP %d", b.getSize());
+                        disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
+                    }
                 }
             }
-            disp.Flush();
 
-            */
             ++m_nPos %= 240;
             disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
             NativePrint("Draw for display %d, time: %d\n", display, time);
