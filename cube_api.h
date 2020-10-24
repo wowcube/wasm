@@ -39,9 +39,36 @@ int NativePrint(const char* fmt, ...)
 class CBitmap
 {
 public:
-    bool Load(void* ptr, size_t size, EBMPFormat fmt);
-    const void* GetAddr() const {return nullptr;} // FIXME: implement
-    EBMPFormat GetFormat() const {return edbRLE;}
+    ~CBitmap() {
+        free(m_data);
+    }
+    bool Load(void* ptr, size_t size, int fmt) {
+        switch (fmt) {
+        case EBMPFormat::edb565:
+            m_data = malloc(size);
+            memcpy(m_data, ptr, size);
+            break;
+        default:
+            NativePrint("Format not supported");
+            return false;
+        }
+
+        if (m_data != nullptr) {
+            m_size = size;
+            m_format = (EBMPFormat)fmt;
+            return true;
+        }
+        return false;
+    }
+
+    const void* GetAddr()   const {   return m_data;     }
+    size_t getSize()        const {   return m_size;     }
+    EBMPFormat GetFormat()  const {   return m_format;   }
+
+private:
+    void *m_data = nullptr;
+    size_t m_size = 0;
+    EBMPFormat m_format = edbRLE;
 };
 
 class CDisplay
@@ -85,7 +112,7 @@ public:
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)
     {
-        return NativeInvoke(DrawBitmap_1_0{m_nDisplay, bmp.GetAddr(), bmp.GetFormat(), x, y, scale, angle, mirror});
+        return NativeInvoke(DrawBitmap_1_0{(uint8_t)m_nDisplay, (uint8_t)bmp.GetFormat(), mirror, x, y, scale, angle, bmp.getSize(), bmp.GetAddr()});
     }
 
     int Flush()

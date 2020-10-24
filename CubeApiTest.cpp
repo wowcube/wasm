@@ -1,5 +1,6 @@
 #include "cube_api.h"
 #include <cstdio>
+#include "Resources/happy.bmp.h"
 
 template<uint16_t _size, class T>
 class CCubeNet
@@ -57,10 +58,18 @@ protected:
             disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
             disp.DrawPixelAlpha(66, 66, 255, 2);
             disp.FillCircle(120,120, 30, 100, 2);
+            if (display == 2) {
+                CBitmap b;
+                if (b.Load(happy_bmp, happy_bmp_len, (int)EBMPFormat::edb565)) {
+                    NativePrint("TRY DRAW BITMAP %d", b.getSize());
+                    disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
+                }
+            }
             disp.Flush();
+
             */
             ++m_nPos %= 240;
-            disp.DrawText(120, 120, "Life!", fColor(1,0,1), 240, m_nPos % 360);
+            disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
             NativePrint("Draw for display %d, time: %d\n", display, time);
         }
         return CEventLoop::OnTick(time);
