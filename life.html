@@ -1,31 +1,45 @@
 <html>
   <body onload="run()">
-    <canvas id="C"></canvas>
-    <input id="I" type="checkbox" />Run
+    <canvas id="canvas"></canvas>
   </body>
   <script lang="jscript">
-    function run(){
-        k = 40, g = 10, b = [];
-        function dt(val){return ~~val;}
-        setInterval(function() {
-            c = [];
-            for (y = k * k; y--;) {
-                n = 0;
-                for (f = 9; f--;) n += b[(dt(y / k) + k + f % 3 - 1) % k * k + (y + k + dt(f / 3) - 1) % k];
-                c[y] = n == 3 || n - b[y] == 3;
-                r.fillStyle = b[y] ? 'red' : 'tan';
-                r.fillRect(y % k * g, dt(y / k) * g, g - 1, g - 1)
-            }
-            if (document.getElementById('I').checked) {b = c}
-        }, 1);
+    k = 40, g = 10, b = [];
 
-        v = document.getElementById('C');
-        v.width = v.height = g * k;
-        v.addEventListener('click', function(e) {
-            b[dt((e.pageY - v.offsetTop) / g) * k + dt((e.pageX - v.offsetLeft) / g)] ^= 1
-        }, 0);
-        r = v.getContext('2d');
+    v = document.getElementById('canvas');
+    v.width = v.height = g * k;
+    r = v.getContext('2d');
+
+    function dt(val){return Math.floor(val);}
+
+    function Draw(x, y, w, h, fill)
+    {
+        r.fillStyle = fill ? 'red' : 'tan';
+        r.fillRect(x, y, w, h)
+    }
+
+    function Randomize()
+    {
         for (y = k * k; y--;) b[y] = dt(Math.random() +0.5);
+    }
+
+    function OnTick() {
+        c = [];
+        for (y = k * k; y--;) {
+            n = 0;
+            for (f = 9; f--;)
+                n += b[(dt(y / k) + k + f % 3 - 1) % k * k + (y + k + dt(f / 3) - 1) % k];
+            c[y] = n == 3 || n - b[y] == 3;
+            Draw(y % k * g, dt(y / k) * g, g - 1, g - 1, c[y])
+        }
+        if (JSON.stringify(b) !== JSON.stringify(c))
+            b = c;
+        else
+            Randomize();
+    }
+
+    function run(){
+        Randomize();
+        setInterval(OnTick, 1);
     }
   </script>
 </html>
