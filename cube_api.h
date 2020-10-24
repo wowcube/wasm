@@ -40,35 +40,35 @@ class CBitmap
 {
 public:
     ~CBitmap() {
-        free(_data);
+        free(m_data);
     }
     bool Load(void* ptr, size_t size, int fmt) {
         switch (fmt) {
         case EBMPFormat::edb565:
-            _data = malloc(size);
-            memcpy(_data, ptr, size);
+            m_data = malloc(size);
+            memcpy(m_data, ptr, size);
             break;
         default:
             NativePrint("Format not supported");
             return false;
         }
 
-        if (_data != nullptr) {
-            _size = size;
-            _format = (EBMPFormat)fmt;
+        if (m_data != nullptr) {
+            m_size = size;
+            m_format = (EBMPFormat)fmt;
             return true;
         }
         return false;
     }
 
-    const void* GetAddr()   const {   return _data;     }
-    size_t getSize()        const {   return _size;     }
-    EBMPFormat GetFormat()  const {   return _format;   }
+    const void* GetAddr()   const {   return m_data;     }
+    size_t getSize()        const {   return m_size;     }
+    EBMPFormat GetFormat()  const {   return m_format;   }
 
 private:
-    void *_data = nullptr;
-    size_t _size = 0;
-    EBMPFormat _format = edbRLE;
+    void *m_data = nullptr;
+    size_t m_size = 0;
+    EBMPFormat m_format = edbRLE;
 };
 
 class CDisplay
