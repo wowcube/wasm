@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <cstdlib>
 
 template<class T>
 int NativeInvoke(const T& val) // calls native by struct name
@@ -37,15 +38,36 @@ int NativePrint(const char* fmt, ...)
 class CBitmap
 {
 public:
-    bool Load(void* ptr, size_t size, int fmt) {
-        data = load_bitmap(ptr, size, fmt);
-        NativePrint("!!!!!!!!!!!!!!!!!!!!!! display with ptr %p \n", data);
-        return data != nullptr;
+    ~CBitmap() {
+        free(_data);
     }
-    const void* GetAddr() const {return data;} // FIXME: implement
-    EBMPFormat GetFormat() const {return edbRLE;}
+    bool Load(void* ptr, size_t size, int fmt) {
+        switch (fmt) {
+        case EBMPFormat::edb565:
+            _data = malloc(size);
+            memcpy(_data, ptr, size);
+            break;
+        default:
+            NativePrint("Format not supported");
+            return false;
+        }
+
+        if (_data != nullptr) {
+            _size = size;
+            _format = (EBMPFormat)fmt;
+            return true;
+        }
+        return false;
+    }
+
+    const void* GetAddr()   const {   return _data;     }
+    size_t getSize()        const {   return _size;     }
+    EBMPFormat GetFormat()  const {   return _format;   }
+
 private:
-    void *data = nullptr;
+    void *_data = nullptr;
+    size_t _size = 0;
+    EBMPFormat _format = edbRLE;
 };
 
 class CDisplay
@@ -89,7 +111,7 @@ public:
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)
     {
-        return NativeInvoke(DrawBitmap_1_0{(uint8_t)m_nDisplay, (uint8_t)bmp.GetFormat(), mirror, x, y, scale, angle, bmp.GetAddr()});
+        return NativeInvoke(DrawBitmap_1_0{(uint8_t)m_nDisplay, (uint8_t)bmp.GetFormat(), mirror, x, y, scale, angle, bmp.getSize(), bmp.GetAddr()});
     }
 
     int Flush()

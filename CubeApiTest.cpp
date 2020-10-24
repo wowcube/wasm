@@ -1,6 +1,6 @@
 #include "cube_api.h"
 #include <cstdio>
-#include "Resources/happy.res.h"
+#include "Resources/happy.bmp.h"
 
 #define WASM_EXPORT __attribute__((used)) __attribute__((visibility ("default")))
 
@@ -23,8 +23,9 @@ protected:
             disp.FillCircle(120,120, 30, 100, 2);
             if (display == 2) {
                 CBitmap b;
-                if (b.Load(happy_jpg, happy_jpg_len, (int)EBMPFormat::edbJPG)) {
-                    disp.DrawBitmap(0, 0, b, 1, 0, 0);
+                if (b.Load(happy_bmp, happy_bmp_len, (int)EBMPFormat::edb565)) {
+                    NativePrint("TRY DRAW BITMAP %d", b.getSize());
+                    disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
                 }
             }
             disp.Flush();

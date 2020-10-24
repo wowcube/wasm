@@ -11,13 +11,6 @@ extern
 #endif
 int native_invoke(const char* cmd, void* buff, size_t size);
 
-#ifdef __cplusplus
-extern "C"
-#else
-extern
-#endif
-void *load_bitmap(void* ptr, size_t size, int fmt);
-
 #pragma pack(push, 1)
 
 typedef enum {
@@ -123,6 +116,7 @@ typedef struct {
     uint32_t x, y;
     uint32_t scale;  // ignored so far
     int32_t angle;
+    uint64_t size;
     const void* addr;  // MUST be global or static!
 } DrawBitmap_1_0;
 
