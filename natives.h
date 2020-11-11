@@ -38,6 +38,7 @@ typedef struct {
         eTick,
         eGEO,
         eMessage,
+        eShutdown,
     } type;
 
     union {

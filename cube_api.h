@@ -157,13 +157,15 @@ protected:
     }
 
     virtual void OnMessage(const Get_Message_1_0& msg){}
+    virtual void OnShutdown(){}
 
 public:
     virtual int Main()
     {
         Event_1_0 event = {};
-        while (NativeInvoke(event))
+        while (true)
         {
+            NativeInvoke(event);
             switch (event.type){
                 case Event_1_0::eTick:
                     if (!OnTick(event.time))
@@ -175,6 +177,9 @@ public:
                 case Event_1_0::eMessage:
                     OnMessage(event.msg_size);
                     break;
+                case Event_1_0::eShutdown:
+                    OnShutdown();
+                    return 0;
             }
         }
         return 0;
