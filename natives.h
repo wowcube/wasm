@@ -3,13 +3,19 @@
 #include "stddef.h"
 #include "stdint.h"
 
-#ifdef __cplusplus
-    #define WASM_EXPORT extern "C" __attribute__((used)) __attribute__((visibility ("default")))
+#ifndef _WIN32
+#define VISIBILITY  __attribute__((used)) __attribute__((visibility ("default")))
 #else
-    #define WASM_EXPORT extern __attribute__((used)) __attribute__((visibility ("default")))
+#define VISIBILITY
+#endif
+#ifdef __cplusplus
+    #define WASM_EXPORT extern "C" VISIBILITY
+#else
+    #define WASM_EXPORT extern VISIBILITY
 #endif
 
-#ifdef __EMSCRIPTEN__
+
+#if defined(__EMSCRIPTEN__) || defined(_WIN32)
     #define WASM_MAGIC_RESOLVE
 #else
     #define WASM_MAGIC_RESOLVE  __attribute__((weak))
@@ -18,7 +24,7 @@
 //IMPORTANT: must never be called with local pointers, use NativeInvoke function or similar techniques
 //this is the only function for communication with native
 
-WASM_EXPORT int32_t WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff, size_t size); // return value meaning might differer depending on the cmd
+WASM_EXPORT int32_t WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff, uint32_t size); // return value meaning might differer depending on the cmd
 //for simple cases it might be used as cmd="GetTemperatureOnMars", buff = nullptr, size = 0, and the temperature will be returned as the native_invoke return value
 //the complex cases should pass the input arguments and receive the output arguments, the return value of the function should be treated as the error code
 //by default, 0 means "no problem"
@@ -44,7 +50,7 @@ typedef struct {
     union {
         uint32_t time;      // when eTick, RTOS_getTimeMs
         EGeoFlags geo_flags;  // combination of EGeoFlags when eGEO
-        size_t msg_size;    // when eMessage
+        uint32_t msg_size;    // when eMessage
     };
 } Event_1_0;
 
@@ -58,7 +64,7 @@ typedef struct
 {
     uint8_t to_cid;
     void* data;
-    size_t size;
+    uint32_t size;
 } Send_Message_1_0;
 
 typedef struct
@@ -69,7 +75,7 @@ typedef struct
 typedef struct
 {
     const char* buff; //null terminated string, must be globally/statically allocated to work
-    size_t size;
+    uint16_t size;
 } Print_1_0;
 
 uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
