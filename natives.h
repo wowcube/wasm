@@ -120,6 +120,7 @@ typedef struct {
     uint32_t x, y;
     uint32_t scale;
     int32_t angle;
+    uint8_t size;
     const char* str;  // MUST be global or static!
 } DrawText_1_0;
 
