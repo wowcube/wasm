@@ -67,10 +67,10 @@ typedef struct
     uint32_t size;
 } Send_Message_1_0;
 
-typedef struct
-{
+//typedef struct
+//{
 
-} Get_TRBL_1_0;
+//} Get_TRBL_1_0;
 
 typedef struct
 {
@@ -137,7 +137,7 @@ typedef struct {
     uint32_t x, y;
     uint32_t scale;  // ignored so far
     int32_t angle;
-    uint64_t size;
+    uint32_t size;
     const void* addr;  // MUST be global or static!
 } DrawBitmap_1_0;
 
