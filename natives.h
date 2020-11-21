@@ -121,7 +121,7 @@ typedef struct {
     int displayNumber;
 } Flush_1_0;
 
-typedef enum {edbRLE, edb565, edbJPG} EBMPFormat;
+typedef enum {epfNone, epfRLE, epfRGB565, epfJPG} EPictureFormat;
 
 typedef struct {
     uint8_t displayNumber;
@@ -138,10 +138,18 @@ typedef struct {
 typedef struct {
     const void* source;  // MUST be global or static!
     uint16_t source_size;
-    EBMPFormat source_format;
+    EPictureFormat source_format;
     void* target;  // MUST be global or static! If null is given, target_size will be calculated
     uint16_t target_size;
-    EBMPFormat target_format;
+    EPictureFormat target_format;
 } Transform_1_0;
+
+typedef enum {esfStop, esfMidi, esfMP3, esfWAV} ESoundFormat;
+
+typedef struct {
+    ESoundFormat fmt;
+    const void* ptr;  // MUST be global or static!
+    uint16_t size;
+} Sound_1_0;
 
 #pragma pack(pop)
