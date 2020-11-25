@@ -70,8 +70,8 @@ protected:
                 disp.FillCircle(120,120, 30, 100, 2);
                 if (display == 2) {
                     CBitmap b;
-                    if (b.Load(happy_bmp, happy_bmp_len, (int)EBMPFormat::edb565)) {
-                        //NativePrint("TRY DRAW BITMAP %d", b.getSize());
+                    if (b.Load(happy_bmp, happy_bmp_len, (int)EPictureFormat::epfRGB565)) {
+                        NativePrint("TRY DRAW BITMAP %d", b.GetSize());
                         disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
                     }
                 }
