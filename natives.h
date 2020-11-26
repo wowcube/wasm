@@ -8,8 +8,15 @@
 #else
 #define VISIBILITY
 #endif
+    
+#if !defined(__EMSCRIPTEN__) && defined(_WIN32)
+    #define WASM_DLL_EXPORT  __declspec( dllexport ) 
+#else 
+    #define WASM_DLL_EXPORT 
+#endif
+
 #ifdef __cplusplus
-    #define WASM_EXPORT extern "C" VISIBILITY
+    #define WASM_EXPORT extern "C" VISIBILITY WASM_DLL_EXPORT
 #else
     #define WASM_EXPORT extern VISIBILITY
 #endif
@@ -29,7 +36,12 @@ WASM_EXPORT int32_t WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff
 //the complex cases should pass the input arguments and receive the output arguments, the return value of the function should be treated as the error code
 //by default, 0 means "no problem"
 
+#if !defined(__EMSCRIPTEN__) && defined(_WIN32)
+ static  int32_t native_invoke(const char* cmd, void* buff, uint32_t size){
+        return 0;
+    }
 
+#endif
 #pragma pack(push, 1)
 
 typedef enum {
@@ -67,10 +79,12 @@ typedef struct
     uint32_t size;
 } Send_Message_1_0;
 
-//typedef struct
-//{
-
-//} Get_TRBL_1_0;
+typedef struct
+{   // keil ругается на структуры, в которых нет полей и не собирается
+    // добавил дефолтные поля
+    void* data;
+    uint32_t size;
+} Get_TRBL_1_0;
 
 typedef struct
 {

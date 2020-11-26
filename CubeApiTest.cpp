@@ -67,7 +67,7 @@ protected:
                 disp.DrawLine(0,0,240,240, 100);
                 disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
                 disp.DrawPixelAlpha(66, 66, 255, 2);
-                disp.FillCircle(120,120, 30, 100, 2);
+                //disp.FillCircle(120,120, 30, 100, 2);
                 if (display == 2) {
                     CBitmap b;
                     if (b.Load(happy_bmp, happy_bmp_len, (int)EPictureFormat::epfRGB565)) {

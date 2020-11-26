@@ -43,7 +43,7 @@ public:
     ~CBitmap() {
         Free();
     }
-    bool Load(void* ptr, size_t size, int fmt)
+    bool Load(void* ptr, uint32_t size, int fmt)
     {
         Free();
         switch (fmt) {
@@ -62,7 +62,7 @@ public:
     }
 
     const void* GetAddr()   const {   return m_data;     }
-    size_t GetSize()        const {   return m_size;     }
+    uint32_t GetSize()        const {   return m_size;     }
     EPictureFormat GetFormat()  const {   return m_format;   }
 
 protected:
@@ -74,7 +74,7 @@ protected:
         m_format = epfNone;
     }
     void *m_data = nullptr;
-    size_t m_size = 0;
+    uint32_t m_size = 0;
     EPictureFormat m_format = epfNone;
 };
 
@@ -189,7 +189,7 @@ protected:
         }
     }
 
-    virtual void OnMessage(size_t size)
+    virtual void OnMessage(uint32_t size)
     {
         Get_Message_1_0 msg = {};
         msg.data = malloc(size);
