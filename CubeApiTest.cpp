@@ -41,6 +41,7 @@ CCubeNet<240*2/pixel, bool> g_cube;
 class CEventLoopEx: public CEventLoop
 {
     int m_nPos = 0;
+    uint32_t m_nPrevTime = 0;
 protected:
     virtual bool OnTick(uint32_t time)
     {
@@ -53,9 +54,13 @@ protected:
                 Update(disp);
 
             if (display == 1)
+            {
                 for (uint16_t y = 0; y < g_cube.height; ++y)
                     for (uint16_t x = 0; x < g_cube.width; ++x)
                         disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
+                ++m_nPos %= 240;
+                disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
+            }
 
             if (display == 2)
             {
@@ -65,16 +70,23 @@ protected:
                 disp.FillCircle(120,120, 30, 100, 2);
                 if (display == 2) {
                     CBitmap b;
-                    if (b.Load(happy_bmp, happy_bmp_len, (int)EBMPFormat::edb565)) {
-                        NativePrint("TRY DRAW BITMAP %d", b.getSize());
+                    if (b.Load(happy_bmp, happy_bmp_len, (int)EPictureFormat::epfRGB565)) {
+                        NativePrint("TRY DRAW BITMAP %d", b.GetSize());
                         disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
                     }
                 }
             }
 
-            ++m_nPos %= 240;
-            disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
-            NativePrint("Draw for display %d, time: %d\n", display, time);
+            if (m_nPrevTime)
+            {
+                uint32_t diff = time - m_nPrevTime;
+                static char buff[20] = {};
+                sprintf(buff, "fps: %f", 1000. / diff);
+                disp.DrawText(0, 0, buff, fColor(1,1,1), 30);
+            }
+            m_nPrevTime = time;
+
+            //NativePrint("Draw for display %d, time: %d\n", display, time);
         }
         return CEventLoop::OnTick(time);
     }

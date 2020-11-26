@@ -41,35 +41,76 @@ class CBitmap
 {
 public:
     ~CBitmap() {
-        free(m_data);
+        Free();
     }
-    bool Load(void* ptr, size_t size, int fmt) {
+    bool Load(void* ptr, size_t size, int fmt)
+    {
+        Free();
         switch (fmt) {
-        case EBMPFormat::edb565:
-            m_data = malloc(size);
-            memcpy(m_data, ptr, size);
-            break;
-        default:
-            NativePrint("Format not supported");
-            return false;
+            case EPictureFormat::epfRGB565:
+                m_data = malloc(size);
+                memcpy(m_data, ptr, size);
+                m_size = size;
+                m_format = (EPictureFormat)fmt;
+                return true;
+            default:
+                NativePrint("Format not supported");
+                return false;
         }
 
-        if (m_data != nullptr) {
-            m_size = size;
-            m_format = (EBMPFormat)fmt;
-            return true;
-        }
         return false;
     }
 
     const void* GetAddr()   const {   return m_data;     }
-    size_t getSize()        const {   return m_size;     }
-    EBMPFormat GetFormat()  const {   return m_format;   }
+    size_t GetSize()        const {   return m_size;     }
+    EPictureFormat GetFormat()  const {   return m_format;   }
 
-private:
+protected:
+    void Free()
+    {
+        free(m_data);
+        m_data = nullptr;
+        m_size = 0;
+        m_format = epfNone;
+    }
     void *m_data = nullptr;
     size_t m_size = 0;
-    EBMPFormat m_format = edbRLE;
+    EPictureFormat m_format = epfNone;
+};
+
+class CSound
+{
+public:
+    bool Load(ESoundFormat esf, const void* ptr, uint16_t size)
+    {
+        switch (esf) {
+            case ESoundFormat::esfMidi:
+                m_data = malloc(size);
+                memcpy(m_data, ptr, size);
+                m_size = size;
+                m_format = esf;
+                return true;
+            default:
+                NativePrint("Format not supported");
+                return false;
+        }
+
+        return false;
+    }
+
+    int32_t Play()
+    {
+        return NativeInvoke(Sound_1_0{m_format, m_data, m_size});
+    }
+
+    int32_t Stop()
+    {
+        return NativeInvoke(Sound_1_0{ESoundFormat::esfStop});
+    }
+protected:
+    void* m_data = nullptr;
+    ESoundFormat m_format = ESoundFormat::esfStop;
+    uint16_t m_size = 0;
 };
 
 class CDisplay
@@ -113,7 +154,7 @@ public:
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)
     {
-        return NativeInvoke(DrawBitmap_1_0{(uint8_t)m_nDisplay, (uint8_t)bmp.GetFormat(), mirror, x, y, scale, angle, bmp.getSize(), bmp.GetAddr()});
+        return NativeInvoke(DrawBitmap_1_0{(uint8_t)m_nDisplay, (uint8_t)bmp.GetFormat(), mirror, x, y, scale, angle, bmp.GetSize(), bmp.GetAddr()});
     }
 
     int Flush()
