@@ -37,9 +37,20 @@ WASM_EXPORT int32_t WASM_MAGIC_RESOLVE native_invoke(const char* cmd, void* buff
 //by default, 0 means "no problem"
 
 #if !defined(__EMSCRIPTEN__) && defined(_WIN32)
- static  int32_t native_invoke(const char* cmd, void* buff, uint32_t size){
-        return 0;
+#include <windows.h>
+
+static  int32_t native_invoke(const char* cmd, void* buff, uint32_t size){
+    typedef int32_t(*native_invoke_t)(const char* cmd, void* buff, uint32_t size);
+    static native_invoke_t fn = nullptr;
+    if (!fn)
+    {
+        char val[40] = {};
+        GetEnvironmentVariableA("wowcube_native_invoke", val, sizeof(val));
+        fn = reinterpret_cast<native_invoke_t>((uintptr_t)_strtoui64(val, nullptr, 16));
     }
+
+    return fn(cmd, buff, size);
+}
 
 #endif
 #pragma pack(push, 1)

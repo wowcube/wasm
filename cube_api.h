@@ -149,7 +149,7 @@ public:
     {
         static char buff[256] = {};
         strncpy(buff, text, 255);
-        return NativeInvoke(DrawText_1_0{(uint8_t)m_nDisplay, color, x, y, scale, angle, (uint8_t)std::min(strlen(text), (size_t)255), buff});
+        return NativeInvoke(DrawText_1_0{(uint8_t)m_nDisplay, color, x, y, scale, angle, (uint8_t)(std::min)(strlen(text), (size_t)255), buff});
     }
 
     int DrawBitmap(uint32_t x, uint32_t y, const CBitmap& bmp, uint32_t scale = 1, int32_t angle = 0, uint8_t mirror = 0)
