@@ -179,13 +179,29 @@ protected:
         return true;
     }
 
+    virtual void OnTRBLChanged(const Get_TRBL_1_0&) {}
+    virtual void OnGyroChanged(const Get_Gyro_1_0&) {}
+    virtual void OnAccelChanged(const Get_Accel_1_0&) {}
+
     virtual void OnGeoChanged(unsigned char geo_flags)
     {
         if (geo_flags & egfTRBL)
         {
             Get_TRBL_1_0 trbl = {};
             NativeInvoke(trbl);
-            //TODO: OnTRBLChanged();
+            OnTRBLChanged(trbl);
+        }
+        if (geo_flags & egfGyro)
+        {
+            Get_Gyro_1_0 gyro = {};
+            NativeInvoke(gyro);
+            OnGyroChanged(gyro);
+        }
+        if (geo_flags & egfAccel)
+        {
+            Get_Accel_1_0 accel = {};
+            NativeInvoke(accel);
+            OnAccelChanged(accel);
         }
     }
 
