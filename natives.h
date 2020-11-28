@@ -91,10 +91,10 @@ typedef struct
 } Send_Message_1_0;
 
 typedef struct
-{   // keil ругается на структуры, в которых нет полей и не собирается
-    // добавил дефолтные поля
-    void* data;
-    uint32_t size;
+{
+    uint8_t CID[8][3];
+    uint8_t CFID[8][3];
+    uint8_t CFMID[8][3];
 } Get_TRBL_1_0;
 
 typedef struct
@@ -189,5 +189,6 @@ typedef struct {
     int16_t axis_Y;
     int16_t axis_Z;
 } Get_Accel_1_0, Get_Gyro_1_0;
+
 
 #pragma pack(pop)
