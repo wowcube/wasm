@@ -56,9 +56,9 @@ static  int32_t native_invoke(const char* cmd, void* buff, uint32_t size){
 #pragma pack(push, 1)
 
 typedef enum {
-    egfTRBL = 0x1,  // Get_TRBL_1_0
-    egfGyro = 0x2,  // Get_Gyro_1_0
-    egfAccel = 0x4, // Get_Accel_1_0
+    egfTRBL  = 0x1,  // Get_TRBL_1_0
+    egfGyro  = 0x2,  // Get_Gyro_1_0
+    egfAccel = 0x4,  // Get_Accel_1_0
 } EGeoFlags;
 
 
@@ -71,9 +71,9 @@ typedef struct {
     } type;
 
     union {
-        uint32_t time;      // when eTick, RTOS_getTimeMs
-        EGeoFlags geo_flags;  // combination of EGeoFlags when eGEO
-        uint32_t msg_size;    // when eMessage
+        uint32_t    time;           // when eTick, RTOS_getTimeMs
+        EGeoFlags   geo_flags;      // combination of EGeoFlags when eGEO
+        uint32_t    msg_size;       // when eMessage
     };
 } Event_1_0;
 
@@ -183,5 +183,11 @@ typedef struct {
     const void* ptr;  // MUST be global or static!
     uint16_t size;
 } Sound_1_0;
+
+typedef struct {
+    int16_t axis_X;
+    int16_t axis_Y;
+    int16_t axis_Z;
+} Get_Accel_1_0, Get_Gyro_1_0;
 
 #pragma pack(pop)
