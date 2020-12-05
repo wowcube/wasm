@@ -229,12 +229,15 @@ public:
                     if (!OnTick(event.time))
                         return 0;
                     break;
+
                 case Event_1_0::eGEO:
                     OnGeoChanged(event.geo_flags);
                     break;
+
                 case Event_1_0::eMessage:
                     OnMessage(event.msg_size);
                     break;
+
                 case Event_1_0::eShutdown:
                     OnShutdown();
                     return 0;
