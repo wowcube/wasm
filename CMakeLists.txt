@@ -18,6 +18,11 @@ endif()
 file(GLOB CORE_HDR *.h)
 file(GLOB CORE_SRC *.cpp) 
 
+set_source_files_properties(
+  ${WASM_SRC}
+  PROPERTIES
+  COMPILE_FLAGS "/wd4996"
+)
 
 add_library(example SHARED ${CORE_SRC} ${CORE_HDR})
 
