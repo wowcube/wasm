@@ -83,6 +83,11 @@ typedef struct
     void* data; // must be pre-allocated by receiver to msg_size
 } Get_Message_1_0;
 
+enum ESendTo {
+    estSelf = 8,
+    estAll  = 0xFF
+};
+
 typedef struct
 {
     uint8_t to_cid;

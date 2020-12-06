@@ -38,11 +38,62 @@ char b[k*k] = {};
 const uint16_t pixel = 10;
 CCubeNet<240*2/pixel, bool> g_cube;
 
+
 class CEventLoopEx: public CEventLoop
 {
     int m_nPos = 0;
     uint32_t m_nPrevTime = 0;
+    uint8_t m_myCID = 0;
+    Get_TRBL_1_0 m_trbl = {};
+
+    size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
+        uint8_t result[3][8];
+
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 3; j++)
+                result[j][i] = matrix[i][j];
+
+        int l = 0;
+        for (int j = 0; j < 3; j++) {
+            if (j)
+                buffer[l++] = '\n';
+            for (int i = 0; i < 8; i++) {
+                if (i)
+                    buffer[l++] = ' ';
+                l += sprintf(&buffer[l], "%x", result[j][i]);
+            }
+        }
+        buffer[l++] = 0;
+        return l;
+    }
+
+    Get_Gyro_1_0 m_gyro = {};
+    Get_Accel_1_0 m_accel = {};
 protected:
+    virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl)
+    {
+        m_trbl = trbl;
+        char buffer[256];
+        print_transpon(m_trbl.CID, buffer);
+        NativePrint("OnTRBLChanged CID %s", buffer);
+
+        print_transpon(m_trbl.CFID, buffer);
+        NativePrint("OnTRBLChanged CFID %s", buffer);
+
+        print_transpon(m_trbl.CFMID, buffer);
+        NativePrint("OnTRBLChanged CFMID %s", buffer);
+    }
+    virtual void OnGyroChanged(const Get_Gyro_1_0& gyro)
+    {
+        m_gyro = gyro;
+        NativePrint("OnGyroChanged X:%d Y:%d Z:%d", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
+    }
+    virtual void OnAccelChanged(const Get_Accel_1_0& accel)
+    {
+        m_accel = accel;
+        NativePrint("OnAccelChanged X:%d Y:%d Z:%d", accel.axis_X, accel.axis_Y, accel.axis_Z);
+    }
+
     virtual bool OnTick(uint32_t time)
     {
         for (int display = 0; display < 3; ++display)
@@ -124,6 +175,11 @@ protected:
 
     virtual void OnMessage(const Get_Message_1_0& msg)
     {
+
+        if (!msg.data) {
+            m_myCID = msg.from_cid;
+        }
+
         NativePrint("Msg from %d: %s", msg.from_cid, (const char*)msg.data);
         char answer[] = "I am fine too!";
         NativeInvoke(Send_Message_1_0{msg.from_cid, answer, sizeof(answer)});
@@ -134,6 +190,7 @@ public:
     {
         NativePrint("Hello WOWd\n");
         Randomize();
+        NativeInvoke( Send_Message_1_0{ estSelf, NULL, 0 } );
         return CEventLoop::Main();
     }
 };
