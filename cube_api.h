@@ -31,8 +31,9 @@ int NativePrint(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     static char buff[1024] = {};
+    memset(buff, 0, sizeof(buff));
     vsprintf(buff, fmt, ap);
-    int32_t res = NativeInvoke(Print_1_0{(char*)buff, 1024});
+    int32_t res = NativeInvoke(Print_1_0{(char*)buff, sizeof(buff) });
     va_end(ap);
     return res;
 }
@@ -100,12 +101,12 @@ public:
 
     int32_t Play()
     {
-        return NativeInvoke(Sound_1_0{m_format, m_data, m_size});
+        return NativeInvoke(Sound_1_0{ static_cast<uint8_t>(m_format), m_data, m_size});
     }
 
     int32_t Stop()
     {
-        return NativeInvoke(Sound_1_0{ESoundFormat::esfStop});
+        return NativeInvoke(Sound_1_0{ static_cast<uint8_t>(ESoundFormat::esfStop)});
     }
 protected:
     void* m_data = nullptr;
@@ -224,21 +225,22 @@ public:
         while (true)
         {
             NativeInvoke(event);
-            switch (event.type){
-                case Event_1_0::eTick:
+            NativePrint("Main event type:%d", event.type);
+            switch (event.type) {
+                case EventType::eTick:
                     if (!OnTick(event.time))
                         return 0;
                     break;
 
-                case Event_1_0::eGEO:
+                case EventType::eGEO:
                     OnGeoChanged(event.geo_flags);
                     break;
 
-                case Event_1_0::eMessage:
+                case EventType::eMessage:
                     OnMessage(event.msg_size);
                     break;
 
-                case Event_1_0::eShutdown:
+                case EventType::eShutdown:
                     OnShutdown();
                     return 0;
             }
