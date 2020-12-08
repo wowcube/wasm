@@ -86,12 +86,12 @@ protected:
     virtual void OnGyroChanged(const Get_Gyro_1_0& gyro)
     {
         m_gyro = gyro;
-        NativePrint("OnGyroChanged X:%d Y:%d Z:%d", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
+        NativePrint("OnGyroChanged X:%x Y:%x Z:%x", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
     }
     virtual void OnAccelChanged(const Get_Accel_1_0& accel)
     {
         m_accel = accel;
-        NativePrint("OnAccelChanged X:%d Y:%d Z:%d", accel.axis_X, accel.axis_Y, accel.axis_Z);
+        NativePrint("OnAccelChanged X:%x Y:%x Z:%x", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
     virtual bool OnTick(uint32_t time)

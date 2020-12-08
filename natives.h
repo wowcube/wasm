@@ -61,14 +61,15 @@ typedef enum {
     egfAccel = 0x4,  // Get_Accel_1_0
 } EGeoFlags;
 
+typedef enum  {
+    eTick,
+    eGEO,
+    eMessage,
+    eShutdown,
+}EventType;
 
 typedef struct {
-    enum Event{
-        eTick,
-        eGEO,
-        eMessage,
-        eShutdown,
-    } type;
+    uint8_t type;                   // EventType
 
     union {
         uint32_t    time;           // when eTick, RTOS_getTimeMs
@@ -105,7 +106,7 @@ typedef struct
 typedef struct
 {
     const char* buff; //null terminated string, must be globally/statically allocated to work
-    uint16_t size;
+    uint32_t size;
 } Print_1_0;
 
 uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
@@ -184,7 +185,7 @@ typedef struct {
 typedef enum {esfStop, esfMidi, esfMP3, esfWAV} ESoundFormat;
 
 typedef struct {
-    ESoundFormat fmt;
+    uint8_t fmt;
     const void* ptr;  // MUST be global or static!
     uint16_t size;
 } Sound_1_0;
@@ -193,7 +194,12 @@ typedef struct {
     int16_t axis_X;
     int16_t axis_Y;
     int16_t axis_Z;
-} Get_Accel_1_0, Get_Gyro_1_0;
+} Get_Accel_1_0;
 
+typedef struct {
+    int16_t axis_X;
+    int16_t axis_Y;
+    int16_t axis_Z;
+} Get_Gyro_1_0;
 
 #pragma pack(pop)
