@@ -5,6 +5,11 @@ typedef int cell;
 #define false 0
 #define true 1
 typedef int stock;
+#define pow pawn_pow
+
+cell sendpacket(const packet[], const size);
+cell ABS(cell);
+cell GetSign(cell);
 
 cell abi_GetCubeN();
 cell abi_SetCubeN(cell cubeN);
