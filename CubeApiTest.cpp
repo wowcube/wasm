@@ -46,7 +46,7 @@ class CEventLoopEx: public CEventLoop
     uint8_t m_myCID = 0;
     Get_TRBL_1_0 m_trbl = {};
 
-    size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
+/*    size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
         uint8_t result[3][8];
 
         for (int i = 0; i < 8; i++)
@@ -66,14 +66,16 @@ class CEventLoopEx: public CEventLoop
         buffer[l++] = 0;
         return l;
     }
+*/
 
     Get_Gyro_1_0 m_gyro = {};
     Get_Accel_1_0 m_accel = {};
+
 protected:
     virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl)
     {
         m_trbl = trbl;
-        char buffer[256];
+/*        char buffer[256];
         print_transpon(m_trbl.CID, buffer);
         NativePrint("OnTRBLChanged CID %s", buffer);
 
@@ -82,16 +84,19 @@ protected:
 
         print_transpon(m_trbl.CFMID, buffer);
         NativePrint("OnTRBLChanged CFMID %s", buffer);
+*/
     }
+
     virtual void OnGyroChanged(const Get_Gyro_1_0& gyro)
     {
         m_gyro = gyro;
-        NativePrint("OnGyroChanged X:%x Y:%x Z:%x", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
+        //NativePrint("OnGyroChanged X:%x Y:%x Z:%x", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
     }
+
     virtual void OnAccelChanged(const Get_Accel_1_0& accel)
     {
         m_accel = accel;
-        NativePrint("OnAccelChanged X:%x Y:%x Z:%x", accel.axis_X, accel.axis_Y, accel.axis_Z);
+        //NativePrint("OnAccelChanged X:%x Y:%x Z:%x", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
     virtual bool OnTick(uint32_t time)
@@ -110,7 +115,9 @@ protected:
                     for (uint16_t x = 0; x < g_cube.width; ++x)
                         disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
                 ++m_nPos %= 240;
-                disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
+                char buf[64];
+                snprintf(buf, sizeof(buf), "X:%d Y:%d Z:%d", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
+                disp.DrawText(120-(strlen(buf)/2), 120, buf, fColor(1,1,1), 30, m_nPos % 360);
             }
 
             if (display == 2)

@@ -31,7 +31,6 @@ int NativePrint(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     static char buff[1024] = {};
-    memset(buff, 0, sizeof(buff));
     vsprintf(buff, fmt, ap);
     int32_t res = NativeInvoke(Print_1_0{(char*)buff, sizeof(buff) });
     va_end(ap);
@@ -44,6 +43,7 @@ public:
     ~CBitmap() {
         Free();
     }
+
     bool Load(void* ptr, uint32_t size, int fmt)
     {
         Free();
@@ -54,6 +54,7 @@ public:
                 m_size = size;
                 m_format = (EPictureFormat)fmt;
                 return true;
+
             default:
                 NativePrint("Format not supported");
                 return false;
@@ -62,9 +63,9 @@ public:
         return false;
     }
 
-    const void* GetAddr()   const {   return m_data;     }
-    uint32_t GetSize()        const {   return m_size;     }
-    EPictureFormat GetFormat()  const {   return m_format;   }
+    const void* GetAddr() const { return m_data;     }
+    uint32_t GetSize() const { return m_size;     }
+    EPictureFormat GetFormat() const { return m_format;   }
 
 protected:
     void Free()
@@ -74,6 +75,7 @@ protected:
         m_size = 0;
         m_format = epfNone;
     }
+
     void *m_data = nullptr;
     uint32_t m_size = 0;
     EPictureFormat m_format = epfNone;
@@ -91,6 +93,7 @@ public:
                 m_size = size;
                 m_format = esf;
                 return true;
+
             default:
                 NativePrint("Format not supported");
                 return false;
@@ -101,13 +104,14 @@ public:
 
     int32_t Play()
     {
-        return NativeInvoke(Sound_1_0{ static_cast<uint8_t>(m_format), m_data, m_size});
+        return NativeInvoke(Sound_1_0{ static_cast<uint32_t>(m_format), m_data, m_size});
     }
 
     int32_t Stop()
     {
-        return NativeInvoke(Sound_1_0{ static_cast<uint8_t>(ESoundFormat::esfStop)});
+        return NativeInvoke(Sound_1_0{ static_cast<uint32_t>(ESoundFormat::esfStop)});
     }
+
 protected:
     void* m_data = nullptr;
     ESoundFormat m_format = ESoundFormat::esfStop;
@@ -192,12 +196,14 @@ protected:
             NativeInvoke(trbl);
             OnTRBLChanged(trbl);
         }
+
         if (geo_flags & egfGyro)
         {
             Get_Gyro_1_0 gyro = {};
             NativeInvoke(gyro);
             OnGyroChanged(gyro);
         }
+
         if (geo_flags & egfAccel)
         {
             Get_Accel_1_0 accel = {};
@@ -225,7 +231,6 @@ public:
         while (true)
         {
             NativeInvoke(event);
-            NativePrint("Main event type:%d", event.type);
             switch (event.type) {
                 case EventType::eTick:
                     if (!OnTick(event.time))
