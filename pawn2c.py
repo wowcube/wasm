@@ -10,7 +10,8 @@ e_switches = re.compile(r"case")
 
 def scanBasicReplacement(lines):
     linesRes = re.sub(r'#.*$', '', lines,flags=re.MULTILINE)
-    linesRes = re.sub(r'forward\s+|native\s+|public\s+', '', linesRes,flags=re.MULTILINE)
+    linesRes = re.sub(r'forward.*$|native.*$', '', linesRes,flags=re.MULTILINE)
+    linesRes = re.sub(r'public\s+', '', linesRes,flags=re.MULTILINE)
     linesRes = re.sub(r"bool\:", "bool ", linesRes, flags=re.MULTILINE)
     linesRes = re.sub(r"]\s*=\s*0\s*;", "]={0};", linesRes, flags=re.MULTILINE)
     return linesRes
@@ -201,10 +202,18 @@ def MakeSource(lines,isPorted):
     return resHeader, resSource
 
 def CreateFile(fileName):
+    if (not os.path.isfile(fileName)):
+        raise Exception("No file found")
     if os.name == 'nt':
-        os.system("pawncc.exe " + fileName + " -l")
+        if (os.path.isfile("pawncc.exe")):
+            os.system("pawncc.exe " + fileName + " -l")
+        else:
+            raise Exception("No pawncc.exe found")
     else:
-        os.system("./pawncc " + fileName + " -l")
+        if (os.path.isfile("./pawncc")):
+            os.system("./pawncc " + fileName + " -l")
+        else:
+            raise Exception("No pawncc found")
 
     basicFileName = re.sub(r"\.pwn|\.lst", "",fileName)
     lines = open(basicFileName + ".lst").read()
@@ -220,4 +229,6 @@ def CreateFile(fileName):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        raise Exception("Invalid arguments. Proper usage: python3 pawn2c.py filename.pwn")
     CreateFile(sys.argv[1])
