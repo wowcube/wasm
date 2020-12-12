@@ -3,7 +3,7 @@ import sys
 import re
 
 e_arrays = re.compile(r"new\s+(const)?\s*([a-zA-Z_][_a-zA-Z0-9]+)\s*(\[.+\])+\s*=\s*([\s\S]*?)\s*;")
-e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<name>[_a-zA-Z0-9]+)(?P<isArray>\[\])?")
+e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<name>[_a-zA-Z0-9:]+)(?P<isArray>\[\])?")
 e_func = re.compile(r"^([_a-zA-Z][_a-zA-Z0-9]+)\((.*)\)\s*{",flags=re.MULTILINE)
 e_case = re.compile(r"case\s*(\d.*)*\:")
 e_switches = re.compile(r"case")
@@ -12,7 +12,6 @@ def scanBasicReplacement(lines):
     linesRes = re.sub(r'#.*$', '', lines,flags=re.MULTILINE)
     linesRes = re.sub(r'forward.*$|native.*$', '', linesRes,flags=re.MULTILINE)
     linesRes = re.sub(r'public\s+', '', linesRes,flags=re.MULTILINE)
-    linesRes = re.sub(r"bool\:", "bool ", linesRes, flags=re.MULTILINE)
     linesRes = re.sub(r"]\s*=\s*0\s*;", "]={0};", linesRes, flags=re.MULTILINE)
     return linesRes
 
@@ -199,6 +198,7 @@ def MakeSource(lines,isPorted):
     resHeaderTmp, resTmp = scanFunctions(resSource,True)
     resSource = resTmp
     resHeader += resHeaderTmp
+    resSource = re.sub(r"bool\:", "bool ", resSource, flags=re.MULTILINE)
     return resHeader, resSource
 
 def CreateFile(fileName):
