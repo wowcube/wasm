@@ -1,7 +1,14 @@
 
 
+#define new signed
+#define bool int
+#define false 0
+#define true 1
+
 #include "header.h"
 
+#define run pawn_run
+#define pow pawn_pow
 
 
 

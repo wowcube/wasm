@@ -195,8 +195,38 @@ public:
     }
 };
 
+#include "rubic/header.h"
+
+extern "C" int pawn_run(cell* pkt, int size, int* src);
+
+bool TASK_pawnScriptRunner()
+{
+    
+
+
+    cell amx_pkt_tick[] = {CMD_TICK, 0, 0, 0};
+    cell amx_pkt_geo[20] = {0};
+    cell amx_pkt_mtd[16] = {0};
+
+    pawn_run(amx_pkt_geo, sizeof(amx_pkt_geo)/sizeof(cell), 0);
+    pawn_run((cell*)amx_pkt_mtd, sizeof(amx_pkt_mtd)/sizeof(cell), 0);
+
+    for (int i = 0; i < 1000; ++i)
+        pawn_run((cell*)amx_pkt_tick, sizeof(amx_pkt_tick)/sizeof(cell), 0);
+
+    return true;
+}
+
+
 WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
+    TASK_pawnScriptRunner();
     //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();
+}
+
+
+WC_EXTERN_C int sendpacket(int* packet, int size)
+{
+    return 0;
 }

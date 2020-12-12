@@ -19,12 +19,18 @@ file(GLOB CORE_HDR *.h)
 file(GLOB CORE_SRC *.cpp) 
 
 set_source_files_properties(
-  ${WASM_SRC}
+  ${CORE_SRC}
   PROPERTIES
   COMPILE_FLAGS "/wd4996"
 )
 
-add_library(example SHARED ${CORE_SRC} ${CORE_HDR})
+set_source_files_properties(
+  rubic/rubic.c
+  PROPERTIES
+  COMPILE_FLAGS "/wd4033 /wd4716"
+)
+
+add_library(example SHARED ${CORE_SRC} ${CORE_HDR} rubic/rubic.c)
 
 
 
