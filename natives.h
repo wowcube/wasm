@@ -69,7 +69,7 @@ typedef enum  {
 }EventType;
 
 typedef struct {
-    uint8_t type;                   // EventType
+    uint32_t type;                   // EventType
 
     union {
         uint32_t    time;           // when eTick, RTOS_getTimeMs
@@ -185,7 +185,7 @@ typedef struct {
 typedef enum {esfStop, esfMidi, esfMP3, esfWAV} ESoundFormat;
 
 typedef struct {
-    uint8_t fmt;
+    uint32_t fmt;
     const void* ptr;  // MUST be global or static!
     uint16_t size;
 } Sound_1_0;
