@@ -190,15 +190,13 @@ def MakeSource(lines,isPorted):
     #pdb.set_trace()
     resSource = ScanSwitches(resSource)
     resSource = scanCase(resSource)
-    resHeader = ""
-    resHeader += "typedef int cell;\n"
+    resHeader = '#include "pawn2c.h"\n'
     resHeader += "#define new signed\n"
     resHeader += "#define bool int\n"
     resHeader += "#define false 0\n"
     resHeader += "#define true 1\n"
-    resHeader += "typedef int stock;\n"  
     resHeaderTmp, resTmp = scanFunctions(resSource,True)
-    resSource = resTmp    
+    resSource = resTmp
     resHeader += resHeaderTmp
     return resHeader, resSource
 
@@ -216,9 +214,10 @@ def CreateFile(fileName):
     headerFile.write(header)
     headerFile.close()
     portedFile = open(basicFileName + ".c", "w")
-    portedFile.write("#include \"" + basicFileName + ".h" + "\"\n")
+    portedFile.write("#include \"" + os.path.basename(basicFileName) + ".h" + "\"\n")
     portedFile.write(ported)
     portedFile.close()
+
 
 if __name__ == "__main__":
     CreateFile(sys.argv[1])
