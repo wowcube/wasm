@@ -23,7 +23,7 @@ set_source_files_properties(
 set_source_files_properties(
   ${CORE_SRC}
   PROPERTIES
-  COMPILE_FLAGS "/wd4033 /wd4716"
+  COMPILE_FLAGS "/wd4033 /wd4716 /wd4996"
 )
 
 include_directories(..)
