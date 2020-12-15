@@ -3,7 +3,7 @@ import sys
 import re
 
 e_arrays = re.compile(r"new\s+(const)?\s*([a-zA-Z_][_a-zA-Z0-9]+)\s*(\[.+\])+\s*=\s*([\s\S]*?)\s*;")
-e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<name>[_a-zA-Z0-9:]+)(?P<isArray>\[\])?")
+e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<type>[_a-zA-Z0-9:]+)(?P<isArray>\[\])?\s*(?P<name>[_a-zA-Z0-9:]+)?")
 e_func = re.compile(r"^([_a-zA-Z][_a-zA-Z0-9]+)\((.*)\)\s*{",flags=re.MULTILINE)
 e_case = re.compile(r"case\s*(\d.*)*\:")
 e_switches = re.compile(r"case")
@@ -13,6 +13,7 @@ def scanBasicReplacement(lines):
     linesRes = re.sub(r'forward.*$|native.*$', '', linesRes,flags=re.MULTILINE)
     linesRes = re.sub(r'public\s+', '', linesRes,flags=re.MULTILINE)
     linesRes = re.sub(r"]\s*=\s*0\s*;", "]={0};", linesRes, flags=re.MULTILINE)
+    linesRes = re.sub(r"bool\:", "bool ", linesRes, flags=re.MULTILINE)
     return linesRes
 
 def scanCase(lines):
@@ -97,31 +98,23 @@ def newFunction(isPorted,parsed):
         match = e_arg.search(argStr)
         if match is None:
             return ""
-        isConst = match.group("isConst")
-        if isConst is None:
-            isConst = False
-        else:
-            isConst = True
-        name = match.group("name")
-        isArray = match.group("isArray")
-        if isArray is None:
-            isArray = False
-        else:
-            isArray = True
+        isConst, type, isArray, name = match.groups()
         resultLine = ""
-        if (isPorted == False):
+        if not isPorted:
             if isConst:
                 resultLine += "const" + " "
-            if (isArray == False):
-                resultLine += name
+            if not isArray:
+                resultLine += type
             else:
-                resultLine += name + "[]"
+                resultLine += type + "[]"
         else:
-            if (isArray == False):
+            if not isArray:
                 resultLine += "cell" + " "
             else:
                 resultLine += "cell*" + " "
-            resultLine += name
+            resultLine += type
+        if name:
+            resultLine += ' ' + name
         return resultLine    
     funcProto = ""
     first = True
@@ -157,7 +150,7 @@ def scanFunctions(lines, isPorted = False):
         parsed["name"], parsed["parameters"] = match.groups()
         proto, func = newFunction(isPorted=isPorted,parsed=parsed)
         resultLines += func
-        resultProto += proto
+        resultProto += scanBasicReplacement(proto)
       
     #pdb.set_trace()
     if (len(lines) - 1 != endSymbol):
@@ -198,7 +191,6 @@ def MakeSource(lines,isPorted):
     resHeaderTmp, resTmp = scanFunctions(resSource,True)
     resSource = resTmp
     resHeader += resHeaderTmp
-    resSource = re.sub(r"bool\:", "bool ", resSource, flags=re.MULTILINE)
     return resHeader, resSource
 
 def CreateFile(fileName):
