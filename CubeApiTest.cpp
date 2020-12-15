@@ -115,9 +115,10 @@ protected:
                     for (uint16_t x = 0; x < g_cube.width; ++x)
                         disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
                 ++m_nPos %= 240;
-                char buf[64];
+
+                static char buf[64];
                 snprintf(buf, sizeof(buf), "X:%d Y:%d Z:%d", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
-                disp.DrawText(120-(strlen(buf)/2), 120, buf, fColor(1,1,1), 30, m_nPos % 360);
+                disp.DrawText(120-(strlen(buf)/2), 100, buf, fColor(0,1,0), 3, 0);
             }
 
             if (display == 2)

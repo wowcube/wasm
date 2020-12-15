@@ -1,4 +1,6 @@
 #pragma once
+#ifndef WASM_NATIVES_H
+#define WASM_NATIVES_H
 
 #include "stddef.h"
 #include "stdint.h"
@@ -151,7 +153,7 @@ typedef struct {
     uint32_t x, y;
     uint32_t scale;
     int32_t angle;
-    uint8_t size;
+    uint16_t size;
     const char* str;  // MUST be global or static!
 } DrawText_1_0;
 
@@ -203,3 +205,4 @@ typedef struct {
 } Get_Gyro_1_0;
 
 #pragma pack(pop)
+#endif
