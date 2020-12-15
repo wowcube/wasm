@@ -4,7 +4,7 @@ import re
 
 e_arrays = re.compile(r"new\s+(const)?\s*([a-zA-Z_][_a-zA-Z0-9]+)\s*(\[.+\])+\s*=\s*([\s\S]*?)\s*;")
 e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<type>[_a-zA-Z0-9:]+)(?P<isArray>\[\])?\s*(?P<name>[_a-zA-Z0-9:]+)?")
-e_func = re.compile(r"^([_a-zA-Z][_a-zA-Z0-9]+)\((.*)\)\s*{",flags=re.MULTILINE)
+e_func = re.compile(r"^([_a-zA-Z][_a-zA-Z0-9]+\s+)?([_a-zA-Z][_a-zA-Z0-9]+)\((.*)\)\s*{",flags=re.MULTILINE)
 e_case = re.compile(r"case\s*(\d.*)*\:")
 e_switches = re.compile(r"case")
 
@@ -147,7 +147,7 @@ def scanFunctions(lines, isPorted = False):
         if (prevSymbol == len(lines)):
             break
         parsed = {}
-        parsed["name"], parsed["parameters"] = match.groups()
+        type, parsed["name"], parsed["parameters"] = match.groups()
         proto, func = newFunction(isPorted=isPorted,parsed=parsed)
         resultLines += func
         resultProto += scanBasicReplacement(proto)
