@@ -12,6 +12,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_ENABLE_C99}")
 file(GLOB CORE_HDR *.h)
 file(GLOB CORE_SRC *.c) 
 
+set(CORE_SRC ${CORE_SRC} PawnRunner.cpp) 
+
 #[[
 set_source_files_properties(
   ${CORE_SRC}
@@ -27,7 +29,7 @@ set_source_files_properties(
 )
 
 include_directories(..)
-add_library(rubic SHARED ${CORE_SRC} ${CORE_HDR} CubeApiTest.cpp)
+add_library(rubic SHARED ${CORE_SRC} ${CORE_HDR})
 
 
 
