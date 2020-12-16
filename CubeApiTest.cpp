@@ -70,6 +70,7 @@ class CEventLoopEx: public CEventLoop
 
     Get_Gyro_1_0 m_gyro = {};
     Get_Accel_1_0 m_accel = {};
+    bool m_bRelayRace = false;
 
 protected:
     virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl)
@@ -116,9 +117,9 @@ protected:
                         disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
                 ++m_nPos %= 240;
 
-                static char buf[64];
+                static char buf[64] = {};
                 snprintf(buf, sizeof(buf), "X:%d Y:%d Z:%d", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
-                disp.DrawText(120-(strlen(buf)/2), 100, buf, fColor(0,1,0), 3, 0);
+                disp.DrawText(120-uint32_t(strlen(buf)/2), 100, buf, fColor(0,1,0), 3, 0);
             }
 
             if (display == 2)
@@ -126,7 +127,7 @@ protected:
                 disp.DrawLine(0,0,240,240, 100);
                 disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
                 disp.DrawPixelAlpha(66, 66, 255, 2);
-                //disp.FillCircle(120,120, 30, 100, 2);
+                
                 if (display == 2) {
                     CBitmap b;
                     if (b.Load(happy_bmp, happy_bmp_len, (int)EPictureFormat::epfRGB565)) {
@@ -134,6 +135,11 @@ protected:
                         disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
                     }
                 }
+            }
+
+            if (m_bRelayRace)
+            {
+                disp.FillCircle(120,120, 60, 100, 2);
             }
 
             if (m_nPrevTime)
@@ -181,16 +187,24 @@ protected:
             Randomize();
     }
 
-    virtual void OnMessage(const Get_Message_1_0& msg)
+    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg)
     {
-
-        if (!msg.data) {
+        static char race[] = "race!";
+        static char race_ok[] = "race_ok";
+        if (!msg.data) {//comes only once at start to set own CID
             m_myCID = msg.from_cid;
+            if (m_myCID == 0) //starting the relay race!
+                NativeSend(1, race);
         }
-
-        NativePrint("Msg from %d: %s", msg.from_cid, (const char*)msg.data);
-        char answer[] = "I am fine too!";
-        NativeInvoke(Send_Message_1_0{msg.from_cid, answer, sizeof(answer)});
+        else if (size == sizeof(race) && strcmp(race, (const char*)msg.data))
+        {
+            m_bRelayRace = true;
+            NativeSend(msg.from_cid, race_ok); //confirming we took it
+        }
+        else if (size == sizeof(race_ok) && strcmp(race_ok, (const char*)msg.data))
+        {
+            m_bRelayRace = false;
+        }
     }
 
 public:
@@ -203,38 +217,8 @@ public:
     }
 };
 
-#include "rubic/header.h"
-
-extern "C" int pawn_run(cell* pkt, int size, int* src);
-
-bool TASK_pawnScriptRunner()
-{
-    
-
-
-    cell amx_pkt_tick[] = {CMD_TICK, 0, 0, 0};
-    cell amx_pkt_geo[20] = {0};
-    cell amx_pkt_mtd[16] = {0};
-
-    pawn_run(amx_pkt_geo, sizeof(amx_pkt_geo)/sizeof(cell), 0);
-    pawn_run((cell*)amx_pkt_mtd, sizeof(amx_pkt_mtd)/sizeof(cell), 0);
-
-    for (int i = 0; i < 1000; ++i)
-        pawn_run((cell*)amx_pkt_tick, sizeof(amx_pkt_tick)/sizeof(cell), 0);
-
-    return true;
-}
-
-
 WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
-    TASK_pawnScriptRunner();
     //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();
-}
-
-
-WC_EXTERN_C int sendpacket(int* packet, int size)
-{
-    return 0;
 }

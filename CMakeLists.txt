@@ -24,13 +24,7 @@ set_source_files_properties(
   COMPILE_FLAGS "/wd4996"
 )
 
-set_source_files_properties(
-  rubic/rubic.c
-  PROPERTIES
-  COMPILE_FLAGS "/wd4033 /wd4716"
-)
-
-add_library(example SHARED ${CORE_SRC} ${CORE_HDR} rubic/rubic.c)
+add_library(example SHARED ${CORE_SRC} ${CORE_HDR})
 
 add_subdirectory(rubic)
 

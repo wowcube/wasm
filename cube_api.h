@@ -31,8 +31,19 @@ int NativePrint(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     static char buff[1024] = {};
-    vsprintf(buff, fmt, ap);
-    int32_t res = NativeInvoke(Print_1_0{(char*)buff, sizeof(buff) });
+    int len = vsprintf(buff, fmt, ap);
+    int32_t res = NativeInvoke(Print_1_0{(char*)buff, (uint32_t)len });
+    va_end(ap);
+    return res;
+}
+
+int NativeSend(uint8_t to_cid, const char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    static char buff[1024] = {};
+    int len = vsprintf(buff, fmt, ap);
+    int32_t res = NativeInvoke(Send_Message_1_0{to_cid, (char*)buff, (uint32_t)len });
     va_end(ap);
     return res;
 }
@@ -118,6 +129,7 @@ protected:
     uint16_t m_size = 0;
 };
 
+#undef DrawText
 class CDisplay
 {
 public:
@@ -217,11 +229,11 @@ protected:
         Get_Message_1_0 msg = {};
         msg.data = malloc(size);
         NativeInvoke(msg); //getting actual message
-        OnMessage(msg);
+        OnMessage(size, msg);
         free(msg.data);
     }
 
-    virtual void OnMessage(const Get_Message_1_0& msg){}
+    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg){}
     virtual void OnShutdown(){}
 
 public:

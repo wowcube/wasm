@@ -113,7 +113,7 @@ protected:
         disp.FillRect(x, y, w, h, fill ? fColor(1,0,0) : fColor(0,0,1));
     }
 
-    virtual void OnMessage(const Get_Message_1_0& msg)
+    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg)
     {
 
         if (!msg.data) {
