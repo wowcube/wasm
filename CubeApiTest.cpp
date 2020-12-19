@@ -91,13 +91,13 @@ protected:
     virtual void OnGyroChanged(const Get_Gyro_1_0& gyro)
     {
         m_gyro = gyro;
-        //NativePrint("OnGyroChanged X:%x Y:%x Z:%x", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
+        //NativePrint("OnGyroChanged X:%f Y:%f Z:%f", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
     }
 
     virtual void OnAccelChanged(const Get_Accel_1_0& accel)
     {
         m_accel = accel;
-        //NativePrint("OnAccelChanged X:%x Y:%x Z:%x", accel.axis_X, accel.axis_Y, accel.axis_Z);
+        //NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
     virtual bool OnTick(uint32_t time)
@@ -116,10 +116,10 @@ protected:
                     for (uint16_t x = 0; x < g_cube.width; ++x)
                         disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
                 ++m_nPos %= 240;
-
-                static char buf[64] = {};
-                snprintf(buf, sizeof(buf), "X:%d Y:%d Z:%d", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
-                disp.DrawText(120-uint32_t(strlen(buf)/2), 100, buf, fColor(0,1,0), 3, 0);
+                disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
+                //static char buf[64] = {};
+                //snprintf(buf, sizeof(buf), "X:%f Y:%f Z:%f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
+                //disp.DrawText(5, 100, buf, fColor(0,1,0), 3, 0);
             }
 
             if (display == 2)
@@ -145,8 +145,8 @@ protected:
             if (m_nPrevTime)
             {
                 uint32_t diff = time - m_nPrevTime;
-                static char buff[20] = {};
-                sprintf(buff, "fps: %f", 1000. / diff);
+                static char buff[32] = {};
+                snprintf(buff, sizeof(buff), "fps: %f", 1000. / diff);
                 disp.DrawText(0, 0, buff, fColor(1,1,1), 30);
             }
             m_nPrevTime = time;
@@ -191,6 +191,7 @@ protected:
     {
         static char race[] = "race!";
         static char race_ok[] = "race_ok";
+
         if (!msg.data) {//comes only once at start to set own CID
             m_myCID = msg.from_cid;
             if (m_myCID == 0) //starting the relay race!

@@ -193,15 +193,15 @@ typedef struct {
 } Sound_1_0;
 
 typedef struct {
-    int16_t axis_X;
-    int16_t axis_Y;
-    int16_t axis_Z;
+    float axis_X;
+    float axis_Y;
+    float axis_Z;
 } Get_Accel_1_0;
 
 typedef struct {
-    int16_t axis_X;
-    int16_t axis_Y;
-    int16_t axis_Z;
+    float axis_X;
+    float axis_Y;
+    float axis_Z;
 } Get_Gyro_1_0;
 
 #pragma pack(pop)
