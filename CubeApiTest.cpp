@@ -127,11 +127,11 @@ protected:
                 disp.DrawLine(0,0,240,240, 100);
                 disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
                 disp.DrawPixelAlpha(66, 66, 255, 2);
-                
+
                 if (display == 2) {
                     CBitmap b;
                     if (b.Load(happy_bmp, happy_bmp_len, (int)EPictureFormat::epfRGB565)) {
-                        NativePrint("TRY DRAW BITMAP %d", b.GetSize());
+                        //NativePrint("TRY DRAW BITMAP %d", b.GetSize());
                         disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
                     }
                 }
@@ -175,7 +175,7 @@ protected:
         char c[k*k] = {};
         for (int y = k * k; y--;) {
             int n = 0;
-            for (int f = 9; f--;) //going around 
+            for (int f = 9; f--;) //going around
                 n += b[(y / k + k + f % 3 - 1) % k * k + (y + k + f / 3 - 1) % k];
             c[y] = (n == 3) || (n - b[y] == 3);
             Draw(disp, y % k * g, (y / k) * g, g - 1, g - 1, c[y]);
@@ -194,11 +194,15 @@ protected:
 
         if (!msg.data) {//comes only once at start to set own CID
             m_myCID = msg.from_cid;
-            if (m_myCID == 0) //starting the relay race!
+            NativePrint("I know my cid!! %d", m_myCID);
+            if (m_myCID == 0) { //starting the relay race!
+                NativePrint("**************Start race**************");
                 NativeSend(1, race);
+            }
         }
         else if (size == sizeof(race) && strcmp(race, (const char*)msg.data))
         {
+            NativePrint("Have message from %d", msg.from_cid);
             m_bRelayRace = true;
             NativeSend(msg.from_cid, race_ok); //confirming we took it
         }
@@ -213,7 +217,7 @@ public:
     {
         NativePrint("Hello WOWd\n");
         Randomize();
-        NativeInvoke( Send_Message_1_0{ estSelf, NULL, 0 } );
+        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
         return CEventLoop::Main();
     }
 };

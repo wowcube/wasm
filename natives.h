@@ -10,11 +10,11 @@
 #else
 #define VISIBILITY
 #endif
-    
+
 #if !defined(__EMSCRIPTEN__) && defined(_WIN32)
-    #define WASM_DLL_EXPORT  __declspec( dllexport ) 
-#else 
-    #define WASM_DLL_EXPORT 
+    #define WASM_DLL_EXPORT  __declspec( dllexport )
+#else
+    #define WASM_DLL_EXPORT
 #endif
 
 #ifdef __cplusplus
@@ -83,6 +83,7 @@ typedef struct {
 typedef struct
 {
     uint8_t from_cid;
+    uint32_t size;
     void* data; // must be pre-allocated by receiver to msg_size
 } Get_Message_1_0;
 
@@ -94,8 +95,8 @@ enum ESendTo {
 typedef struct
 {
     uint8_t to_cid;
-    void* data;
     uint32_t size;
+    void* data;
 } Send_Message_1_0;
 
 typedef struct

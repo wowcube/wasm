@@ -122,14 +122,14 @@ protected:
 
         NativePrint("Msg from %d: %s", msg.from_cid, (const char*)msg.data);
         char answer[] = "I am fine too!";
-        NativeInvoke(Send_Message_1_0{msg.from_cid, answer, sizeof(answer)});
+        NativeInvoke(Send_Message_1_0{msg.from_cid, sizeof(answer), answer});
     }
 
 public:
     virtual int Main()
     {
         NativePrint("Hello WOWd\n");
-        NativeInvoke( Send_Message_1_0{ estSelf, NULL, 0 } );
+        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
         return CEventLoop::Main();
     }
 };
