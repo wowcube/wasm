@@ -191,24 +191,23 @@ protected:
     {
         static char race[] = "race!";
         static char race_ok[] = "race_ok";
-
-        if (!msg.data) {//comes only once at start to set own CID
+        if (msg.size == 0) {//comes only once at start to set own CID
             m_myCID = msg.from_cid;
-            NativePrint("I know my cid!! %d", m_myCID);
             if (m_myCID == 0) { //starting the relay race!
-                NativePrint("**************Start race**************");
+                m_bRelayRace = true;
                 NativeSend(1, race);
             }
-        }
-        else if (size == sizeof(race) && strcmp(race, (const char*)msg.data))
-        {
-            NativePrint("Have message from %d", msg.from_cid);
-            m_bRelayRace = true;
-            NativeSend(msg.from_cid, race_ok); //confirming we took it
-        }
-        else if (size == sizeof(race_ok) && strcmp(race_ok, (const char*)msg.data))
-        {
-            m_bRelayRace = false;
+        } else {
+            if (size == sizeof(race) && !strcmp(race, (const char*)msg.data)) {
+                m_bRelayRace = true;
+                NativeSend(msg.from_cid, race_ok); //confirming we took it
+                NativeSend(m_myCID == 7 ? 0 : m_myCID + 1, race); //send race to another
+            } else {
+                if (size == sizeof(race_ok) && !strcmp(race_ok, (const char*)msg.data))
+                {
+                    m_bRelayRace = false;
+                }
+            }
         }
     }
 

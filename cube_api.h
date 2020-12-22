@@ -43,6 +43,11 @@ int NativeSend(uint8_t to_cid, const char* fmt, ...)
     va_start(ap, fmt);
     static char buff[1024] = {};
     int len = vsprintf(buff, fmt, ap);
+    NativePrint("NativeSend: %d %s", len, (char*)buff);
+    if (len > 0) {
+        len += 1;
+        buff[len + 1] = '\0';
+    }
     int32_t res = NativeInvoke(Send_Message_1_0{to_cid, (uint32_t)len, (char*)buff});
     va_end(ap);
     return res;
@@ -228,6 +233,7 @@ protected:
     {
         Get_Message_1_0 msg = {};
         msg.data = malloc(size);
+        msg.size = size;
         NativeInvoke(msg); //getting actual message
         OnMessage(size, msg);
         free(msg.data);
