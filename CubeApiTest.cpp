@@ -202,7 +202,7 @@ protected:
             if (size == sizeof(race) && !strcmp(race, (const char*)msg.data)) {
                 m_bRelayRace = true;
                 NativeSend(msg.from_cid, race_ok); //confirming we took it
-                NativeSend(m_myCID == 7 ? 0 : m_myCID + 1, race); //send race to another
+                NativeSend((m_myCID + 1) % 8, race); //send race to another
             } else {
                 if (size == sizeof(race_ok) && !strcmp(race_ok, (const char*)msg.data))
                 {
