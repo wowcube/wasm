@@ -7,6 +7,16 @@
 #include <cstdlib>
 #include <algorithm>
 
+void* GetSharableMem(size_t size)
+{
+    static size_t current_size = 0;
+    static void* current_mem = nullptr;
+    if (size <= current_size)
+        return current_mem;
+    free(current_mem);
+    current_mem = malloc(size);
+    return current_mem;
+}
 
 template<class T>
 int32_t NativeInvoke(const T& val) // calls native by struct name
@@ -30,9 +40,10 @@ int NativePrint(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    static char buff[1024] = {};
-    int len = vsprintf(buff, fmt, ap);
-    int32_t res = NativeInvoke(Print_1_0{(char*)buff, (uint32_t)len });
+    int len = vsnprintf(nullptr, 0, fmt, ap); //len is without trailing 0
+    char* buff = (char*)GetSharableMem(len+1);
+    vsprintf(buff, fmt, ap);
+    int32_t res = NativeInvoke(Print_1_0{(char*)buff, (uint32_t)len+1 });
     va_end(ap);
     return res;
 }
@@ -41,9 +52,11 @@ int NativeSend(uint8_t to_cid, const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    static char buff[1024] = {};
-    int len = vsprintf(buff, fmt, ap);
-    int32_t res = NativeInvoke(Send_Message_1_0{to_cid, (uint32_t)len, (char*)buff});
+
+    int len = vsnprintf(nullptr, 0, fmt, ap); //len is without trailing 0
+    char* buff = (char*)GetSharableMem(len + 1);
+    vsprintf(buff, fmt, ap);
+    int32_t res = NativeInvoke(Send_Message_1_0{to_cid, (uint32_t)len+1, (char*)buff});
     va_end(ap);
     return res;
 }

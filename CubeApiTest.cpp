@@ -192,7 +192,7 @@ protected:
         static char race[] = "race!";
         static char race_ok[] = "race_ok";
 
-        if (!msg.data) {//comes only once at start to set own CID
+        if (!size) {//comes only once at start to set own CID
             m_myCID = msg.from_cid;
             NativePrint("I know my cid!! %d", m_myCID);
             if (m_myCID == 0) { //starting the relay race!
