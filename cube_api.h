@@ -241,6 +241,7 @@ protected:
     {
         Get_Message_1_0 msg = {};
         msg.data = malloc(size);
+        msg.size = size;
         NativeInvoke(msg); //getting actual message
         OnMessage(size, msg);
         free(msg.data);
