@@ -1,43 +1,6 @@
 #include "../cube_api.h"
 #include <cstdio>
 
-template<uint16_t _size, class T>
-class CCubeNet
-{
-public:
-    static const uint16_t width = _size * 4;
-    static const uint16_t height = _size * 3;
-    static const uint16_t size = _size;
-
-    T& At(int16_t x, int16_t y)
-    {
-        x %= width;
-        y %= height;
-        int16_t nx = 0;
-        int16_t ny = 0;
-        if (size < y < 2*size || size < x < 2*size) // direct mapping on the cross
-        {
-            nx = x;
-            ny = y;
-        } else if (x < size && y < size) {// leftmost upper quadrant
-            nx = size*2 - y;
-            ny = x;
-        }
-        return m_values[ny][nx];
-    }
-
-protected:
-    T m_values[height][width];
-};
-
-const int g = 10;
-const int k = 240 / g;
-char b[k*k] = {};
-
-const uint16_t pixel = 10;
-CCubeNet<240*2/pixel, bool> g_cube;
-
-
 class CEventLoopEx: public CEventLoop
 {
     int m_nPos = 0;
@@ -110,7 +73,7 @@ public:
     virtual int Main()
     {
         NativePrint("Hello WOWd\n");
-        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
+        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} ); //to get own CID, search for m_myCID to see how it is set
         return CEventLoop::Main();
     }
 };
