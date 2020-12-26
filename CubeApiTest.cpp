@@ -70,7 +70,6 @@ class CEventLoopEx: public CEventLoop
 
     Get_Gyro_1_0 m_gyro = {};
     Get_Accel_1_0 m_accel = {};
-    bool m_bRelayRace = false;
 
 protected:
     virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl)
@@ -137,11 +136,6 @@ protected:
                 }
             }
 
-            if (m_bRelayRace)
-            {
-                disp.FillCircle(120,120, 60, 100, 2);
-            }
-
             if (m_nPrevTime)
             {
                 uint32_t diff = time - m_nPrevTime;
@@ -189,26 +183,9 @@ protected:
 
     virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg)
     {
-        static char race[] = "race!";
-        static char race_ok[] = "race_ok";
-
         if (!size) {//comes only once at start to set own CID
             m_myCID = msg.from_cid;
-            if (m_myCID == 0) { //starting the relay race!
-                m_bRelayRace = true;
-                NativeSend(1, race);
-            }
-        } else {
-            if (size == sizeof(race) && !strcmp(race, (const char*)msg.data)) {
-                m_bRelayRace = true;
-                NativeSend(msg.from_cid, race_ok); //confirming we took it
-                NativeSend((m_myCID + 1) % 8, race); //send race to another
-            } else {
-                if (size == sizeof(race_ok) && !strcmp(race_ok, (const char*)msg.data))
-                {
-                    m_bRelayRace = false;
-                }
-            }
+            NativePrint("MY CID IS %d", m_myCID);
         }
     }
 

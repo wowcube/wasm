@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(example LANGUAGES CXX)
+project(race LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,9 +22,6 @@ set_source_files_properties(
   COMPILE_FLAGS "/wd4996"
 )
 
-add_library(example SHARED ${CORE_SRC} ${CORE_HDR})
-
-add_subdirectory(rubic)
-add_subdirectory(race)
-
+include_directories(..)
+add_library(race SHARED ${CORE_SRC} ${CORE_HDR})
 
