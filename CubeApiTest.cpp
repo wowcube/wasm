@@ -43,7 +43,6 @@ class CEventLoopEx: public CEventLoop
 {
     int m_nPos = 0;
     uint32_t m_nPrevTime = 0;
-    uint8_t m_myCID = 0;
     Get_TRBL_1_0 m_trbl = {};
 
 /*    size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
@@ -181,16 +180,17 @@ protected:
             Randomize();
     }
 
-    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg)
+    void OnMessage(uint32_t size, const Get_Message_1_0& msg) override
     {
-        if (!size) {//comes only once at start to set own CID
-            m_myCID = msg.from_cid;
-            NativePrint("MY CID IS %d", m_myCID);
-        }
+    }
+
+    void OwnCID(uint8_t cid) override
+    {
+        NativePrint("MY CID IS %d", cid);
     }
 
 public:
-    virtual int Main()
+    int Main() override
     {
         NativePrint("Hello WOWd\n");
         Randomize();

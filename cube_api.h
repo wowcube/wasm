@@ -19,11 +19,17 @@ void* GetSharableMem(size_t size)
 }
 
 template<class T>
+int32_t NativeInvokeDirect(T& val) // with return args
+{
+    return native_invoke(typeid(T).name(), &val, sizeof(T));
+}
+
+template<class T>
 int32_t NativeInvoke(const T& val) // calls native by struct name
 {
     static T global_value; //only static/global memory can pass the native boundary
     global_value = val;
-    return native_invoke(typeid(T).name(), &global_value, sizeof(T));
+    return NativeInvokeDirect(global_value);
 }
 
 template<class T>
@@ -31,7 +37,7 @@ int32_t NativeInvoke(T& val) // with return args
 {
     static T global_value;
     global_value = val;
-    int res = native_invoke(typeid(T).name(), &global_value, sizeof(T));
+    int res = NativeInvokeDirect(global_value);
     val = global_value;
     return res;
 }
@@ -240,20 +246,26 @@ protected:
     virtual void OnMessage(uint32_t size)
     {
         Get_Message_1_0 msg = {};
-        msg.data = malloc(size);
+        msg.data = GetSharableMem(size);
         msg.size = size;
-        NativeInvoke(msg); //getting actual message
-        OnMessage(size, msg);
-        free(msg.data);
+        NativeInvokeDirect(msg); //getting actual message, must be "Direct" as memory is managed manually here
+        if (size)
+            OnMessage(size, msg);
+        else
+            OwnCID(msg.from_cid);
     }
 
-    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg){}
+    virtual void OwnCID(uint8_t cid){}
+
+    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg){};
 
     virtual void OnShutdown(){}
 
 public:
     virtual int Main()
     {
+        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} ); //to get own CID, search for m_myCID to see how it is set
+
         Event_1_0 event = {};
         while (true)
         {

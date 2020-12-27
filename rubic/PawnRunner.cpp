@@ -113,20 +113,21 @@ protected:
         disp.FillRect(x, y, w, h, fill ? fColor(1,0,0) : fColor(0,0,1));
     }
 
-    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg)
+    void OnMessage(uint32_t size, const Get_Message_1_0& msg) override
     {
-
-        if (!msg.data) {
-            m_myCID = msg.from_cid;
-        }
-
         NativePrint("Msg from %d: %s", msg.from_cid, (const char*)msg.data);
         char answer[] = "I am fine too!";
         NativeInvoke(Send_Message_1_0{msg.from_cid, sizeof(answer), answer});
     }
 
+    void OwnCID(uint8_t cid) override
+    {
+        NativePrint("MY CID IS %d", cid);
+    }
+
+
 public:
-    virtual int Main()
+    int Main() override
     {
         NativePrint("Hello WOWd\n");
         NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
