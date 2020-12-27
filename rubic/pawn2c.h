@@ -23,6 +23,7 @@ typedef int stock;
 #define CMD_G2D_DYNAMIC_TEXTURE CMD_GUI_BASE+17 /* draw dynamic texture to pawn buffer or g2d */ 
 #define CMD_STATE_SAVE         CMD_GUI_BASE+18 /* store game save */
 #define CMD_STATE_SYNC         CMD_GUI_BASE+19 /* Sync game save from master module to other modules */
+#define CMD_EXIT               CMD_GUI_BASE+20 
 
 #define CMD_NET_BASE        20 /* TO UARTs 0-2 */
 #define CMD_NET_TX          CMD_NET_BASE+1 /* CMD_NET_TX{8},line_tx{8},TTL{8},RESERVED{8},<4 CELLs of arbitrary data here>{128} */
