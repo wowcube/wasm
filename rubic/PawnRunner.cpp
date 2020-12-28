@@ -7,7 +7,7 @@ extern "C" int pawn_run(cell* pkt, int size, int* src);
 class CEventLoopEx: public CEventLoop
 {
     uint32_t m_nPrevTime = 0;
-    uint8_t m_myCID = 0;
+    uint8_t m_myCID = 0xFF;
     Get_TRBL_1_0 m_trbl = {};
 
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
@@ -122,6 +122,7 @@ protected:
 
     void OwnCID(uint8_t cid) override
     {
+        m_myCID = cid;
         NativePrint("MY CID IS %d", cid);
     }
 
@@ -130,16 +131,24 @@ public:
     int Main() override
     {
         NativePrint("Hello WOWd\n");
-        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
+        NativeInvoke( Send_Message_1_0{estSelf, 0, NULL} );
         return CEventLoop::Main();
+    }
+
+    void Send(uint8_t line, uint32_t size, void* data)
+    {
+        if (0xFF == m_myCID)
+            return;
+        NativeInvoke(Send_Message_1_0{m_trbl.CID[m_myCID][line], size, data});
     }
 };
 
+CEventLoopEx g_runner;
 
 WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
     //whatever you return here will just be recorded into logs
-    return CEventLoopEx().Main();
+    return g_runner.Main();
 }
 
 
@@ -295,6 +304,8 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         else
             printf("CMD_NET_TX which %d payload too large\n", cmd);
         //NET_sendAMXPacket(line_tx, ttl, payload);
+        
+        g_runner.Send(line_tx, size, payload);
     }
                    break;
 
