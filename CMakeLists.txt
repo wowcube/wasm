@@ -24,6 +24,17 @@ set_source_files_properties(
 
 add_library(example SHARED ${CORE_SRC} ${CORE_HDR})
 
+
+set(WASM_CMD "emcc ${CORE_SRC} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wasm_example.wasm")
+add_custom_target(wasm_example ALL
+  COMMAND cmd /c "${WASM_CMD}"
+  DEPENDS ${CORE_SRC}
+  COMMENT ${WASM_CMD}
+  USES_TERMINAL
+  VERBATIM
+) #WORKING_DIRECTORY dir
+add_dependencies(example wasm_example)
+
 add_subdirectory(rubic)
 add_subdirectory(race)
 

@@ -71,7 +71,7 @@ class CEventLoopEx: public CEventLoop
     Get_Accel_1_0 m_accel = {};
 
 protected:
-    virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl)
+    void OnTRBLChanged(const Get_TRBL_1_0& trbl) override
     {
         m_trbl = trbl;
 /*        char buffer[256];
@@ -86,19 +86,19 @@ protected:
 */
     }
 
-    virtual void OnGyroChanged(const Get_Gyro_1_0& gyro)
+    void OnGyroChanged(const Get_Gyro_1_0& gyro) override
     {
         m_gyro = gyro;
         //NativePrint("OnGyroChanged X:%f Y:%f Z:%f", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
     }
 
-    virtual void OnAccelChanged(const Get_Accel_1_0& accel)
+    void OnAccelChanged(const Get_Accel_1_0& accel) override
     {
         m_accel = accel;
         //NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
-    virtual bool OnTick(uint32_t time)
+    bool OnTick(uint32_t time) override
     {
         for (int display = 0; display < 3; ++display)
         {
