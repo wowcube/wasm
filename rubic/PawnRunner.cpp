@@ -166,7 +166,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
     uint8_t cmd = pkt[0];
     */
     uint8_t* pkt = (uint8_t*)packet;
-    uint16_t sizeUnpacked = size * sizeof(int);
+    uint16_t sizeUnpacked = static_cast<uint16_t>(size * sizeof(int));
     uint8_t cmd = pkt[0];
     
     switch (cmd)

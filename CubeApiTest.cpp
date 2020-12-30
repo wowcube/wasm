@@ -16,7 +16,7 @@ public:
         y %= height;
         int16_t nx = 0;
         int16_t ny = 0;
-        if (size < y < 2*size || size < x < 2*size) // direct mapping on the cross
+        if ((size < y && y < 2*size) || (size < x && x < 2*size)) // direct mapping on the cross
         {
             nx = x;
             ny = y;
