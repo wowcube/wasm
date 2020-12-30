@@ -27,6 +27,7 @@ set_source_files_properties(
 )
 
 include_directories(..)
+# DualCompilation(rubic ${CORE_SRC} ${CORE_HDR})
 add_library(rubic SHARED ${CORE_SRC} ${CORE_HDR})
 
 

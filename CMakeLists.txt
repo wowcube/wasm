@@ -13,27 +13,33 @@ if (UNIX)
 
 endif()
 
+macro(DualCompilation name src hdr)
+  message("DualCompilation ${name}: ${src}, ${hdr}")
+
+  set_source_files_properties(
+    ${src}
+    PROPERTIES
+    COMPILE_FLAGS "/wd4996"
+  )
+
+  add_library(${name} SHARED ${src} ${hdr})
+
+  set(WASM_CMD "emcc ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
+  add_custom_target(wasm_${name} ALL
+    COMMAND cmd /c "${WASM_CMD}"
+    DEPENDS ${src} ${hdr}
+    COMMENT ${WASM_CMD}
+    USES_TERMINAL
+    VERBATIM
+  )
+  add_dependencies(${name} wasm_${name})
+
+endmacro()
+
 file(GLOB CORE_HDR *.h)
-file(GLOB CORE_SRC *.cpp) 
+file(GLOB CORE_SRC *.cpp)
 
-set_source_files_properties(
-  ${CORE_SRC}
-  PROPERTIES
-  COMPILE_FLAGS "/wd4996"
-)
-
-add_library(example SHARED ${CORE_SRC} ${CORE_HDR})
-
-
-set(WASM_CMD "emcc ${CORE_SRC} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wasm_example.wasm")
-add_custom_target(wasm_example ALL
-  COMMAND cmd /c "${WASM_CMD}"
-  DEPENDS ${CORE_SRC}
-  COMMENT ${WASM_CMD}
-  USES_TERMINAL
-  VERBATIM
-) #WORKING_DIRECTORY dir
-add_dependencies(example wasm_example)
+DualCompilation(example ${CORE_SRC} ${CORE_HDR})
 
 add_subdirectory(rubic)
 add_subdirectory(race)

@@ -12,7 +12,7 @@ class CEventLoopEx: public CEventLoop
 
 protected:
 
-    virtual bool OnTick(uint32_t time)
+    bool OnTick(uint32_t time) override
     {
         for (int display = 0; display < 3; ++display)
         {

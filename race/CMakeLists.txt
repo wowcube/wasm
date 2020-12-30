@@ -23,5 +23,6 @@ set_source_files_properties(
 )
 
 include_directories(..)
-add_library(race SHARED ${CORE_SRC} ${CORE_HDR})
+#add_library(race SHARED ${CORE_SRC} ${CORE_HDR})
+DualCompilation(race "${CORE_SRC}" "${CORE_HDR}")
 
