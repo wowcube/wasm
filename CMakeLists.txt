@@ -13,7 +13,10 @@ if (UNIX)
 
 endif()
 
-macro(DualCompilation name src hdr)
+macro(DualCompilation name lsrc lhdr)
+  message("DualCompilation ${name}: ${lsrc}, ${lhdr}")
+  string (REPLACE ";" " " src "${lsrc}")
+  string (REPLACE ";" " " hdr "${lhdr}")
   message("DualCompilation ${name}: ${src}, ${hdr}")
 
   set_source_files_properties(
@@ -22,9 +25,10 @@ macro(DualCompilation name src hdr)
     COMPILE_FLAGS "/wd4996"
   )
 
-  add_library(${name} SHARED ${src} ${hdr})
+  add_library(${name} SHARED ${lsrc} ${lhdr})
 
-  set(WASM_CMD "emcc ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
+  #EMMAKEN_CFLAGS
+  set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
   add_custom_target(wasm_${name} ALL
     COMMAND cmd /c "${WASM_CMD}"
     DEPENDS ${src} ${hdr}
