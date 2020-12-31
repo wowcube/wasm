@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_ENABLE_C99}")
 
 file(GLOB CORE_HDR *.h)
-file(GLOB CORE_SRC *.c) 
+file(GLOB CORE_SRC *.c)
 
 set(CORE_SRC ${CORE_SRC} PawnRunner.cpp) 
 

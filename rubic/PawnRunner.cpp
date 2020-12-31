@@ -1,6 +1,7 @@
 #include "cube_api.h"
 #include <cstdio>
 #include "rubic/header.h"
+#include <map>
 extern "C" int pawn_run(cell* pkt, int size, int* src);
 
 
@@ -9,6 +10,11 @@ class CEventLoopEx: public CEventLoop
     uint32_t m_nPrevTime = 0;
     uint8_t m_myCID = 0xFF;
     Get_TRBL_1_0 m_trbl = {};
+    struct SBuff
+    {
+        uint16_t color;
+    };
+    std::map<int, SBuff> m_buff;
 
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
         uint8_t result[3][8];
@@ -71,40 +77,6 @@ protected:
 
         pawn_run((cell*)amx_pkt_tick, sizeof(amx_pkt_tick)/sizeof(cell), 0);
 
-        for (int display = 0; display < 3; ++display)
-        {
-            CDisplay disp(display);
-            disp.Fill(fColor(1,1,1));
-
-            if (display == 0)
-            {
-
-            }
-
-            if (display == 1)
-            {
-
-            }
-
-            if (display == 2)
-            {
-            }
-            
-            disp.DrawLine(0,0,240,240, 100);
-            disp.DrawPixelAlpha(66, 66, 255, 2);
-            //disp.FillCircle(120,120, 30, 100, 2);
-
-            if (m_nPrevTime)
-            {
-                uint32_t diff = time - m_nPrevTime;
-                static char buff[20] = {};
-                sprintf(buff, "fps: %f", 1000. / diff);
-                disp.DrawText(0, 0, buff, fColor(1,1,1), 30);
-            }
-            m_nPrevTime = time;
-
-            //NativePrint("Draw for display %d, time: %d\n", display, time);
-        }
         return CEventLoop::OnTick(time);
     }
 
@@ -139,7 +111,22 @@ public:
     {
         if (0xFF == m_myCID)
             return;
-        NativeInvoke(Send_Message_1_0{m_trbl.CID[m_myCID][line], size, data});
+        auto copy = GetSharableMem(size);
+        memcpy(copy.get(), data, size);
+        NativeInvoke(Send_Message_1_0{m_trbl.CID[m_myCID][line], size, copy.get()});
+    }
+
+    void FB_FlushTmpFrameBuffer(int screen, int buff)
+    {
+        CDisplay disp(screen);
+        disp.Fill(m_buff[buff].color);
+    }
+    void DISPLAY_flushFramebufferAsync(int screen)
+    {
+    }
+    void FB_fillBuffer(int buff, uint16_t color)
+    {
+        m_buff[buff].color = color;
     }
 };
 
@@ -151,6 +138,7 @@ WASM_EXPORT int run() // native cube code searches for this function and runs as
     return g_runner.Main();
 }
 
+int pawn_tmp_framebuffer = 3; //offscreen display
 
 //TODO: check all (usure) outputs with real data (just search it)
 WC_EXTERN_C int sendpacket(int* packet, int size)
@@ -174,7 +162,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
     case CMD_REDRAW: {
         uint8_t screen = pkt[1];
 
-//        FB_FlushTmpFrameBuffer(screen, pawn_tmp_framebuffer);
+        g_runner.FB_FlushTmpFrameBuffer(screen, pawn_tmp_framebuffer);
 //        if (CUBIOS_isDebugInfoEnabled()) {
 //            FB_drawDebugInfo(screen);
 //        }
@@ -186,7 +174,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
 //        if (CUBIOS_isBluetoothEnabled()) {
 //            FB_drawBluetoothOn(screen);
 //        }
-//        DISPLAY_flushFramebufferAsync(screen);
+        g_runner.DISPLAY_flushFramebufferAsync(screen);
         printf("CMD_REDRAW which %d screen: %d\n",cmd, screen);
     }
                    break;
@@ -197,7 +185,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         uint16_t b = (pkt[3] & 0x1F) << 0; // Bmax=31
         uint32_t packed = r | g | b;
         //// Old:
-        //FB_fillBuffer(pawn_tmp_framebuffer, r | g | b /*packed*/); // RGB565
+        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, r | g | b /*packed*/); // RGB565
         printf("CMD_FILL which %d r,g,b: %d %d %d packed: %08X\n", cmd, pkt[1], pkt[2], pkt[3], packed);
     }
                  break;
@@ -305,7 +293,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
             printf("CMD_NET_TX which %d payload too large\n", cmd);
         //NET_sendAMXPacket(line_tx, ttl, payload);
         
-        g_runner.Send(line_tx, size, payload);
+        g_runner.Send(line_tx, (size-1) * sizeof(int), payload);
     }
                    break;
 
