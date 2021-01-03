@@ -6,13 +6,35 @@
 #include <string.h>
 #include <cstdlib>
 #include <algorithm>
-#include <memory>
 
-template<class T=char>
-auto GetSharableMem(size_t size)
-{
-    return std::unique_ptr<T[]>(new T[size]);
-}
+#if 1
+    #include <memory>
+
+    template<class T=char>
+    auto GetSharableMem(size_t size)
+    {
+        return std::unique_ptr<T[]>(new T[size]);
+    }
+
+#else
+
+    template<class T>
+    class Getter
+    {
+    public:
+        Getter(T*){}
+        T* get()
+        {
+            return nullptr;
+        }
+    };
+
+    template<class T=char>
+    auto GetSharableMem(size_t size)
+    {
+        return Getter<T>(new T[size]);
+    }
+#endif
 
 template<class T>
 int32_t NativeInvokeDirect(T& val) // with return args

@@ -40,7 +40,7 @@ class CEventLoopEx: public CEventLoop
     Get_Gyro_1_0 m_gyro = {};
     Get_Accel_1_0 m_accel = {};
 protected:
-    virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl)
+    void OnTRBLChanged(const Get_TRBL_1_0& trbl) override
     {
         m_trbl = trbl;
         char buffer[256];
@@ -56,14 +56,14 @@ protected:
         cell amx_pkt_geo[20] = {0};
         pawn_run(amx_pkt_geo, sizeof(amx_pkt_geo)/sizeof(cell), 0);
     }
-    virtual void OnGyroChanged(const Get_Gyro_1_0& gyro)
+    void OnGyroChanged(const Get_Gyro_1_0& gyro) override
     {
         m_gyro = gyro;
         NativePrint("OnGyroChanged X:%x Y:%x Z:%x", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
         cell amx_pkt_mtd[16] = {0};
         pawn_run((cell*)amx_pkt_mtd, sizeof(amx_pkt_mtd)/sizeof(cell), 0);
     }
-    virtual void OnAccelChanged(const Get_Accel_1_0& accel)
+    void OnAccelChanged(const Get_Accel_1_0& accel) override
     {
         m_accel = accel;
         NativePrint("OnAccelChanged X:%x Y:%x Z:%x", accel.axis_X, accel.axis_Y, accel.axis_Z);
@@ -71,7 +71,7 @@ protected:
         pawn_run((cell*)amx_pkt_mtd, sizeof(amx_pkt_mtd)/sizeof(cell), 0);
     }
 
-    virtual bool OnTick(uint32_t time)
+    bool OnTick(uint32_t time) override
     {
         cell amx_pkt_tick[] = {CMD_TICK, 0, 0, 0};
 

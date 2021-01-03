@@ -28,7 +28,7 @@ macro(DualCompilation name lsrc lhdr)
   add_library(${name} SHARED ${lsrc} ${lhdr})
 
   #EMMAKEN_CFLAGS
-  set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
+  set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
   add_custom_target(wasm_${name} ALL
     COMMAND cmd /c "${WASM_CMD}"
     DEPENDS ${src} ${hdr}
