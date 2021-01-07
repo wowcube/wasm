@@ -11,7 +11,7 @@
     #include <memory>
 
     template<class T=char>
-    auto GetSharableMem(size_t size)
+    std::unique_ptr<T[]> GetSharableMem(size_t size)
     {
         return std::unique_ptr<T[]>(new T[size]);
     }

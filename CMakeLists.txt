@@ -14,30 +14,31 @@ if (UNIX)
 endif()
 
 macro(DualCompilation name lsrc lhdr)
-  message("DualCompilation ${name}: ${lsrc}, ${lhdr}")
-  string (REPLACE ";" " " src "${lsrc}")
-  string (REPLACE ";" " " hdr "${lhdr}")
-  message("DualCompilation ${name}: ${src}, ${hdr}")
-
-  set_source_files_properties(
-    ${src}
-    PROPERTIES
-    COMPILE_FLAGS "/wd4996"
-  )
-
   add_library(${name} SHARED ${lsrc} ${lhdr})
+  if(WIN32)
+    message("DualCompilation ${name}: ${lsrc}, ${lhdr}")
+    string (REPLACE ";" " " src "${lsrc}")
+    string (REPLACE ";" " " hdr "${lhdr}")
+    message("DualCompilation ${name}: ${src}, ${hdr}")
 
-  #EMMAKEN_CFLAGS
-  set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
-  add_custom_target(wasm_${name} ALL
-    COMMAND cmd /c "${WASM_CMD}"
-    DEPENDS ${src} ${hdr}
-    COMMENT ${WASM_CMD}
-    USES_TERMINAL
-    VERBATIM
-  )
+    set_source_files_properties(
+      ${src}
+      PROPERTIES
+      COMPILE_FLAGS "/wd4996"
+    )
+
+
+    #EMMAKEN_CFLAGS
+    set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
+    add_custom_target(wasm_${name} ALL
+      COMMAND cmd /c "${WASM_CMD}"
+      DEPENDS ${src} ${hdr}
+      COMMENT ${WASM_CMD}
+      USES_TERMINAL
+      VERBATIM
+    )
+  endif()
   add_dependencies(${name} wasm_${name})
-
 endmacro()
 
 file(GLOB CORE_HDR *.h)
