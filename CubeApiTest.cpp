@@ -115,9 +115,9 @@ protected:
                         disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
                 ++m_nPos %= 240;
                 disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
-                //static char buf[64] = {};
-                //snprintf(buf, sizeof(buf), "X:%f Y:%f Z:%f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
-                //disp.DrawText(5, 100, buf, fColor(0,1,0), 3, 0);
+                static char buf[64] = {};
+                snprintf(buf, sizeof(buf), "X:%f Y:%f Z:%f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
+                disp.DrawText(5, 100, buf, fColor(0,1,0), 3, 0);
             }
 
             if (display == 2)
