@@ -333,6 +333,7 @@ cell abi_CMD_FILL_2(cell rgb)
 
 }
 
+// FIXME: what the heck with size? Which should be default? Re-check source code and update
 cell abi_CMD_TEXT(cell* text, cell fontResID, cell x, cell y, cell scale, cell angle, cell r, cell g, cell b, cell size)
 {
 
@@ -521,17 +522,18 @@ cell abi_trigger_nightlamp(cell c_mode)
 
 }
 
-cell abi_CMD_DYNAMIC_TEXTURE(cell effectId, cell time, cell* args, cell argsCount, cell bool g2d)
-{
-  cell pkt[argsCount+2] = {0};
-  pkt[0] = ((0 + 17) & 0xff) | ((((effectId) & 0xff)) << (((1) % 4) * 8)) | ((((g2d) & 0xff)) << (((2) % 4) * 8));
-  pkt[1] = time;
-  for(new i = 0; i < argsCount; i++)
-    pkt[i + 2] = args[i];
-
-  sendpacket(pkt, argsCount + 2);
-
-}
+// FIXME: Not used in pacman
+//cell abi_CMD_DYNAMIC_TEXTURE(cell effectId, cell time, cell* args, cell argsCount, cell bool g2d)
+//{
+//  cell pkt[argsCount+2] = {0};
+//  pkt[0] = ((0 + 17) & 0xff) | ((((effectId) & 0xff)) << (((1) % 4) * 8)) | ((((g2d) & 0xff)) << (((2) % 4) * 8));
+//  pkt[1] = time;
+//  for(new i = 0; i < argsCount; i++)
+//    pkt[i + 2] = args[i];
+//
+//  sendpacket(pkt, argsCount + 2);
+//
+//}
 
 
 
@@ -2642,7 +2644,7 @@ cell RunGhostBehaviour ()
     }
 }
 
-GetTargetTile (&targetPosX, &targetPosY, &targetCube, &targetFace) {
+cell GetTargetTile (cell *targetPosX, cell *targetPosY, cell *targetCube, cell *targetFace) {
     FindTargetLocation ( targetPosX,  targetPosY,  targetCube,  targetFace);
 
     new xIndex = 0;
@@ -2651,11 +2653,11 @@ GetTargetTile (&targetPosX, &targetPosY, &targetCube, &targetFace) {
     new neighbourCube = 0;
     new neighbourFace = 0;
 
-    if (targetCube == actorCube) {
-        if (targetFace == actorFace) {
+    if (*targetCube == actorCube) {
+        if (*targetFace == actorFace) {
             return;
         } else {
-            if (abi_rightFaceN(abi_cubeN, actorFace) == targetFace) {
+            if (abi_rightFaceN(abi_cubeN, actorFace) == *targetFace) {
                 xIndex = 1;
                 yIndex = 2;
                 neighbourFace = (actorFace - 1) % 3;
@@ -2668,15 +2670,15 @@ GetTargetTile (&targetPosX, &targetPosY, &targetCube, &targetFace) {
         }
     } else {
 
-        if (neighbours[2] == targetCube) {
+        if (neighbours[2] == *targetCube) {
             xIndex = 1;
             neighbourCube = neighbours[2];
             neighbourFace = neighbours[3];
-        } else if (neighbours[4]  == targetCube) {
+        } else if (neighbours[4]  == *targetCube) {
             yIndex = 1;
             neighbourCube = neighbours[4];
             neighbourFace = neighbours[5];
-        } else if (neighbours[6] == targetCube) {
+        } else if (neighbours[6] == *targetCube) {
             xIndex = 1;
             cubesToCheck = 2;
             neighbourCube = neighbours[2];
@@ -2686,33 +2688,33 @@ GetTargetTile (&targetPosX, &targetPosY, &targetCube, &targetFace) {
             xIndex = 1;
             yIndex = 2;
             neighbourFace = (actorFace + 1) % 3;
-            GetExitTileSameCube ( targetPosX,  targetPosY, xIndex, yIndex, neighbourFace);
+            GetExitTileSameCube ( *targetPosX,  *targetPosY, xIndex, yIndex, neighbourFace);
             return;
         }
-        GetExitTileOtherCube( &targetPosX,  &targetPosY, xIndex, yIndex, cubesToCheck, neighbourCube, neighbourFace);
+        GetExitTileOtherCube( targetPosX,  targetPosY, xIndex, yIndex, cubesToCheck, neighbourCube, neighbourFace);
     }
 }
 
-FindGhostRoom (&targetCube, &targetFace) {
+cell FindGhostRoom (cell *targetCube, cell *targetFace) {
     for (new neighbour = 0; neighbour < 8; neighbour += 2) {
         new cube = neighbours[neighbour];
         for (new faceI = 0; faceI < 3; ++faceI){
 
 
             if ((cube < 8) && (patternLevelMap[currentLevelNumber][cube * 3 + faceI] == GHOST_ROOM_PATTERN)) {
-                targetCube = cube;
-                targetFace = faceI;
+                *targetCube = cube;
+                *targetFace = faceI;
                 return;
             }
         }
     }
-    targetCube = actorCube;
-    targetFace = abi_bottomFaceN(actorCube, actorFace);
+    *targetCube = actorCube;
+    *targetFace = abi_bottomFaceN(actorCube, actorFace);
 }
 
-FindTargetLocation (&targetPosX, &targetPosY, &targetCube, &targetFace) {
-    targetPosX = ROOM_CENTER;
-    targetPosY = ROOM_CENTER;
+FindTargetLocation (cell *targetPosX, cell *targetPosY, cell *targetCube, cell *targetFace) {
+    *targetPosX = ROOM_CENTER;
+    *targetPosY = ROOM_CENTER;
 
     if (!wasIEaten) {
         new pacman = actors[0];
@@ -2728,24 +2730,24 @@ FindTargetLocation (&targetPosX, &targetPosY, &targetCube, &targetFace) {
             pacmanPosX *= -1;
         }
 
-        targetCube = pacmanCube;
-        targetFace = pacmanFace;
+        *targetCube = pacmanCube;
+        *targetFace = pacmanFace;
         switch (currentActor) {
             break;case 1: {
-                    targetPosX = pacmanPosX;
-                    targetPosY = pacmanPosY;
+                    *targetPosX = pacmanPosX;
+                    *targetPosY = pacmanPosY;
                 }
             break;case 2: { 
-                    targetPosX = ROOM_CENTER;
-                    targetPosY = ROOM_CENTER - TILE_SIZE;
+                    *targetPosX = ROOM_CENTER;
+                    *targetPosY = ROOM_CENTER - TILE_SIZE;
                 }
             break;case 3: {
-                    targetPosX = ROOM_CENTER - TILE_SIZE;
-                    targetPosY = ROOM_CENTER;
+                    *targetPosX = ROOM_CENTER - TILE_SIZE;
+                    *targetPosY = ROOM_CENTER;
                 }
             break;case 4: { 
-                    targetCube = abi_rightCubeN(pacmanCube, pacmanFace);
-                    targetFace = abi_rightFaceN(pacmanCube, pacmanFace);
+                    *targetCube = abi_rightCubeN(pacmanCube, pacmanFace);
+                    *targetFace = abi_rightFaceN(pacmanCube, pacmanFace);
                 }
         }
     } else {
@@ -2754,14 +2756,14 @@ FindTargetLocation (&targetPosX, &targetPosY, &targetCube, &targetFace) {
             new cube = neighbours[neighbour];
             for (new faceI = 0; faceI < 3; ++faceI){
                 if ((cube < 8) && (patternLevelMap[currentLevelNumber][cube * 3 + faceI] == GHOST_ROOM_PATTERN)) {
-                    targetCube = cube;
-                    targetFace = faceI;
+                    *targetCube = cube;
+                    *targetFace = faceI;
                     return;
                 }
             }
         }
-        targetCube = actorCube;
-        targetFace = abi_bottomFaceN(actorCube, actorFace);
+        *targetCube = actorCube;
+        *targetFace = abi_bottomFaceN(actorCube, actorFace);
     }
 }
 
@@ -2891,7 +2893,8 @@ SendGeneralInfo ()
     abi_CMD_NET_TX(2, 2, data, 0);
 }
 
-SendActor (actorPktNumber) {
+cell SendActor (cell actorPktNumber) 
+{
     new data[4];
 
     data[0] = 10 + 1 | (abi_cubeN << 8) | (currentActor << 16);
@@ -2907,7 +2910,8 @@ SendActor (actorPktNumber) {
 
 
 
-FindNewAngles (farCube) {
+cell FindNewAngles (cell farCube) 
+{
     new angle;
     new neighborCubeN;
     new neighborFaceN;
@@ -2919,7 +2923,7 @@ FindNewAngles (farCube) {
         angle = 180;
         if (farCube == abi_cubeN) {
             newAngles[faceN] = angle;
-            faceCubeSide{faceN} = faceN + ((farCube != 0) * 3);
+            faceCubeSide[faceN] = faceN + ((farCube != 0) * 3);
         }
         for (new count = 0; count < 3; ++count) {
             tmp_cubeN = abi_topCubeN(neighborCubeN, neighborFaceN);
@@ -2930,7 +2934,7 @@ FindNewAngles (farCube) {
             }
             if (tmp_cubeN == abi_cubeN) {
                 newAngles[tmp_faceN] = angle;
-                faceCubeSide{tmp_faceN} = faceN + ((farCube != 0) * 3);
+                faceCubeSide[tmp_faceN] = faceN + ((farCube != 0) * 3);
             }
             neighborCubeN = tmp_cubeN;
             neighborFaceN = tmp_faceN;
@@ -2986,17 +2990,17 @@ DrawActor(who, angle) {
         if (!angle) {
             angle = actorMoveDir * 90;
         }
-        sprite = munchAnim{actorAnimFrame};
+        sprite = munchAnim[actorAnimFrame];
     } else {
         if (!angle) {
             angle = newAngles[actorFace];
         }
         if (actorView & 0x02) {
-            sprite = SCARED_GHOSTS + ghostAnim{actorAnimFrame};
+            sprite = SCARED_GHOSTS + ghostAnim[actorAnimFrame];
         } else {
             if (!wasIEaten) {
 
-                abi_CMD_BITMAP (GHOST_PICS + (actorsSupportData[who] & 0x0F) + ghostAnim{actorAnimFrame}, actorPosX, actorPosY, angle, 0, 0);
+                abi_CMD_BITMAP (GHOST_PICS + (actorsSupportData[who] & 0x0F) + ghostAnim[actorAnimFrame], actorPosX, actorPosY, angle, 0, 0);
 
             }
 
@@ -3007,7 +3011,7 @@ DrawActor(who, angle) {
 
     }
 
-    abi_CMD_BITMAP (sprite, actorPosX, actorPosY, angle, 0);
+    abi_CMD_BITMAP (sprite, actorPosX, actorPosY, angle, 0, 0);
 
 }
 
@@ -3037,7 +3041,7 @@ DrawLevel (faceI) {
         new angle = (portal >> 24) & 0xFF;
         portal &= ~IS_ACTIVE_MASK;
 
-        abi_CMD_BITMAP (portal & 0xFF, ROOM_CENTER, ROOM_CENTER, angle << 1, 0);
+        abi_CMD_BITMAP (portal & 0xFF, ROOM_CENTER, ROOM_CENTER, angle << 1, 0, 0);
 
         new exitCube = (portal >> 8) & 0xF;
 
@@ -3087,10 +3091,10 @@ DrawCountdown () {
     if (curSecond <= startTimer) {
 
         abi_CMD_BITMAP ((RESOURCES_NUMBERS + startTimer - curSecond) * (curSecond < startTimer) + READY_LABEL * (curSecond == startTimer),
-                            120, 120, 0, 0);
+                            120, 120, 0, 0, 0);
 
     } else {
-        ticksTillStart = isCountdownLaunch = 0
+        ticksTillStart = isCountdownLaunch = 0;
         SetGameState (eFSM_playing);
     }
 }
@@ -3099,33 +3103,33 @@ DrawResults (face) {
     switch (newAngles[face]) {
         break;case 0: { 
 
-                    abi_CMD_BITMAP(MOVES_LABEL, 120, 80,   0, 0); 
+                    abi_CMD_BITMAP(MOVES_LABEL, 120, 80,   0, 0, 0); 
 
                     Parse (moves, 120, 120, 0, 0, 1);
         }
         break;case 90: { 
 
-                    abi_CMD_BITMAP(SCORES_LABEL, 130, 120,  90, 0); 
+                    abi_CMD_BITMAP(SCORES_LABEL, 130, 120,  90, 0, 0); 
 
                     Parse (score, 100, 120,  90, 1, 1); 
         }
         break;case 180: { 
                     if (isLevelFinished == 1) {
 
-                        abi_CMD_BITMAP(GAME_OVER_ICON,  120, 170, 180, 0); 
-                        abi_CMD_BITMAP(RED_LINE,        120,  75, 180, 0); 
-                        abi_CMD_BITMAP(GAME_OVER_LABEL, 120, 100, 180, 0); 
-                        abi_CMD_BITMAP(TWIST_TO_PLAY,   120,  40, 180, 0); 
+                        abi_CMD_BITMAP(GAME_OVER_ICON,  120, 170, 180, 0, 0); 
+                        abi_CMD_BITMAP(RED_LINE,        120,  75, 180, 0, 0); 
+                        abi_CMD_BITMAP(GAME_OVER_LABEL, 120, 100, 180, 0, 0); 
+                        abi_CMD_BITMAP(TWIST_TO_PLAY,   120,  40, 180, 0, 0); 
 
                     } else {
 
-                        abi_CMD_BITMAP(LEVEL_FINISHED, 120, 120, 180, 0);
+                        abi_CMD_BITMAP(LEVEL_FINISHED, 120, 120, 180, 0, 0);
 
                     } 
         }
         break;case 270: { 
 
-                    abi_CMD_BITMAP(PILLS_LABEL, 100, 120, 270, 0); 
+                    abi_CMD_BITMAP(PILLS_LABEL, 100, 120, 270, 0, 0); 
 
                     Parse (pillsCollected, 130, 110, 270, 1, 0); 
         }
@@ -3139,7 +3143,7 @@ DrawDeathAnimation (faceI) {
     if (pacmanDeathFrame <= MAX_DEATH_ANIM_FRAMES) {
         if ((abi_cubeN == actorCube) && (faceI == actorFace)) {
 
-            abi_CMD_BITMAP (DEATH_ANIMATION_START + pacmanDeathFrame - (pacmanDeathFrame == MAX_DEATH_ANIM_FRAMES), actorPosX, actorPosY, 0, 0);
+            abi_CMD_BITMAP (DEATH_ANIMATION_START + pacmanDeathFrame - (pacmanDeathFrame == MAX_DEATH_ANIM_FRAMES), actorPosX, actorPosY, 0, 0, 0);
 
             SendGeneralInfo();
         } else {
@@ -3158,7 +3162,7 @@ DrawDeathAnimation (faceI) {
                 x = temp * is_y_const + 120 * !is_y_const; 
                 y = 120 * is_y_const  + temp * !is_y_const;
 
-                abi_CMD_BITMAP (PACMAN_LIFES_ICON, x, y, angle, 0);
+                abi_CMD_BITMAP (PACMAN_LIFES_ICON, x, y, angle, 0, 0);
 
             }
         }
@@ -3192,9 +3196,10 @@ DrawDeathAnimation (faceI) {
 DrawLeaderBoard (faceI) {
     abi_CMD_FILL (0, 0, 0);
     new leaderTableFont = 7;
-    switch (leaderBoardTable[faceCubeSide{faceI} * 4 + newAngles[faceI] / 90]) {
+    switch (leaderBoardTable[faceCubeSide[faceI] * 4 + newAngles[faceI] / 90]) {
         break;case FIRST_LEADER_GROUP: {
-                abi_CMD_TEXT(['1','\0'],                 FONT, 216, 180, leaderTableFont, 180, 16, 31, 16);
+            //TODO: FIX
+                /*abi_CMD_TEXT(['1','\0'],                 FONT, 216, 180, leaderTableFont, 180, 16, 31, 16);
                 abi_CMD_TEXT(['A','L','E','X','\0'],     FONT, 190, 180, leaderTableFont, 180, 24, 48, 24);
                 abi_CMD_TEXT(['3','4','5','3','4','0','3','\0'], FONT, 100, 180, leaderTableFont, 180, 255, 255, 255);
 
@@ -3212,11 +3217,12 @@ DrawLeaderBoard (faceI) {
 
                 abi_CMD_TEXT(['5','\0'],                 FONT, 216,  20, leaderTableFont, 180, 16, 31, 16);
                 abi_CMD_TEXT(['P','A','V','E','L','\0'], FONT, 190,  20, leaderTableFont, 180, 24, 48, 24);
-                abi_CMD_TEXT(['3','3','4','3','2','9','\0'], FONT, 100, 20, leaderTableFont, 180, 255, 255, 255);
+                abi_CMD_TEXT(['3','3','4','3','2','9','\0'], FONT, 100, 20, leaderTableFont, 180, 255, 255, 255);*/
 
         }
         break;case SECOND_LEADER_GROUP: {
-                abi_CMD_TEXT(['6','\0'],                 FONT,  20, 216, leaderTableFont, 270, 16, 31, 16);
+            //TODO: FIX
+                /*abi_CMD_TEXT(['6','\0'],                 FONT,  20, 216, leaderTableFont, 270, 16, 31, 16);
                 abi_CMD_TEXT(['A','N','D','R','\0'],     FONT,  20, 190, leaderTableFont, 270, 24, 48, 24);
                 abi_CMD_TEXT(['2','9','0','6','6','4','\0'],     FONT,  20, 100, leaderTableFont, 270, 255, 255, 255);
 
@@ -3234,55 +3240,56 @@ DrawLeaderBoard (faceI) {
 
                 abi_CMD_TEXT(['1','0','\0'],             FONT, 180, 232, leaderTableFont, 270, 16, 31, 16);
                 abi_CMD_TEXT(['E','V','G','E','N','\0'], FONT, 180, 190, leaderTableFont, 270, 24, 48, 24);
-                abi_CMD_TEXT(['7','8','6','7','8','\0'],     FONT,  180, 100, leaderTableFont, 270, 255, 255, 255);
+                abi_CMD_TEXT(['7','8','6','7','8','\0'],     FONT,  180, 100, leaderTableFont, 270, 255, 255, 255);*/
 
         }
         break;case YOUR_RECORD: {
 
 
-            TextParse (personalRecord, 22, 114, 14, 0);
-            abi_CMD_TEXT(['Y','O','U','\0'], FONT, 84, 154, 12, 0, 31, 15, 14);
+            TextParse (personalRecord, 22, 114, 14, 0);        
+            abi_CMD_TEXT("YOU", FONT, 84, 154, 12, 0, 31, 15, 14, 0);
         }
         break;case LEADERBOARD_SPRITE: {
-            abi_CMD_BITMAP(GAME_OVER_ICON, 120, 120, 90, 0);
-            abi_CMD_TEXT(leaderBoardText, FONT, 40, 10, 10, 90, 255, 255, 255);
-            abi_CMD_BITMAP(RED_LINE, 26, 120, 90, 0);
+            abi_CMD_BITMAP(GAME_OVER_ICON, 120, 120, 90, 0, 0);
+            abi_CMD_TEXT(leaderBoardText, FONT, 40, 10, 10, 90, 255, 255, 255, 0);
+            abi_CMD_BITMAP(RED_LINE, 26, 120, 90, 0, 0);
         }
         break;case GAME_TITLE: {
-            abi_CMD_TEXT(pacmanText, FONT, 24, 160, 12, 0, 255, 255, 255);
-            abi_CMD_TEXT(twistText, FONT, 12,  200, 8, 0, 26, 14, 14);
-            abi_CMD_TEXT(toText,    FONT, 102, 200, 8, 0, 26, 14, 14);
-            abi_CMD_TEXT(startText, FONT, 144, 200, 8, 0, 26, 14, 14);
+            abi_CMD_TEXT(pacmanText, FONT, 24, 160, 12, 0, 255, 255, 255, 0);
+            abi_CMD_TEXT(twistText, FONT, 12,  200, 8, 0, 26, 14, 14, 0);
+            abi_CMD_TEXT(toText,    FONT, 102, 200, 8, 0, 26, 14, 14, 0);
+            abi_CMD_TEXT(startText, FONT, 144, 200, 8, 0, 26, 14, 14, 0);
         }
         break;case LAST_RESULT: {
-            abi_CMD_BITMAP(GAME_OVER_ICON, 120, 120, 180, 0);
-            abi_CMD_TEXT(lastText,    FONT, 205, 40, 9, 180, 255, 255, 255);
-            abi_CMD_TEXT(resultsText, FONT, 120, 40, 9, 180, 255, 255, 255);
-            abi_CMD_BITMAP(RED_LINE, 120, 26, 180, 0);
+            abi_CMD_BITMAP(GAME_OVER_ICON, 120, 120, 180, 0, 0);
+            abi_CMD_TEXT(lastText,    FONT, 205, 40, 9, 180, 255, 255, 255, 0);
+            abi_CMD_TEXT(resultsText, FONT, 120, 40, 9, 180, 255, 255, 255, 0);
+            abi_CMD_BITMAP(RED_LINE, 120, 26, 180, 0, 0);
         }
         break;case LAST_SCORES: {
 
 
             TextParse (lastResultScore, 110, 180, 15, 270);
-            abi_CMD_TEXT(scoresText, FONT, 150, 180, 10, 270, 31, 15, 14);
+            abi_CMD_TEXT(scoresText, FONT, 150, 180, 10, 270, 31, 15, 14, 0);
         }
         break;case LAST_MOVES: {
 
 
             TextParse (lastResultMoves, 90, 110, 15, 0);
-            abi_CMD_TEXT(movesText, FONT, 70, 152, 10, 0, 31, 15, 14);
+            abi_CMD_TEXT(movesText, FONT, 70, 152, 10, 0, 31, 15, 14, 0);
         }
         break;case LAST_CHIPS: {
 
 
             TextParse (lastResultPills, 121, 90, 15, 90);
-            abi_CMD_TEXT(blocksText, FONT, 88, 60, 10, 90, 31, 15, 14);
+            abi_CMD_TEXT(blocksText, FONT, 88, 60, 10, 90, 31, 15, 14, 0);
         }
     }
     ++drawLeaderboardFlag;
 }
 
-ResetActors () {
+ResetActors () 
+{
     for (new i = 0; i < MAX_ACTORS; ++i) {
         actors[i] = lvlInitActors[i];
     }
@@ -3465,8 +3472,8 @@ CheckNearestActors (actor) {
             }
         }
     }
-    if ((isTeleportOut{actor}) && (neighbours[1] == actorFace)) {
-        return (isTeleportOut{actor} = (isTeleportOut{actor} += 1) % MAX_TELE_OUT_ANIM_FRAMES);
+    if ((isTeleportOut[actor]) && (neighbours[1] == actorFace)) {
+        return (isTeleportOut[actor] = (isTeleportOut[actor] += 1) % MAX_TELE_OUT_ANIM_FRAMES);
     }
     return 0;
 }
@@ -3602,53 +3609,8 @@ ON_CHECK_ROTATE () {
     }
 }
 
-ON_CMD_NET_RX (const pkt[]) {
+ON_CMD_NET_RX (cell* pkt) {
     switch (abi_ByteN(pkt, 4)) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         break;case 10 + 2: {
             new packetNumberReceived = pkt[4];
             if ((packetNumber < packetNumberReceived) || (ABS(packetNumber - packetNumberReceived) > (0x7FFFFFFF >> 1))) {
