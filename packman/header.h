@@ -1,4 +1,4 @@
-#include "..\rubic\pawn2c.h"
+#include "pawn2c.h"
 #define new signed
 #define bool int
 #define false 0
@@ -85,8 +85,8 @@ cell Swap(cell* value1, cell* value2);
 cell SendGeneralInfo();
 cell CheckIfGhostScare();
 cell ScareGhosts(cell turnOn);
-cell GetExitTileOtherCube(cell *targetPosX, cell *targetPosY, xIndex, yIndex, cubesToCheck, neighbourCube, neighbourFace);
-cell GetExitTileSameCube(cell* targetPosX, cell* targetPosY, xIndex, yIndex, neighbourFace);
+cell GetExitTileOtherCube(cell *targetPosX, cell *targetPosY, cell xIndex, cell yIndex,cell cubesToCheck,cell neighbourCube,cell neighbourFace);
+cell GetExitTileSameCube(cell* targetPosX, cell* targetPosY,cell xIndex,cell yIndex,cell neighbourFace);
 cell RunGhostBehaviour();
 cell RunActorsLogic(cell who);
 cell TransferToOtherCube(cell fromPos);
@@ -96,6 +96,7 @@ cell FindGhostRoom(cell* targetCube, cell* targetFace);
 cell SendActor(cell actorPktNumber);
 cell FindNewAngles(cell farCube);
 cell ResetActors();
+cell DrawActor(cell who, cell angle);
 cell ONTICK();
 cell ON_INIT();
 cell ON_CMD_NET_RX(cell* pkt);

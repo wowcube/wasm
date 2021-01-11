@@ -1,4 +1,13 @@
+#define new signed
+#define bool int
+#define false 0
+#define true 1
+
 #include "header.h"
+
+#define run pawn_run
+#define pow pawn_pow
+
 
 new abi_cubeN = 0;
 new abi_TRBL[8][3];
@@ -333,7 +342,7 @@ cell abi_CMD_FILL_2(cell rgb)
 
 }
 
-// FIXME: what the heck with size? Which should be default? Re-check source code and update
+// FIXME: what the heck with size? Which should be default? Re-check source code and update + text
 cell abi_CMD_TEXT(cell* text, cell fontResID, cell x, cell y, cell scale, cell angle, cell r, cell g, cell b, cell size)
 {
 
@@ -1359,62 +1368,65 @@ cell run(cell* pkt, cell size, cell* src)
 }
 
 
+#define RESOURCES_NUMBERS 0
+    //const cell RESOURCES_NUMBERS     = 0;
+#define RESOURCES_OFFSET      (RESOURCES_NUMBERS + 14) 
+#define PACMAN_START_FRAME RESOURCES_NUMBERS + 29
+    //const PACMAN_START_FRAME    = RESOURCES_NUMBERS + 29;  
+#define PACMAN_MIDDLE_FRAME (PACMAN_START_FRAME + 1)
+   //const PACMAN_MIDDLE_FRAME   = PACMAN_START_FRAME + 1; 
+#define PACMAN_END_FRAME (PACMAN_START_FRAME + 2)
+   //const PACMAN_END_FRAME      = PACMAN_START_FRAME + 2; 
+#define GHOST_PICS              (RESOURCES_NUMBERS + 32)  
+#define SCARED_GHOSTS           (RESOURCES_NUMBERS + 40)  
+#define GHOSTS_EYES             (RESOURCES_NUMBERS + 44)  
+#define DEATH_ANIMATION_START   (RESOURCES_NUMBERS + 48)  
+#define PACMAN_LIFES_ICON       (RESOURCES_NUMBERS + 55) 
 
-    const RESOURCES_NUMBERS     = 0;
-    const RESOURCES_OFFSET      = RESOURCES_NUMBERS + 14; 
-    const PACMAN_START_FRAME    = RESOURCES_NUMBERS + 29;  
-    const PACMAN_MIDDLE_FRAME   = PACMAN_START_FRAME + 1; 
-    const PACMAN_END_FRAME      = PACMAN_START_FRAME + 2; 
-    const GHOST_PICS            = RESOURCES_NUMBERS + 32;  
-    const SCARED_GHOSTS         = RESOURCES_NUMBERS + 40;  
-    const GHOSTS_EYES           = RESOURCES_NUMBERS + 44;  
-    const DEATH_ANIMATION_START = RESOURCES_NUMBERS + 48;  
-    const PACMAN_LIFES_ICON     = RESOURCES_NUMBERS + 55;  
-
-    const FRUITS_ICONS          = RESOURCES_NUMBERS + 43;  
-    const IN_GAME_SCORE_LABEL   = RESOURCES_NUMBERS + 58;  
-    const HIGH_SCORE_LABEL      = RESOURCES_NUMBERS + 59;  
-    const READY_LABEL           = RESOURCES_NUMBERS + 60;  
-    const PURPLE_PORTAL         = RESOURCES_NUMBERS + 68;
-    const BLUE_PORTAL           = RESOURCES_NUMBERS + 69;
-    const FONT                  = RESOURCES_NUMBERS + 70;
-
-
-
-    const GAME_OVER_ICON  = RESOURCES_NUMBERS + 10;
-    const RED_LINE        = RESOURCES_NUMBERS + 11;
-    const GAME_OVER_LABEL = RESOURCES_NUMBERS + 12;
-    const TWIST_TO_PLAY   = RESOURCES_NUMBERS + 13;
-    const LEVEL_FINISHED  = RESOURCES_NUMBERS + 61;
-    const MOVES_LABEL     = RESOURCES_NUMBERS + 62;
-    const SCORES_LABEL    = RESOURCES_NUMBERS + 63;
-    const TIME_LABEL      = RESOURCES_NUMBERS + 64;
-    const BONUSES_LABEL   = RESOURCES_NUMBERS + 65;
-    const LIVES_LABEL     = RESOURCES_NUMBERS + 66;
-    const PILLS_LABEL     = RESOURCES_NUMBERS + 67;
+#define FRUITS_ICONS            (RESOURCES_NUMBERS + 43)  
+#define IN_GAME_SCORE_LABEL     (RESOURCES_NUMBERS + 58)
+#define HIGH_SCORE_LABEL        (RESOURCES_NUMBERS + 59)
+#define READY_LABEL             (RESOURCES_NUMBERS + 60)
+#define PURPLE_PORTAL           (RESOURCES_NUMBERS + 68)
+#define BLUE_PORTAL             (RESOURCES_NUMBERS + 69)
+#define FONT                    (RESOURCES_NUMBERS + 70)
 
 
 
+#define GAME_OVER_ICON    (RESOURCES_NUMBERS + 10)
+#define RED_LINE          (RESOURCES_NUMBERS + 11)
+#define GAME_OVER_LABEL   (RESOURCES_NUMBERS + 12)
+#define TWIST_TO_PLAY     (RESOURCES_NUMBERS + 13)
+#define LEVEL_FINISHED    (RESOURCES_NUMBERS + 61)
+#define MOVES_LABEL       (RESOURCES_NUMBERS + 62)
+#define SCORES_LABEL      (RESOURCES_NUMBERS + 63)
+#define TIME_LABEL        (RESOURCES_NUMBERS + 64)
+#define BONUSES_LABEL     (RESOURCES_NUMBERS + 65)
+#define LIVES_LABEL       (RESOURCES_NUMBERS + 66)
+#define PILLS_LABEL       (RESOURCES_NUMBERS + 67)
 
-    const BLUE_WALL           = RESOURCES_NUMBERS + 14;
-    const BLUE_CORNER         = RESOURCES_NUMBERS + 15;
-    const BLUE_END            = RESOURCES_NUMBERS + 16;
-    const BLUE_CROSS          = RESOURCES_NUMBERS + 17;
-    const BLUE_T_SHAPE        = RESOURCES_NUMBERS + 18;
-    const PURPLE_CORNER_CLOSE = RESOURCES_NUMBERS + 19;
-    const PURPLE_CORNER_OPEN  = RESOURCES_NUMBERS + 20;
-    const PURPLE_SOLID_WALL   = RESOURCES_NUMBERS + 21;
-    const PURPLE_WALL         = RESOURCES_NUMBERS + 22;
-    const RED_END             = RESOURCES_NUMBERS + 23;
-    const RED_WALL            = RESOURCES_NUMBERS + 24;
-    const PILL                = RESOURCES_NUMBERS + 25;
-    const ENERGIZER           = RESOURCES_NUMBERS + 26;
-    const CHERRY              = RESOURCES_NUMBERS + 27;
-    const KEY                 = RESOURCES_NUMBERS + 28;
 
-    const TURN_90_DEGREE      = 0x100;
-    const TURN_180_DEGREE     = 0x200;
-    const TURN_270_DEGREE     = 0x300;
+
+
+#define BLUE_WALL             (RESOURCES_NUMBERS + 14)
+#define BLUE_CORNER           (RESOURCES_NUMBERS + 15)
+#define BLUE_END              (RESOURCES_NUMBERS + 16)
+#define BLUE_CROSS            (RESOURCES_NUMBERS + 17)
+#define BLUE_T_SHAPE          (RESOURCES_NUMBERS + 18)
+#define PURPLE_CORNER_CLOSE   (RESOURCES_NUMBERS + 19)
+#define PURPLE_CORNER_OPEN    (RESOURCES_NUMBERS + 20)
+#define PURPLE_SOLID_WALL     (RESOURCES_NUMBERS + 21)
+#define PURPLE_WALL           (RESOURCES_NUMBERS + 22)
+#define RED_END               (RESOURCES_NUMBERS + 23)
+#define RED_WALL              (RESOURCES_NUMBERS + 24)
+#define PILL                  (RESOURCES_NUMBERS + 25)
+#define ENERGIZER             (RESOURCES_NUMBERS + 26)
+#define CHERRY                (RESOURCES_NUMBERS + 27)
+#define KEY                   (RESOURCES_NUMBERS + 28)
+
+#define TURN_90_DEGREE      0x100
+#define TURN_180_DEGREE     0x200
+#define TURN_270_DEGREE     0x300
 
 
 
@@ -1447,31 +1459,38 @@ cell run(cell* pkt, cell size, cell* src)
 
 
     const ROOM_CENTER = 120;
-    const PACMAN_SIZE = 96;
-    const HALF_ACTOR_SIZE = PACMAN_SIZE >> 1;
-    const TILE_SIZE = 80;
-    const HALF_TILE_SIZE = TILE_SIZE / 2;
-    const LEVEL_SIZE = 3;
-    const MAX_ACTORS = 5;
-    const MAX_LEVELS = 3;
-    const PILLS_BEFORE_NEW_GHOST_RELEASE = 6;
+    //const PACMAN_SIZE = 96;
+#define PACMAN_SIZE 96
+#define HALF_ACTOR_SIZE ( PACMAN_SIZE >> 1)
+    //const TILE_SIZE = 80;
+#define TILE_SIZE 80
+#define HALF_TILE_SIZE 40
+    //const HALF_TILE_SIZE = TILE_SIZE / 2;
+    //const LEVEL_SIZE = 3;
+#define LEVEL_SIZE 3
+    //const MAX_ACTORS = 5;
+#define MAX_ACTORS 5
+#define MAX_LEVELS 3
+#define PILLS_BEFORE_NEW_GHOST_RELEASE 6
 
-    const MAXIMUM_PILLS = 96;
-    const SECONDS_TO_START_GAME = 8;
-    const SECONDS_TO_START_GAME_DEATH = 3;
-    const GHOST_SCARE_TIME = 15;
-    const GHOST_SCARE_BLINK_TIME = GHOST_SCARE_TIME * 2/3;
-    const MAX_DEATH_ANIM_FRAMES = 7;
-    const ACCEL_MOVE_SENSITIVITY = 10;
-    const OTHER_FACE_TRANSFER_BOUNDRY = (LEVEL_SIZE - 1) * TILE_SIZE + HALF_TILE_SIZE;
-    const TICKS_IN_SECOND = 7;
-    const MOVE_DIR_SWAP_FLAG = 3;
-    const MAX_TELE_IN_ANIM_FRAMES  = 12;
-    const MAX_TELE_OUT_ANIM_FRAMES = 6;
-    const DEFAULT_GHOST_SPEED = 5;
-    const MODULE_GAP = 40;
-    const HALF_MODULE_GAP = MODULE_GAP >> 1;
-    const NUMBERS_ASCII_OFFSET = 48;
+#define MAXIMUM_PILLS 96
+#define SECONDS_TO_START_GAME 8
+#define SECONDS_TO_START_GAME_DEATH 3
+    //const GHOST_SCARE_TIME = 15;
+#define GHOST_SCARE_TIME 15
+#define GHOST_SCARE_BLINK_TIME ( GHOST_SCARE_TIME * 2/3)
+#define MAX_DEATH_ANIM_FRAMES  7
+#define ACCEL_MOVE_SENSITIVITY  10
+#define OTHER_FACE_TRANSFER_BOUNDRY ( (LEVEL_SIZE - 1) * TILE_SIZE + HALF_TILE_SIZE)
+#define TICKS_IN_SECOND 7
+#define MOVE_DIR_SWAP_FLAG 3
+#define MAX_TELE_IN_ANIM_FRAMES 12
+#define MAX_TELE_OUT_ANIM_FRAMES 6
+#define DEFAULT_GHOST_SPEED  5
+    //const MODULE_GAP = 40;
+#define MODULE_GAP 40
+#define HALF_MODULE_GAP ( MODULE_GAP >> 1)
+#define NUMBERS_ASCII_OFFSET  48
 
 
 
@@ -1494,17 +1513,28 @@ cell run(cell* pkt, cell size, cell* src)
     new lastResultPills = 0;
     new personalRecord  = 0;
 
-    const EMPTY_PART          = 0;
-    const FIRST_LEADER_GROUP  = 1;
-    const SECOND_LEADER_GROUP = 2;
-    const YOUR_RECORD         = 3;
-    const LEADERBOARD_SPRITE  = 4;
-    const GAME_TITLE          = 5;
-    const LEVEL_PART          = 6;
-    const LAST_RESULT         = 7;
-    const LAST_SCORES         = 8;
-    const LAST_MOVES          = 9;
-    const LAST_CHIPS          = 10;
+#define EMPTY_PART 0
+    //const EMPTY_PART          = 0;
+#define FIRST_LEADER_GROUP 1
+    //const FIRST_LEADER_GROUP  = 1;
+#define SECOND_LEADER_GROUP 2
+    //const SECOND_LEADER_GROUP = 2;
+#define YOUR_RECORD 3
+    //const YOUR_RECORD         = 3;
+#define LEADERBOARD_SPRITE 4
+    //const LEADERBOARD_SPRITE  = 4;
+#define GAME_TITLE 5
+    //const GAME_TITLE          = 5;
+#define LEVEL_PART 6
+    //const LEVEL_PART          = 6;
+#define LAST_RESULT 7
+    //const LAST_RESULT         = 7;
+#define LAST_SCORES 8
+    //const LAST_SCORES         = 8;
+#define  LAST_MOVES 9
+    //const LAST_MOVES          = 9;
+#define LAST_CHIPS 10
+    //const LAST_CHIPS          = 10;
 
     new leaderBoardTable[] = {
                             GAME_TITLE, EMPTY_PART, LEVEL_PART, EMPTY_PART, 
@@ -1520,12 +1550,16 @@ cell run(cell* pkt, cell size, cell* src)
 
 
 
-
-const RIGHT_DIR = 0;
-const DOWN_DIR  = 1;
-const LEFT_DIR  = 2;
-const UP_DIR    = 3;
-const NONE_DIR  = 4;
+#define RIGHT_DIR 0
+    //const RIGHT_DIR = 0;
+#define DOWN_DIR 1
+    //const DOWN_DIR  = 1;
+#define LEFT_DIR 2
+    //const LEFT_DIR  = 2;
+#define UP_DIR 3
+    //const UP_DIR    = 3;
+#define NONE_DIR 4
+    //const NONE_DIR  = 4;
 
 new oppositeDirections[] = {LEFT_DIR, UP_DIR, RIGHT_DIR, DOWN_DIR, NONE_DIR};
 new munchAnim[] = {PACMAN_START_FRAME, PACMAN_MIDDLE_FRAME, PACMAN_END_FRAME, PACMAN_MIDDLE_FRAME};
@@ -1655,7 +1689,7 @@ cell zonesOnThisModule[][3] = {{0, 0, 0},
 
 
 
-cell zoneType[][3] = { {BLUE_WALL | TURN_180_DEGREE, PILL, BLUE_CORNER | TURN_270_DEGREE},
+cell zoneType[9*3][3] = { {BLUE_WALL | TURN_180_DEGREE, PILL, BLUE_CORNER | TURN_270_DEGREE},
                       {BLUE_WALL | TURN_180_DEGREE, PILL, PILL},
                       {BLUE_WALL | TURN_180_DEGREE, PILL, BLUE_CORNER},
 
@@ -1694,36 +1728,39 @@ cell zoneType[][3] = { {BLUE_WALL | TURN_180_DEGREE, PILL, BLUE_CORNER | TURN_27
 
 
 
-    const ROTATE_90_DEGREE  = 0x40000000;
-    const ROTATE_180_DEGREE = 0x80000000;
-    const ROTATE_270_DEGREE = 0xC0000000;
+#define ROTATE_90_DEGREE  0x40000000
+#define ROTATE_180_DEGREE 0x80000000
+#define ROTATE_270_DEGREE 0xC0000000
 
-    const EMPTY   = 0;
-    const ANGLE   = BLUE_CORNER | (PURPLE_CORNER_OPEN << 8);
-    const ANGLE_2 = BLUE_CORNER | (PURPLE_CORNER_CLOSE << 8);
-    const WALL    = BLUE_WALL | (PURPLE_WALL << 8);
-    const WALL_2  = BLUE_CROSS | (PURPLE_WALL << 8);
-    const SPECIAL = 4;
+#define EMPTY   0
+#define ANGLE   ( BLUE_CORNER | (PURPLE_CORNER_OPEN << 8))
+#define ANGLE_2 ( BLUE_CORNER | (PURPLE_CORNER_CLOSE << 8))
+#define WALL    ( BLUE_WALL | (PURPLE_WALL << 8))
+#define WALL_2  (BLUE_CROSS | (PURPLE_WALL << 8))
+#define SPECIAL  4
+
+#define CROSS_ROOM_PATTERN 0
+    //const CROSS_ROOM_PATTERN   = 0;
+#define T_SHAPE_ROOM_PATTERN 1
+    //const T_SHAPE_ROOM_PATTERN = 1;
+#define ANGLE_ROOM_PATTERN 2
+    //const ANGLE_ROOM_PATTERN   = 2;
+#define TUNNEL_ROOM_PATTERN 3
+    //const TUNNEL_ROOM_PATTERN  = 3;
+#define GHOST_ROOM_PATTERN   4
+#define ROOM_PATTERN_COUNT   5
 
 
-    const CROSS_ROOM_PATTERN   = 0;
-    const T_SHAPE_ROOM_PATTERN = 1;
-    const ANGLE_ROOM_PATTERN   = 2;
-    const TUNNEL_ROOM_PATTERN  = 3;
-    const GHOST_ROOM_PATTERN   = 4;
-    const ROOM_PATTERN_COUNT   = 5;
+#define BLUE    0x00
+#define PURPLE  0x10
 
 
-    const BLUE   = 0x00;
-    const PURPLE = 0x10;
+#define  _0_    0x00
+#define  _90_   0x40
+#define  _180_  0x80
+#define  _270_  0xC0
 
-
-    const _0_   = 0x00;
-    const _90_  = 0x40;
-    const _180_ = 0x80;
-    const _270_ = 0xC0;
-
-    cell roomPatterns[][3] = {
+    cell roomPatterns[5*3][3] = {
                             {ANGLE | ROTATE_180_DEGREE, PILL,     ANGLE | ROTATE_270_DEGREE},
                             {PILL,                      SPECIAL,  PILL  },
                             {ANGLE | ROTATE_90_DEGREE, PILL,     ANGLE},
@@ -1745,7 +1782,7 @@ cell zoneType[][3] = { {BLUE_WALL | TURN_180_DEGREE, PILL, BLUE_CORNER | TURN_27
                             {BLUE_WALL | ROTATE_90_DEGREE,    EMPTY,     RED_WALL | ROTATE_90_DEGREE},
                             {BLUE_CORNER | ROTATE_270_DEGREE, RED_WALL,  BLUE_CROSS}
                         };
-    cell patternLevelMap[][3] = {
+    cell patternLevelMap[3][8*3] = {
 
                     {1 | BLUE | _0_ | (PILL << 8),      1 | BLUE | _270_ | (ENERGIZER << 8),   0 | BLUE | _0_ | (CHERRY << 8),  
                      4 | BLUE | _0_,                    1 | BLUE | _90_ | (PILL << 8),         0 | BLUE | _0_ | (KEY << 8)      , 
@@ -1780,7 +1817,7 @@ cell zoneType[][3] = { {BLUE_WALL | TURN_180_DEGREE, PILL, BLUE_CORNER | TURN_27
 
 
 
-new levelMap[][3] = { {0,2,1, 4,5,3, 2,8,1, 2,4,5, 1,8,3, 0,5,4, 0,1,2, 4,3,5},
+new levelMap[3][24] = { {0,2,1, 4,5,3, 2,8,1, 2,4,5, 1,8,3, 0,5,4, 0,1,2, 4,3,5},
                          {5,7,6, 5,4,3, 7,3,6, 7,5,4, 6,5,3, 4,5,0, 5,6,7, 3,4,5},
                          {5,0,7, 0,4,5, 1,3,5, 4,2,3, 0,3,1, 7,4,0, 6,7,5, 0,2,4}
     };
@@ -2543,7 +2580,7 @@ cell RunGhostBehaviour ()
     {
         new targetCube = 8;
         new targetFace = 3;
-        GetTargetTile( targetPosX,  targetPosY,  targetCube,  targetFace);
+        GetTargetTile( &targetPosX,  &targetPosY,  &targetCube,  &targetFace);
         if ((actorCube == targetCube) && (actorFace == targetFace)) {
             wasIEaten = 0;
         }
@@ -2688,7 +2725,7 @@ cell GetTargetTile (cell *targetPosX, cell *targetPosY, cell *targetCube, cell *
             xIndex = 1;
             yIndex = 2;
             neighbourFace = (actorFace + 1) % 3;
-            GetExitTileSameCube ( *targetPosX,  *targetPosY, xIndex, yIndex, neighbourFace);
+            GetExitTileSameCube ( targetPosX,  targetPosY, xIndex, yIndex, neighbourFace);
             return;
         }
         GetExitTileOtherCube( targetPosX,  targetPosY, xIndex, yIndex, cubesToCheck, neighbourCube, neighbourFace);
@@ -2767,7 +2804,7 @@ FindTargetLocation (cell *targetPosX, cell *targetPosY, cell *targetCube, cell *
     }
 }
 
-GetExitTileSameCube (cell *targetPosX, cell *targetPosY, xIndex, yIndex, neighbourFace) 
+GetExitTileSameCube (cell *targetPosX, cell *targetPosY,cell xIndex,cell yIndex,cell neighbourFace) 
 {
 
     if (IsTileSafe(zonesOnThisModule[xIndex + LEVEL_SIZE * actorFace][yIndex] & 0xFF)) {
@@ -2984,7 +3021,8 @@ cell CheckAngles()
 
 
 
-DrawActor(who, angle) {
+cell DrawActor(cell who,cell angle)
+{
     new sprite = 0;
     if (who == 0) {
         if (!angle) {
@@ -3531,7 +3569,7 @@ ONTICK () {
                         if (actorCube != abi_cubeN) {
                             ReversePosDependOnSide ();
                         }
-                        DrawActor (actor);
+                        DrawActor (actor, 0);
                     }
                     DrawCountdown ();
                 }
