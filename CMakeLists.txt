@@ -48,5 +48,5 @@ DualCompilation(example ${CORE_SRC} ${CORE_HDR})
 
 add_subdirectory(rubic)
 add_subdirectory(race)
-
+add_subdirectory(packman)
 
