@@ -10,7 +10,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_ENABLE_C99}")
 file(GLOB CORE_HDR *.h)
 file(GLOB CORE_SRC *.c)
 
-set(CORE_SRC ${CORE_SRC} ${CMAKE_CURRENT_LIST_DIR}/PawnRunner.cpp)
+set(CORE_SRC ${CORE_SRC} ${CMAKE_CURRENT_LIST_DIR}/../PawnRunner.cpp)
 
 #[[
 set_source_files_properties(

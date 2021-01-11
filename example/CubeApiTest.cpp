@@ -89,13 +89,13 @@ protected:
     void OnGyroChanged(const Get_Gyro_1_0& gyro) override
     {
         m_gyro = gyro;
-        //NativePrint("OnGyroChanged X:%f Y:%f Z:%f", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
+        NativePrint("OnGyroChanged X:%f Y:%f Z:%f", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
     }
 
     void OnAccelChanged(const Get_Accel_1_0& accel) override
     {
         m_accel = accel;
-        //NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
+        NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
     bool OnTick(uint32_t time) override

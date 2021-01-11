@@ -41,11 +41,7 @@ macro(DualCompilation name lsrc lhdr)
   add_dependencies(${name} wasm_${name})
 endmacro()
 
-file(GLOB CORE_HDR *.h)
-file(GLOB CORE_SRC *.cpp)
-
-DualCompilation(example ${CORE_SRC} ${CORE_HDR})
-
+add_subdirectory(example)
 add_subdirectory(rubic)
 add_subdirectory(race)
 add_subdirectory(packman)
