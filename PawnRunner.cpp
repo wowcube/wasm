@@ -128,6 +128,27 @@ public:
     {
         m_buff[buff].color = color;
     }
+
+    void DrawBitmap(uint16_t resID, uint16_t x, uint16_t y, uint16_t angle, uint8_t mirror, bool g2d)
+    {
+        /*if (!g2d) {
+            uint8_t scriptID = CUBIOS_getActiveAMXScript();
+            const char* packName = (scriptID == UNDEFINED_SCRIPT) ? CUBIOS_getActiveAMXPackName() : getPackNameByScriptID(scriptID);
+
+            if (isResourceAvailable(packName, resID)) {
+                FB_drawExternalRLEBitmapInBuffer2(pawn_tmp_framebuffer, packName, resID, x, y, angle, mirror);
+            }
+        }
+        else {
+            FB_drawG2DBitmapInBuffer(
+                pawn_tmp_framebuffer,
+                DISPLAY_WIDTH,
+                DISPLAY_HEIGHT,
+                resID,
+                x, y,
+                angle, mirror);
+        }*/
+    }
 };
 
 CEventLoopEx g_runner;
@@ -176,8 +197,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
 //        }
         g_runner.DISPLAY_flushFramebufferAsync(screen);
         printf("CMD_REDRAW which %d screen: %d\n",cmd, screen);
-    }
-                   break;
+    } break;
 
     case CMD_FILL: {
         uint16_t r = (pkt[1] & 0x1F) << 11; // Rmax=31
@@ -187,8 +207,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //// Old:
         g_runner.FB_fillBuffer(pawn_tmp_framebuffer, r | g | b /*packed*/); // RGB565
         printf("CMD_FILL which %d r,g,b: %d %d %d packed: %08X\n", cmd, pkt[1], pkt[2], pkt[3], packed);
-    }
-                 break;
+    } break;
 
     case CMD_TEXT: {
         int16_t fontResID = pkt[1] | pkt[2] << 8;
@@ -213,8 +232,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //else if (isResourceAvailable(packName, fontResID)) {
         //    FB_drawTextWithExternalRLEFontInBuffer(pawn_tmp_framebuffer, text, packName, fontResID, x, y, r | g | b, scale, angle);
         //}
-    }
-                 break;
+    } break;
 
     case CMD_BITMAP: {
         uint16_t resID = pkt[1] | pkt[2] << 8;
@@ -223,27 +241,11 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         uint16_t angle = pkt[7] | pkt[8] << 8;
         uint8_t mirror = pkt[9];
         bool g2d = pkt[10];
-        printf("CMD_RECT (unsure) which %d resID %d x, y: %d %d angle %d mirror %d g2d %d\n", cmd, resID, x, y, angle, mirror, g2d);
-        /*if (!g2d) {
-            uint8_t scriptID = CUBIOS_getActiveAMXScript();
-            const char* packName = (scriptID == UNDEFINED_SCRIPT) ? CUBIOS_getActiveAMXPackName() : getPackNameByScriptID(scriptID);
+        printf("CMD_BITMAP (unsure) which %d resID %d x, y: %d %d angle %d mirror %d g2d %d\n", cmd, resID, x, y, angle, mirror, g2d);
 
-            if (isResourceAvailable(packName, resID)) {
-                FB_drawExternalRLEBitmapInBuffer2(pawn_tmp_framebuffer, packName, resID, x, y, angle, mirror);
-            }
-        }
-        else {
-            FB_drawG2DBitmapInBuffer(
-                pawn_tmp_framebuffer,
-                DISPLAY_WIDTH,
-                DISPLAY_HEIGHT,
-                resID,
-                x, y,
-                angle, mirror);
-        }*/
-    }
-                   break;
-                   
+        g_runner.DrawBitmap(resID, x, y, angle, mirror, g2d);
+    } break;
+
     case CMD_LINE: {
         uint16_t x1 = pkt[1] | pkt[2] << 8;
         uint16_t y1 = pkt[3] | pkt[4] << 8;
@@ -272,9 +274,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
             ((x1 < x2) ? (x2 - x1) : (x1 - x2)),
             ((y1 < y2) ? (y2 - y1) : (y1 - y2)),
             (r | g | b));*/
-    }
-  
-  break;
+    } break;
 
     case CMD_NET_TX: {
         uint8_t line_tx = pkt[1]; // UART 0-2 through which to send this packet
@@ -294,8 +294,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //NET_sendAMXPacket(line_tx, ttl, payload);
         
         g_runner.Send(line_tx, (size-1) * sizeof(int), payload);
-    }
-                   break;
+    } break;
 
     case CMD_CHANGE_SCRIPT: {
         uint8_t scriptID = pkt[1];
@@ -305,8 +304,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //if ((scriptID > 0) && (GEO_getModuleCID() == 0)) {
         //    AUDIO_playPlatformSound(SOUND_GAME_START, DEFAULT_VOLUME);
         //}*/
-    }
-                          break;
+    } break;
 
     case CMD_DRAW_OVERLAY: {
         printf("CMD_DRAW_OVERLAY which %d\n", cmd);
@@ -318,8 +316,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //    // Not master cube - broadcast message
         //    NET_broadcastActionPacket(ACTION_TRIGGER_DEBUG_INFO);
         //}
-    }
-                         break;
+    } break;
 
     case CMD_SLEEP: {
         printf("CMD_SLEEP which %d\n", cmd);
@@ -334,8 +331,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //    // Not master cube - broadcast message
         //    NET_broadcastActionPacket(ACTION_SLEEP);
         //}
-    }
-                  break;
+    } break;
 
     case CMD_TRIGGER_BLUETOOTH: {
         printf("CMD_TRIGGER_BLUETOOTH which %d\n", cmd);
@@ -346,8 +342,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //else {
         //    NET_broadcastActionPacket(ACTION_TRIGGER_BLUETOOTH);
         //}
-    }
-                              break;
+    } break;
 
     case CMD_G2D_BEGIN_BITMAP: {
         uint16_t resID = pkt[1] | pkt[2] << 8;
@@ -356,16 +351,14 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         bool replace = pkt[7];
         printf("CMD_G2D_BEGIN_BITMAP (unsure) which %d resID: %d width, height: %d %d replace: %d\n", cmd, resID, width, height, replace);
         //G2D_requestBeginBitmap(resID, width, height, replace);
-    }
-                             break;
+    } break;
 
     case CMD_G2D_BEGIN_DISPLAY: {
         uint8_t display = pkt[1];
         bool replace = pkt[2];
         printf("CMD_G2D_BEGIN_DISPLAY which %d display: %d replace %d", cmd, display, replace);
         //G2D_requestBeginDisplay(display, replace);
-    }
-                              break;
+    } break;
 
     case CMD_G2D_ADD_SPRITE: {
         uint16_t resID = pkt[1] | pkt[2] << 8;
@@ -379,8 +372,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         printf("CMD_G2D_ADD_SPRITE (unsure) which %d resID: %d scriptID (to do): %d x, y: %d %d color: %08X alpha: %d angle: %d mirror: %d\n", cmd, resID, scriptID, x, y, color, alpha, angle, mirror);
         /*const char* packName = (scriptID == UNDEFINED_SCRIPT) ? CUBIOS_getActiveAMXPackName() : getPackNameByScriptID(scriptID);
         G2D_requestAddSprite(packName, resID, x, y, alpha, color, angle, mirror);*/
-    }
-                           break;
+    } break;
 
     case CMD_G2D_ADD_RECTANGLE: {
         uint16_t x = pkt[1] | pkt[2] << 8;
@@ -390,14 +382,12 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         uint32_t color = pkt[9] | pkt[10] << 8 | pkt[11] << 16 | pkt[12] << 24;
         printf("CMD_G2D_ADD_RECTANGLE (unsure) which %d x, y: %d %d width, height: %d %d color: %d\n", cmd, x, y, width, height, color);
         //G2D_requestAddRectangle(x, y, width, height, color);
-    }
-                              break;
+    } break;
 
     case CMD_G2D_END: {
         printf("CMD_G2D_END which %d\n", cmd);
        // G2D_requestEnd();
-    }
-                    break;
+    } break;
 
     case CMD_TRIGGER_NIGHTLAMP: {
         printf("CMD_TRIGGER_NIGHTLAMP which %d\n", cmd);
@@ -413,22 +403,21 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         //else {
         //    NET_broadcastActionPacketArgs(ACTION_TRIGGER_NIGHTLAMP, NIGHTLAMP_ACTION_FLAG_START_NEW_EFFECT, args);
         //}
-    }
-                              break;
+    } break;
 
     case CMD_G2D_DYNAMIC_TEXTURE: {
         //dynamic_texture_effect_t effectType = (dynamic_texture_effect_t)pkt[1];             // 2,3 - not used yet. planned 2 - g2d mode  
         uint32_t time = *((uint32_t*)&pkt[4]); // pkt 4,5,6,7
         //G2D_renderDynamicTexture(g2d_getPawnOutputBuffer(), effectType, time, &pkt[8]);
         printf("CMD_G2D_DYNAMIC_TEXTURE which %d time: %d\n pkt[8]: (reference to some chunk)", cmd, time);
-    }
-                                break;
+    } break;
 
-    //case CMD_EXIT:
-    //    //NET_broadcastActionPacket(ACTION_MENU_EXIT);
-    //    //CUBIOS_MenuExit();
-    //    printf("CMD_EXIT which %d\n", cmd);
-    //    break;
+    case CMD_EXIT:
+    {
+        //    //NET_broadcastActionPacket(ACTION_MENU_EXIT);
+        //    //CUBIOS_MenuExit();
+        //    printf("CMD_EXIT which %d\n", cmd);
+    } break;
 
     case CMD_PLAYSND: {
         printf("CMD_PLAYSND which %d args: %d %d\n", cmd, pkt[1], pkt[2]);
@@ -441,8 +430,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
                 AUDIO_playSound(&gameSound, pkt[2]);
             }
         }*/
-    }
-                    break;
+    } break;
 
     case CMD_STATE_SAVE: {
         uint16_t saveSize = pkt[1] | pkt[2] << 8;
