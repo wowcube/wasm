@@ -116,7 +116,8 @@ def convert_dir(path, rle, output="test2.h"):
     out = open(output, "w")            
     for root, dir, files in os.walk(path):  
         names = []
-        for file in fnmatch.filter(files, '*.png'):
+        
+        for file in sorted(fnmatch.filter(files, '*.png')):
             string, name, _len = convert_picture(os.path.join(root,file), rle)
             _len = str(_len)
             names.append({"name":name,
@@ -130,7 +131,7 @@ def convert_dir(path, rle, output="test2.h"):
             _name = name["name"]
             _len = name["len"]
             out.write("__table_len[" + str(num) +"] = " + _len + "; ")
-            out.write("__table[" + str(num) + "] = " + _name + ";\n")
+            out.write("__table[" + str(num) + "] = (void*)" + _name + ";\n")
             num = num + 1
             #a.write()
         out.write("if (num >= 0 && num < " + str(len(names)) + ")\n")
