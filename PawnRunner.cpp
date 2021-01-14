@@ -2,6 +2,10 @@
 #include <cstdio>
 #include "rubic/header.h"
 #include <map>
+#include "packman/resources.h"
+#include <list>
+#include <functional>
+
 extern "C" int pawn_run(cell* pkt, int size, int* src);
 
 
@@ -13,6 +17,8 @@ class CEventLoopEx: public CEventLoop
     struct SBuff
     {
         uint16_t color;
+        using TStep = std::function<void(CDisplay&)>;
+        std::list<TStep> steps;
     };
     std::map<int, SBuff> m_buff;
 
@@ -119,35 +125,52 @@ public:
     void FB_FlushTmpFrameBuffer(int screen, int buff)
     {
         CDisplay disp(screen);
-        disp.Fill(m_buff[buff].color);
+        for (auto& step: m_buff[buff].steps)
+        {
+            step(disp);
+        }
+        //disp.Fill(m_buff[buff].color);
+        
     }
     void DISPLAY_flushFramebufferAsync(int screen)
     {
     }
     void FB_fillBuffer(int buff, uint16_t color)
     {
-        m_buff[buff].color = color;
+        //m_buff[buff].color = color;
+        m_buff[buff].steps.push_back(
+            [color](CDisplay& disp) {
+                disp.Fill(color);
+            }
+        );
     }
 
-    void DrawBitmap(uint16_t resID, uint16_t x, uint16_t y, uint16_t angle, uint8_t mirror, bool g2d)
+    void DrawBitmap(int buff, uint16_t resID, uint16_t x, uint16_t y, uint16_t angle, uint8_t mirror, bool g2d)
     {
-        /*if (!g2d) {
-            uint8_t scriptID = CUBIOS_getActiveAMXScript();
-            const char* packName = (scriptID == UNDEFINED_SCRIPT) ? CUBIOS_getActiveAMXPackName() : getPackNameByScriptID(scriptID);
+        const void* data = nullptr;
+        size_t size = 0;
+#define map_res(num) \
+        case num:\
+            data = _img_0##num;\
+            size = sizeof(_img_0##num);\
+            break
 
-            if (isResourceAvailable(packName, resID)) {
-                FB_drawExternalRLEBitmapInBuffer2(pawn_tmp_framebuffer, packName, resID, x, y, angle, mirror);
-            }
+        switch (resID) {
+            map_res(14);
+            map_res(15);
+            map_res(25);
+            map_res(26);
+            map_res(40);
+            default:
+                return;
         }
-        else {
-            FB_drawG2DBitmapInBuffer(
-                pawn_tmp_framebuffer,
-                DISPLAY_WIDTH,
-                DISPLAY_HEIGHT,
-                resID,
-                x, y,
-                angle, mirror);
-        }*/
+        m_buff[buff].steps.push_back(
+            [data, size, x, y, angle, mirror](CDisplay& disp) {
+                CBitmap bmp;
+                bmp.Load(data, size, EPictureFormat::epfRGB565);
+                disp.DrawBitmap(x,y, bmp, 1, angle, mirror);
+            }
+        );
     }
 };
 
@@ -243,7 +266,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         bool g2d = pkt[10];
         printf("CMD_BITMAP (unsure) which %d resID %d x, y: %d %d angle %d mirror %d g2d %d\n", cmd, resID, x, y, angle, mirror, g2d);
 
-        g_runner.DrawBitmap(resID, x, y, angle, mirror, g2d);
+        g_runner.DrawBitmap(pawn_tmp_framebuffer, resID, x, y, angle, mirror, g2d);
     } break;
 
     case CMD_LINE: {
@@ -461,4 +484,11 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
     }
         
     return result;
+}
+
+extern "C" cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror, int g2d)
+{
+    printf("CMD_BITMAP resID %d x, y: %d %d angle %d mirror %d g2d %d\n", resID, x, y, angle, mirror, g2d);
+
+    g_runner.DrawBitmap(pawn_tmp_framebuffer, resID, x, y, angle, mirror, g2d);
 }

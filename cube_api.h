@@ -6,35 +6,15 @@
 #include <string.h>
 #include <cstdlib>
 #include <algorithm>
+#include <memory>
 
-#if 1
-    #include <memory>
+#define WC_CHECKRET(cond, ret) if (!(cond)) {NativePrint("%s(%d):\t%s\t-\t%s", __FILE__, __LINE__, __FUNCTION__, #cond); return ret;}
 
-    template<class T=char>
-    std::unique_ptr<T[]> GetSharableMem(size_t size)
-    {
-        return std::unique_ptr<T[]>(new T[size]);
-    }
-
-#else
-
-    template<class T>
-    class Getter
-    {
-    public:
-        Getter(T*){}
-        T* get()
-        {
-            return nullptr;
-        }
-    };
-
-    template<class T=char>
-    auto GetSharableMem(size_t size)
-    {
-        return Getter<T>(new T[size]);
-    }
-#endif
+template<class T=char>
+std::unique_ptr<T[]> GetSharableMem(uint32_t size)
+{
+    return std::unique_ptr<T[]>(new T[size]);
+}
 
 template<class T>
 int32_t NativeInvokeDirect(T& val) // with return args
@@ -64,10 +44,10 @@ int NativePrint(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    int len = vsnprintf(nullptr, 0, fmt, ap); //len is without trailing 0
+    uint32_t len = vsnprintf(nullptr, 0, fmt, ap); //len is without trailing 0
     auto buff = GetSharableMem(len+1);
     vsprintf(buff.get(), fmt, ap);
-    int32_t res = NativeInvoke(Print_1_0{(char*)buff.get(), (uint32_t)len+1 });
+    int32_t res = NativeInvoke(Print_1_0{(char*)buff.get(), len+1 });
     va_end(ap);
     return res;
 }
@@ -77,10 +57,10 @@ int NativeSend(uint8_t to_cid, const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
 
-    int len = vsnprintf(nullptr, 0, fmt, ap); //len is without trailing 0
+    uint32_t len = vsnprintf(nullptr, 0, fmt, ap); //len is without trailing 0
     auto buff = GetSharableMem(len + 1);
     vsprintf(buff.get(), fmt, ap);
-    int32_t res = NativeInvoke(Send_Message_1_0{to_cid, (uint32_t)len+1, buff.get()});
+    int32_t res = NativeInvoke(Send_Message_1_0{to_cid, len + 1, buff.get()});
     va_end(ap);
     return res;
 }
@@ -92,7 +72,7 @@ public:
         Free();
     }
 
-    bool Load(void* ptr, uint32_t size, int fmt)
+    bool Load(const void* ptr, uint32_t size, int fmt)
     {
         Free();
         switch (fmt) {
@@ -129,6 +109,7 @@ protected:
     EPictureFormat m_format = epfNone;
 };
 
+
 class CSound
 {
 public:
@@ -137,6 +118,7 @@ public:
         switch (esf) {
             case ESoundFormat::esfMidi:
                 m_data = malloc(size);
+                WC_CHECKRET(m_data, false);
                 memcpy(m_data, ptr, size);
                 m_size = size;
                 m_format = esf;

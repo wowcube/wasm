@@ -363,6 +363,7 @@ cell abi_CMD_FILL_2(cell rgb)
 
 }
 
+/*
 cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror)
 {
   cell pkt[3] = {0};
@@ -373,6 +374,7 @@ cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror)
   sendpacket(pkt, 3);
 
 }
+*/
 
 cell abi_CMD_LINE(cell x1, cell y1, cell x2, cell y2, cell R, cell G, cell B)
 {

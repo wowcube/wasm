@@ -375,6 +375,7 @@ cell abi_CMD_TEXT(cell* text, cell fontResID, cell x, cell y, cell scale, cell a
 
 }
 
+/*
 cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror, cell bool g2d)
 {
   cell pkt[3] = {0};
@@ -385,6 +386,7 @@ cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror, cell bo
   sendpacket(pkt, 3);
 
 }
+*/
 
 cell abi_CMD_PLAYSND(cell id, cell volume)
 {
