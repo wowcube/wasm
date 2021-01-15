@@ -4,6 +4,8 @@
 #define true 1
 
 #include "header.h"
+typedef unsigned short uint16_t;
+#include "resources.h"
 
 #define run pawn_run
 #define pow pawn_pow

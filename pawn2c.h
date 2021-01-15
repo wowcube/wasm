@@ -49,3 +49,10 @@ typedef int stock;
 WC_EXTERN_C int sendpacket(int* packet, int size);
 cell ABS(cell);
 cell GetSign(cell);
+
+typedef struct {
+    const void* ptr;
+    int size;
+} resource_t;
+
+WC_EXTERN_C resource_t get_resource(int idx);

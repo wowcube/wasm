@@ -2,9 +2,10 @@
 #include <cstdio>
 #include "rubic/header.h"
 #include <map>
-#include "packman/resources.h"
 #include <list>
 #include <functional>
+#include "pawn2c.h"
+
 
 extern "C" int pawn_run(cell* pkt, int size, int* src);
 
@@ -147,27 +148,13 @@ public:
 
     void DrawBitmap(int buff, uint16_t resID, uint16_t x, uint16_t y, uint16_t angle, uint8_t mirror, bool g2d)
     {
-        const void* data = nullptr;
-        size_t size = 0;
-#define map_res(num) \
-        case num:\
-            data = _img_0##num;\
-            size = sizeof(_img_0##num);\
-            break
+        resource_t res = get_resource(resID);
 
-        switch (resID) {
-            map_res(14);
-            map_res(15);
-            map_res(25);
-            map_res(26);
-            map_res(40);
-            default:
-                return;
-        }
+
         m_buff[buff].steps.push_back(
-            [data, size, x, y, angle, mirror](CDisplay& disp) {
+            [res, x, y, angle, mirror](CDisplay& disp) {
                 CBitmap bmp;
-                bmp.Load(data, size, EPictureFormat::epfRGB565);
+                bmp.Load(res.ptr, res.size, EPictureFormat::epfRGB565);
                 disp.DrawBitmap(x,y, bmp, 1, angle, mirror);
             }
         );

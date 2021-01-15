@@ -112,34 +112,27 @@ def estimate_size(path):
     fl.write(s)
     fl.close()
 
-def convert_dir(path, rle, output="test2.h"):
-    out = open(output, "w")            
-    for root, dir, files in os.walk(path):  
-        names = []
-        
-        for file in sorted(fnmatch.filter(files, '*.png')):
-            string, name, _len = convert_picture(os.path.join(root,file), rle)
-            _len = str(_len)
-            names.append({"name":name,
-                          "len":_len})
-            out.write(string)
-        out.write("void getRes(int num, void** ret, int* size){\n")
-        out.write("void* __table[" + str(len(names)) + "] = {0};\n")
-        out.write("int __table_len[" + str(len(names)) + "] = {0};\n")
-        num = 0
-        for name in names:
-            _name = name["name"]
-            _len = name["len"]
-            out.write("__table_len[" + str(num) +"] = " + _len + "; ")
-            out.write("__table[" + str(num) + "] = (void*)" + _name + ";\n")
-            num = num + 1
-            #a.write()
-        out.write("if (num >= 0 && num < " + str(len(names)) + ")\n")
-        out.write("{*ret = __table[num]; *size = __table_len[num];}\n")
-        out.write("else\ngetRes(0,ret,size);")
-        out.write("\n}\n")
-     
-    out.close()
+getRes = """
+resource_t get_resource(int idx){
+    static resource_t resources[] = {
+%s
+    };
+    return resources[idx];
+}
+"""
+
+def convert_dir(path, rle):
+    names = []
+    with open(path+'.h', "w") as out:
+        for root, dir, files in os.walk(path):  
+            for file in sorted(fnmatch.filter(files, '*.png')):
+                print(file)
+                string, name, _len = convert_picture(os.path.join(root,file), rle)
+                names.append("{%s, %d}" % (name, _len))
+                out.write(string)
+                out.write('\n')
+
+        out.write(getRes % ',\n'.join(names))
 
 
 

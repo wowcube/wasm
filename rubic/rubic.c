@@ -6,6 +6,7 @@
 #define true 1
 
 #include "header.h"
+#include "pawn2c.h"
 
 #define run pawn_run
 #define pow pawn_pow
@@ -1421,3 +1422,9 @@ cell ON_CHECK_ROTATE()
 
 
 }
+
+resource_t get_resource(int idx) {
+    static resource_t dummy = {0,0};
+    return dummy;
+};
+
