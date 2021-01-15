@@ -9,6 +9,7 @@
 #include <memory>
 
 #define WC_CHECKRET(cond, ret) if (!(cond)) {NativePrint("%s(%d):\t%s\t-\t%s", __FILE__, __LINE__, __FUNCTION__, #cond); return ret;}
+#define WC_NORET ;
 
 template<class T=char>
 std::unique_ptr<T[]> GetSharableMem(uint32_t size)
@@ -77,6 +78,7 @@ public:
         Free();
         switch (fmt) {
             case EPictureFormat::epfRGB565:
+            case EPictureFormat::epfRLE:
                 m_data = malloc(size);
                 memcpy(m_data, ptr, size);
                 m_size = size;

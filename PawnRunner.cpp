@@ -154,7 +154,8 @@ public:
         m_buff[buff].steps.push_back(
             [res, x, y, angle, mirror](CDisplay& disp) {
                 CBitmap bmp;
-                bmp.Load(res.ptr, res.size, EPictureFormat::epfRGB565);
+                bool ret = bmp.Load(res.ptr, res.size, EPictureFormat::epfRLE);
+                WC_CHECKRET(ret, WC_NORET);
                 disp.DrawBitmap(x,y, bmp, 1, angle, mirror);
             }
         );
