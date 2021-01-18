@@ -10,7 +10,7 @@ cmake cmd
 mkdir build
 cd build
 cmake ..
-cmake --build . -jYOUR_CORES_NUM
+cmake --build .
 ```
 In follder ../bin you will find all wasm files
 ## Usage
