@@ -1,0 +1,8 @@
+*.autosave
+*.qmlc
+*.jsc
+*.ini
+*.txt.user
+bin
+build
+.vscode/
