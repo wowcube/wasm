@@ -51,4 +51,5 @@ add_subdirectory(example)
 add_subdirectory(rubic)
 add_subdirectory(race)
 add_subdirectory(packman)
+add_subdirectory(trbl_example)
 
