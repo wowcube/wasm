@@ -198,12 +198,12 @@ def CreateFile(fileName):
         raise Exception("No file found")
     if os.name == 'nt':
         if (os.path.isfile("pawncc.exe")):
-            os.system("pawncc.exe " + fileName + " -l")
+            os.system("pawncc.exe " + fileName + " -l PAWN2C=")
         else:
             raise Exception("No pawncc.exe found")
     else:
         if (os.path.isfile("./pawncc")):
-            os.system("./pawncc " + fileName + " -l")
+            os.system("./pawncc " + fileName + " -l PAWN2C=")
         else:
             raise Exception("No pawncc found")
 
