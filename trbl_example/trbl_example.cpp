@@ -15,10 +15,10 @@ protected:
             
             static char buf[64] = {};
             snprintf(buf, sizeof(buf), "DISPLAY: %d", display);
-            disp.DrawText(0, 0, buf, fColor(0, 0, 0), 30, 0);
+            disp.DrawText(0, 0, buf, fColor(0, 0, 0), 1, 0);
 
             snprintf(buf, sizeof(buf), "MODULE: %d", m_cid);
-            disp.DrawText(0, 60, buf, fColor(0, 0, 0), 30, 0);
+            disp.DrawText(0, 60, buf, fColor(0, 0, 0), 1, 0);
 
             disp.DrawLine(120, 0, 120, 120, fColor(1, 0, 0));
             disp.DrawLine(0, 120, 120, 120, fColor(0, 1, 0));
