@@ -140,7 +140,7 @@ protected:
                 uint32_t diff = time - m_nPrevTime;
                 static char buff[32] = {};
                 snprintf(buff, sizeof(buff), "fps: %f", 1000. / diff);
-                disp.DrawText(0, 0, buff, fColor(1,1,1), 30);
+                disp.DrawText(0, 0, buff, fColor(1,1,1), 3);
             }
             m_nPrevTime = time;
 
