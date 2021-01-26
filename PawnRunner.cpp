@@ -1,6 +1,5 @@
 #include "cube_api.h"
 #include <cstdio>
-#include "rubic/header.h"
 #include <map>
 #include <list>
 #include <functional>
@@ -479,4 +478,130 @@ extern "C" cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirr
     printf("CMD_BITMAP resID %d x, y: %d %d angle %d mirror %d g2d %d\n", resID, x, y, angle, mirror, g2d);
 
     g_runner.DrawBitmap(pawn_tmp_framebuffer, resID, x, y, angle, mirror, g2d);
+}
+// Remove TODO on realization
+extern "C" cell abi_CMD_REDRAW(cell faceN)
+{
+    printf("TODO: abi_CMD_REDRAW %d\n", faceN);
+
+}
+
+extern "C" cell abi_exit()
+{
+    printf("TODO: abi_exit\n");
+
+}
+
+extern "C" cell abi_trigger_debug_info()
+{
+    printf("TODO: abi_trigger_debug_info\n");
+
+}
+
+extern "C" cell abi_trigger_bluetooth()
+{
+    printf("TODO: abi_trigger_bluetooth\n");
+
+}
+
+extern "C" cell abi_CMD_FILL(cell R, cell G, cell B)
+{
+    printf("TODO: abi_CMD_FILL %d %d %d\n",R,G,B);
+
+}
+
+extern "C" cell abi_CMD_FILL_2(cell rgb)
+{
+    printf("TODO: abi_CMD_FILL_2 %d\n", rgb);
+
+}
+
+extern "C" cell abi_CMD_TEXT(cell * text, cell fontResID, cell x, cell y, cell scale, cell angle, cell r, cell g, cell b, cell size)
+{
+    printf("TODO: abi_CMD_TEXT  * text (not supported),  fontResID %d,  x %d,  y %d,  scale %d,  angle %d,  r %d,  g %d,  b %d,  size %d", fontResID, x, y, scale, angle, r, g, b, size);
+
+}
+
+extern "C" cell abi_CMD_PLAYSND(cell id, cell volume)
+{
+    printf("TODO: abi_CMD_PLAYSND id %d, volume %d\n", id, volume);
+
+}
+
+extern "C" cell abi_CMD_LINE(cell x1, cell y1, cell x2, cell y2, cell R, cell G, cell B)
+{
+    printf("TODO: abi_CMD_LINE x1 %d,  y1 %d,  x2 %d,  y2 %d,  R %d,  G %d,  B %d\n", x1, y1, x2, y2, R, G, B);
+
+}
+
+extern "C" cell abi_CMD_RECT(cell x1, cell y1, cell x2, cell y2, cell R, cell G, cell B)
+{
+    printf("TODO: abi_CMD_RECT x1 %d,  y1 %d,  x2 %d,  y2 %d,  R %d,  G %d,  B %d\n", x1, y1, x2, y2, R, G, B);
+
+}
+
+extern "C" cell abi_CMD_NET_TX(cell line_tx, cell TTL, cell * data, cell with_pool)
+{
+    printf("TODO: abi_CMD_NET_TX line_tx %d,  TTL %d,  data (not supported),  with_pool %d\n", line_tx, TTL, with_pool);
+
+}
+
+extern "C" cell abi_CMD_SAVE_STATE(cell * data, cell size)
+{
+    printf("TODO: abi_CMD_SAVE_STATE data (not supported), size %d\n", size);
+
+}
+
+extern "C" cell abi_CMD_LOAD_STATE()
+{
+    printf("TODO: abi_CMD_LOAD_STATE\n");
+
+}
+
+extern "C" cell abi_CMD_CHANGE_SCRIPT(cell scriptID)
+{
+    printf("TODO: abi_CMD_CHANGE_SCRIPT scriptID %d\n", scriptID);
+
+}
+
+extern "C" cell abi_CMD_SLEEP()
+{
+    printf("TODO: abi_CMD_SLEEP\n");
+
+}
+
+extern "C" cell abi_CMD_G2D_BEGIN_BITMAP(cell resID, cell width, cell height, bool replace)
+{
+    printf("TODO: abi_CMD_G2D_BEGIN_BITMAP resID %d, width %d, height %d, replace %d\n", resID, width, height, replace);
+
+}
+
+extern "C" cell abi_CMD_G2D_BEGIN_DISPLAY(cell display, bool replace)
+{
+    printf("TODO: abi_CMD_G2D_BEGIN_DISPLAY display %d, replace %d\n", display, replace);
+
+}
+
+extern "C" cell abi_CMD_G2D_ADD_SPRITE(cell resID, bool g2d, cell x, cell y, cell alpha, cell color, cell rotation, cell mirror)
+{
+    printf("TODO: abi_CMD_G2D_ADD_SPRITE  resID %d, g2d %d,  x %d,  y %d,  alpha %d,  color %d,  rotation %d,  mirror%d\n", resID, g2d, x, y, alpha, color, rotation, mirror);
+
+}
+
+extern "C" cell abi_CMD_G2D_ADD_RECTANGLE(cell x, cell y, cell width, cell height, cell color)
+{
+    printf("TODO: abi_CMD_G2D_ADD_RECTANGLE  x %d,  y %d,  width %d,  height %d,  color %d\n", x, y, width, height, color);
+
+}
+
+extern "C" cell abi_CMD_G2D_END()
+{
+    printf("TODO: abi_CMD_G2D_END\n");
+
+}
+
+extern "C" cell abi_trigger_nightlamp(cell c_mode)
+{
+    printf("TODO: abi_trigger_nightlamp c_mode %d\n", c_mode);
+
 }
