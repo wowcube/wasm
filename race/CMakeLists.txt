@@ -24,5 +24,5 @@ file(GLOB CORE_SRC *.cpp)
 
 include_directories(..)
 #add_library(race SHARED ${CORE_SRC} ${CORE_HDR})
-DualCompilation(race "${CORE_SRC}" "${CORE_HDR}")
+DualCompilation(race "${CORE_SRC}" "${CORE_HDR}" "")
 

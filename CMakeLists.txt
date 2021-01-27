@@ -19,7 +19,7 @@ if (UNIX)
 
 endif()
 
-macro(DualCompilation name lsrc lhdr)
+macro(DualCompilation name lsrc lhdr wasm_ext)
   add_library(${name} SHARED ${lsrc} ${lhdr})
   if(WIN32)
     message("DualCompilation ${name}: ${lsrc}, ${lhdr}")
@@ -35,7 +35,7 @@ macro(DualCompilation name lsrc lhdr)
 
 
     #EMMAKEN_CFLAGS
-    set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
+    set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry ${wasm_ext} -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
     add_custom_target(wasm_${name} ALL
       COMMAND cmd /c "${WASM_CMD}"
       DEPENDS ${src} ${hdr}
@@ -52,4 +52,4 @@ add_subdirectory(rubic)
 add_subdirectory(race)
 add_subdirectory(packman)
 add_subdirectory(trbl_example)
-
+#add_subdirectory(cocos)

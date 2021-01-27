@@ -23,5 +23,5 @@ file(GLOB CORE_SRC *.cpp)
 
 include_directories(..)
 
-DualCompilation(trbl_example "${CORE_SRC}" "${CORE_HDR}")
+DualCompilation(trbl_example "${CORE_SRC}" "${CORE_HDR}" "")
 

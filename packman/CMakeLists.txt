@@ -28,8 +28,7 @@ set_source_files_properties(
 endif()
 
 include_directories(..)
-DualCompilation(pacman "${CORE_SRC}" "${CORE_HDR}")
-#add_library(pacman SHARED ${CORE_SRC} ${CORE_HDR})
+DualCompilation(pacman "${CORE_SRC}" "${CORE_HDR}" "")
 
 
 
