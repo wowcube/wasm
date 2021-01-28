@@ -56,3 +56,26 @@ typedef struct {
 } resource_t;
 
 WC_EXTERN_C resource_t get_resource(int idx);
+
+WC_EXTERN_C cell abi_CMD_REDRAW(cell faceN);
+WC_EXTERN_C cell abi_exit();
+WC_EXTERN_C cell abi_trigger_debug_info();
+WC_EXTERN_C cell abi_trigger_bluetooth();
+WC_EXTERN_C cell abi_CMD_FILL(cell R, cell G, cell B);
+WC_EXTERN_C cell abi_CMD_FILL_2(cell rgb);
+WC_EXTERN_C cell abi_CMD_TEXT(cell* text, cell fontResID, cell x, cell y, cell scale, cell angle, cell r, cell g, cell b, cell size);
+WC_EXTERN_C cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror, int g2d);
+WC_EXTERN_C cell abi_CMD_PLAYSND(cell id, cell volume);
+WC_EXTERN_C cell abi_CMD_LINE(cell x1, cell y1, cell x2, cell y2, cell R, cell G, cell B);
+WC_EXTERN_C cell abi_CMD_RECT(cell x1, cell y1, cell x2, cell y2, cell R, cell G, cell B);
+WC_EXTERN_C cell abi_CMD_NET_TX(cell line_tx, cell TTL, cell* data, cell with_pool);
+WC_EXTERN_C cell abi_CMD_SAVE_STATE(cell* data, cell size);
+WC_EXTERN_C cell abi_CMD_LOAD_STATE();
+WC_EXTERN_C cell abi_CMD_CHANGE_SCRIPT(cell scriptID);
+WC_EXTERN_C cell abi_CMD_SLEEP();
+WC_EXTERN_C cell abi_CMD_G2D_BEGIN_BITMAP(cell resID, cell width, cell height, int replace);
+WC_EXTERN_C cell abi_CMD_G2D_BEGIN_DISPLAY(cell display, int replace);
+WC_EXTERN_C cell abi_CMD_G2D_ADD_SPRITE(cell resID, int g2d, cell x, cell y, cell alpha, cell color, cell rotation, cell mirror);
+WC_EXTERN_C cell abi_CMD_G2D_ADD_RECTANGLE(cell x, cell y, cell width, cell height, cell color);
+WC_EXTERN_C cell abi_CMD_G2D_END();
+WC_EXTERN_C cell abi_trigger_nightlamp(cell c_mode);

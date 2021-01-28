@@ -572,19 +572,19 @@ extern "C"
 
     }
 
-    cell abi_CMD_G2D_BEGIN_BITMAP(cell resID, cell width, cell height, bool replace)
+    cell abi_CMD_G2D_BEGIN_BITMAP(cell resID, cell width, cell height, int replace)
     {
         printf("TODO: abi_CMD_G2D_BEGIN_BITMAP resID %d, width %d, height %d, replace %d\n", resID, width, height, replace);
 
     }
 
-    cell abi_CMD_G2D_BEGIN_DISPLAY(cell display, bool replace)
+    cell abi_CMD_G2D_BEGIN_DISPLAY(cell display, int replace)
     {
         printf("TODO: abi_CMD_G2D_BEGIN_DISPLAY display %d, replace %d\n", display, replace);
 
     }
 
-    cell abi_CMD_G2D_ADD_SPRITE(cell resID, bool g2d, cell x, cell y, cell alpha, cell color, cell rotation, cell mirror)
+    cell abi_CMD_G2D_ADD_SPRITE(cell resID, int g2d, cell x, cell y, cell alpha, cell color, cell rotation, cell mirror)
     {
         printf("TODO: abi_CMD_G2D_ADD_SPRITE  resID %d, g2d %d,  x %d,  y %d,  alpha %d,  color %d,  rotation %d,  mirror%d\n", resID, g2d, x, y, alpha, color, rotation, mirror);
 
