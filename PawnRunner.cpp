@@ -475,6 +475,15 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
     return result;
 }
 
+inline uint16_t ToRGB565(uint32_t r, uint32_t g, uint32_t b) {
+    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b >> 3) & 0x1F);
+}
+
+inline uint16_t ToRGB565(cell color) {
+    return ToRGB565((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+}
+
+
 extern "C"
 {
     cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror, int g2d)
@@ -512,13 +521,14 @@ extern "C"
     cell abi_CMD_FILL(cell R, cell G, cell B)
     {
         //printf("TODO: abi_CMD_FILL %d %d %d\n", R, G, B);
-        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, R | G | B /*packed*/); // RGB565
+
+        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, ToRGB565(R, G, B)); // RGB565
     }
 
     cell abi_CMD_FILL_2(cell rgb)
     {
         printf("TODO: abi_CMD_FILL_2 %d\n", rgb);
-        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, rgb);
+        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, ToRGB565(rgb));
     }
 
     cell abi_CMD_TEXT(cell* text, cell fontResID, cell x, cell y, cell scale, cell angle, cell r, cell g, cell b, cell size)
