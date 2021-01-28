@@ -21,6 +21,7 @@ class CEventLoopEx: public CEventLoop
         std::list<TStep> steps;
     };
     std::map<int, SBuff> m_buff;
+    std::map<int, CBitmap> m_bitmaps;
 
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
         uint8_t result[3][8];
@@ -129,6 +130,7 @@ public:
         {
             step(disp);
         }
+        m_buff[buff].steps.clear();
         //disp.Fill(m_buff[buff].color);
         
     }
@@ -148,14 +150,14 @@ public:
     void DrawBitmap(int buff, uint16_t resID, uint16_t x, uint16_t y, uint16_t angle, uint8_t mirror, bool g2d)
     {
         resource_t res = get_resource(resID);
-
+        if (!m_bitmaps.count(resID)) {
+            bool ret = m_bitmaps[resID].Load(res.ptr, res.size, EPictureFormat::epfRLE);
+            WC_CHECKRET(ret, WC_NORET);
+        }
 
         m_buff[buff].steps.push_back(
-            [res, x, y, angle, mirror](CDisplay& disp) {
-                CBitmap bmp;
-                bool ret = bmp.Load(res.ptr, res.size, EPictureFormat::epfRLE);
-                WC_CHECKRET(ret, WC_NORET);
-                disp.DrawBitmap(x,y, bmp, 1, angle, mirror);
+            [resID, x, y, angle, mirror, this](CDisplay& disp) {
+                disp.DrawBitmap(x,y, m_bitmaps[resID], 1, angle, mirror);
             }
         );
     }
@@ -477,15 +479,16 @@ extern "C"
 {
     cell abi_CMD_BITMAP(cell resID, cell x, cell y, cell angle, cell mirror, int g2d)
     {
-        printf("CMD_BITMAP resID %d x, y: %d %d angle %d mirror %d g2d %d\n", resID, x, y, angle, mirror, g2d);
+        //printf("CMD_BITMAP resID %d x, y: %d %d angle %d mirror %d g2d %d\n", resID, x, y, angle, mirror, g2d);
 
         g_runner.DrawBitmap(pawn_tmp_framebuffer, resID, x, y, angle, mirror, g2d);
     }
     // Remove TODO on realization
     cell abi_CMD_REDRAW(cell faceN)
     {
-        printf("TODO: abi_CMD_REDRAW %d\n", faceN);
-
+        //printf("TODO: abi_CMD_REDRAW %d\n", faceN);
+        g_runner.FB_FlushTmpFrameBuffer(faceN, pawn_tmp_framebuffer);
+        g_runner.DISPLAY_flushFramebufferAsync(faceN);
     }
 
     cell abi_exit()
@@ -508,14 +511,14 @@ extern "C"
 
     cell abi_CMD_FILL(cell R, cell G, cell B)
     {
-        printf("TODO: abi_CMD_FILL %d %d %d\n", R, G, B);
-
+        //printf("TODO: abi_CMD_FILL %d %d %d\n", R, G, B);
+        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, R | G | B /*packed*/); // RGB565
     }
 
     cell abi_CMD_FILL_2(cell rgb)
     {
         printf("TODO: abi_CMD_FILL_2 %d\n", rgb);
-
+        g_runner.FB_fillBuffer(pawn_tmp_framebuffer, rgb);
     }
 
     cell abi_CMD_TEXT(cell* text, cell fontResID, cell x, cell y, cell scale, cell angle, cell r, cell g, cell b, cell size)
@@ -544,8 +547,8 @@ extern "C"
 
     cell abi_CMD_NET_TX(cell line_tx, cell TTL, cell* data, cell with_pool)
     {
-        printf("TODO: abi_CMD_NET_TX line_tx %d,  TTL %d,  data (not supported),  with_pool %d\n", line_tx, TTL, with_pool);
-
+        //printf("TODO: abi_CMD_NET_TX line_tx %d,  TTL %d,  data (not supported),  with_pool %d\n", line_tx, TTL, with_pool);
+        g_runner.Send(line_tx, 4 * sizeof(int), data);
     }
 
     cell abi_CMD_SAVE_STATE(cell* data, cell size)
