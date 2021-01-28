@@ -448,7 +448,7 @@ cell Draw_Results(cell _type)
 
   if (_type == 0)
   {
-    abi_CMD_BITMAP(0+_type, 120, 120, 180, 0);
+    abi_CMD_BITMAP(0+_type, 120, 120, 180, 0, 0);
   }
   else if (_type == 1)
   {
@@ -463,10 +463,10 @@ cell Draw_Results(cell _type)
     base=moves;
     for(new i=0;i<=count;i++)
     {
-      abi_CMD_BITMAP(4+base%10,  120, 120  + (22+2)/2*count - (22+2)*i, 90, 0);
+      abi_CMD_BITMAP(4+base%10,  120, 120  + (22+2)/2*count - (22+2)*i, 90, 0, 0);
       base/=10;
     }
-    abi_CMD_BITMAP(0+_type, 70, 120, 90, 0);
+    abi_CMD_BITMAP(0+_type, 70, 120, 90, 0, 0);
   }
   else if (_type == 2)
   {
@@ -482,10 +482,10 @@ cell Draw_Results(cell _type)
     base=score;
     for(new i=0;i<=count;i++)
     {
-      abi_CMD_BITMAP(4+base%10, 120 + (22+2)/2*count - (22+2)*i, 120, 0, 0);
+      abi_CMD_BITMAP(4+base%10, 120 + (22+2)/2*count - (22+2)*i, 120, 0, 0, 0);
       base/=10;
     }
-    abi_CMD_BITMAP(0+_type, 120, 170, 0, 0);
+    abi_CMD_BITMAP(0+_type, 120, 170, 0, 0, 0);
   }
   else if (_type == 3)
   {
@@ -507,15 +507,15 @@ cell Draw_Results(cell _type)
     {
       if (((i+1)-(i+1)/3*3 == 0) && (i!=0))
       {
-        abi_CMD_BITMAP(4+10, 120, 120 - (22+2)/2*count + (22+2)*i, 270, 0);
+        abi_CMD_BITMAP(4+10, 120, 120 - (22+2)/2*count + (22+2)*i, 270, 0, 0);
       }
       else
       {
-        abi_CMD_BITMAP(4+base%10, 120, 120 - (22+2)/2*count + (22+2)*i, 270, 0);
+        abi_CMD_BITMAP(4+base%10, 120, 120 - (22+2)/2*count + (22+2)*i, 270, 0, 0);
         base/=10;
       }
     }
-    abi_CMD_BITMAP(0+_type, 170, 120, 270, 0);
+    abi_CMD_BITMAP(0+_type, 170, 120, 270, 0, 0);
   }
 
 }
