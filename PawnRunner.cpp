@@ -9,6 +9,15 @@
 extern "C" int pawn_run(cell* pkt, int size, int* src);
 
 
+inline uint16_t ToRGB565(uint32_t r, uint32_t g, uint32_t b) {
+    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b >> 3) & 0x1F);
+}
+
+inline uint16_t ToRGB565(cell color) {
+    return ToRGB565((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+}
+
+
 class CEventLoopEx: public CEventLoop
 {
     uint32_t m_nPrevTime = 0;
@@ -126,12 +135,13 @@ public:
     void FB_FlushTmpFrameBuffer(int screen, int buff)
     {
         CDisplay disp(screen);
+
         for (auto& step: m_buff[buff].steps)
         {
             step(disp);
         }
+        
         m_buff[buff].steps.clear();
-        //disp.Fill(m_buff[buff].color);
         
     }
     void DISPLAY_flushFramebufferAsync(int screen)
@@ -139,19 +149,20 @@ public:
     }
     void FB_fillBuffer(int buff, uint16_t color)
     {
-        //m_buff[buff].color = color;
+        /*
         m_buff[buff].steps.push_back(
             [color](CDisplay& disp) {
                 disp.Fill(color);
             }
         );
+        */
     }
 
     void DrawBitmap(int buff, uint16_t resID, uint16_t x, uint16_t y, uint16_t angle, uint8_t mirror, bool g2d)
     {
         resource_t res = get_resource(resID);
         if (!m_bitmaps.count(resID)) {
-            bool ret = m_bitmaps[resID].Load(res.ptr, res.size, EPictureFormat::epfRLE);
+            bool ret = m_bitmaps[resID].Load(res.ptr, res.size*sizeof(uint16_t), EPictureFormat::epfRLE);
             WC_CHECKRET(ret, WC_NORET);
         }
 
@@ -473,14 +484,6 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
     }
         
     return result;
-}
-
-inline uint16_t ToRGB565(uint32_t r, uint32_t g, uint32_t b) {
-    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b >> 3) & 0x1F);
-}
-
-inline uint16_t ToRGB565(cell color) {
-    return ToRGB565((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
 }
 
 
