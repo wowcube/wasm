@@ -36,7 +36,7 @@ macro(DualCompilation name lsrc lhdr wasm_ext)
     set(EMCC_FLAGS "-I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 --no-entry")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       # -s SAFE_HEAP=1 -s SAFE_HEAP_LOG=1 | -fsanitize=address -s ALLOW_MEMORY_GROWTH & -s ASSERTIONS=2 -s STACK_OVERFLOW_CHECK=2
-      set(EMCC_FLAGS "${EMCC_FLAGS} -g4 -s DEMANGLE_SUPPORT=1 -s ASSERTIONS=1 -s STACK_OVERFLOW_CHECK=1")
+      set(EMCC_FLAGS "${EMCC_FLAGS} -g4 -s ASSERTIONS=1 -s STACK_OVERFLOW_CHECK=1 -s DEMANGLE_SUPPORT=1")
     else()
       message(FATAL_ERROR "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
       set(EMCC_FLAGS "${EMCC_FLAGS} -O3")
