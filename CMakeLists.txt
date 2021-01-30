@@ -33,9 +33,17 @@ macro(DualCompilation name lsrc lhdr wasm_ext)
       COMPILE_FLAGS "/wd4996"
     )
 
+    set(EMCC_FLAGS "-I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 --no-entry")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      # -s SAFE_HEAP=1 -s SAFE_HEAP_LOG=1 | -fsanitize=address -s ALLOW_MEMORY_GROWTH & -s ASSERTIONS=2 -s STACK_OVERFLOW_CHECK=2
+      set(EMCC_FLAGS "${EMCC_FLAGS} -g4 -s DEMANGLE_SUPPORT=1 -s ASSERTIONS=1 -s STACK_OVERFLOW_CHECK=1")
+    else()
+      message(FATAL_ERROR "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+      set(EMCC_FLAGS "${EMCC_FLAGS} -O3")
+    endif()
 
     #EMMAKEN_CFLAGS
-    set(WASM_CMD "emcc -I ${CMAKE_CURRENT_LIST_DIR}/.. -Wno-return-type -Wno-implicit-int ${src} -s STANDALONE_WASM -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O3 --no-entry ${wasm_ext} -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
+    set(WASM_CMD "emcc ${EMCC_FLAGS} ${wasm_ext} -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.wasm")
     add_custom_target(wasm_${name} ALL
       COMMAND cmd /c "${WASM_CMD}"
       DEPENDS ${src} ${hdr}
