@@ -3,7 +3,7 @@ Wowcube public WebAssembly examples and utils
 ## Installation
 
 * [Install](https://emscripten.org/docs/getting_started/downloads.html) Emscripten Compiler Frontend
-* Add to system environment path C:\your_path\emsdk\upstream\emscripten
+* open cmd and execute `emsdk_env.bat --permanent`
 ## Build wasm
 cmake cmd
 ```bash
