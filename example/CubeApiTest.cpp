@@ -202,8 +202,5 @@ public:
 
 WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
-    test();
-    boost_test();
-    //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();
 }
