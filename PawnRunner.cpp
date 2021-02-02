@@ -69,21 +69,26 @@ protected:
         print_transpon(m_trbl.CFMID, buffer);
         NativePrint("OnTRBLChanged CFMID %s", buffer);
 
-        cell amx_pkt_geo[20] = {0};
+        cell amx_pkt_geo[20] = { CMD_GEO };// CMD_GEO{8},n_records{8},CID[0]{8},screen[0]{8},...,CID[N]{8},screen[N]{8}
+
         pawn_run(amx_pkt_geo, sizeof(amx_pkt_geo)/sizeof(cell), 0);
     }
     void OnGyroChanged(const Get_Gyro_1_0& gyro) override
     {
         m_gyro = gyro;
         NativePrint("OnGyroChanged X:%x Y:%x Z:%x", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
-        cell amx_pkt_mtd[16] = {0};
+        cell amx_pkt_mtd[16] = { CMD_MTD }; /*CMD_MTD{8},
+        accel_X_pos{ 8 }, accel_X_neg{ 8 }, accel_Y_pos{ 8 }, accel_Y_neg{ 8 }, accel_Z_pos{ 8 }, accel_Z_neg{ 8 },
+            gyro_X_pos{ 8 }, gyro_X_neg{ 8 }, gyro_Y_pos{ 8 }, gyro_Y_neg{ 8 }, gyro_Z_pos{ 8 }, gyro_Z_neg{ 8 }*/
         pawn_run((cell*)amx_pkt_mtd, sizeof(amx_pkt_mtd)/sizeof(cell), 0);
     }
     void OnAccelChanged(const Get_Accel_1_0& accel) override
     {
         m_accel = accel;
         NativePrint("OnAccelChanged X:%x Y:%x Z:%x", accel.axis_X, accel.axis_Y, accel.axis_Z);
-        cell amx_pkt_mtd[16] = {0};
+        cell amx_pkt_mtd[16] = { CMD_MTD };/*CMD_MTD{8},
+        accel_X_pos{ 8 }, accel_X_neg{ 8 }, accel_Y_pos{ 8 }, accel_Y_neg{ 8 }, accel_Z_pos{ 8 }, accel_Z_neg{ 8 },
+            gyro_X_pos{ 8 }, gyro_X_neg{ 8 }, gyro_Y_pos{ 8 }, gyro_Y_neg{ 8 }, gyro_Z_pos{ 8 }, gyro_Z_neg{ 8 }*/
         pawn_run((cell*)amx_pkt_mtd, sizeof(amx_pkt_mtd)/sizeof(cell), 0);
     }
 
@@ -104,8 +109,8 @@ protected:
     void OnMessage(uint32_t size, const Get_Message_1_0& msg) override
     {
         NativePrint("Msg from %d: %s", msg.from_cid, (const char*)msg.data);
-        char answer[] = "I am fine too!";
-        NativeInvoke(Send_Message_1_0{msg.from_cid, sizeof(answer), answer});
+        cell amx_pkt_rx[] = { CMD_NET_RX, 0, 0, 0 }; //CMD_NET_RX{8},line_rx{8},neighbor_line_tx{8},TTL{8},<4 CELLs of arbitrary data here>{128}
+        pawn_run((cell*)amx_pkt_rx, sizeof(amx_pkt_rx) / sizeof(cell), 0);
     }
 
     void OwnCID(uint8_t cid) override
@@ -183,7 +188,7 @@ WASM_EXPORT int run() // native cube code searches for this function and runs as
 }
 
 int pawn_tmp_framebuffer = 3; //offscreen display
-
+#if 0
 //TODO: check all (usure) outputs with real data (just search it)
 WC_EXTERN_C int sendpacket(int* packet, int size)
 { 
@@ -485,7 +490,7 @@ WC_EXTERN_C int sendpacket(int* packet, int size)
         
     return result;
 }
-
+#endif
 
 extern "C"
 {
