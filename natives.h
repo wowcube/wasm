@@ -112,7 +112,7 @@ typedef struct
     uint32_t size;
 } Print_1_0;
 
-uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
+inline uint16_t fColor(float r, float g, float b){ // 0.0f .. 1.0f
     return ((int)(r*0x1F) << 11)|((int)(g*0x3F)<<5)|(int)(b*0x1F);
 }
 
