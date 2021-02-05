@@ -39,9 +39,6 @@ const int g = 10;
 const int k = 240 / g;
 char b[k*k] = {};
 
-const uint16_t pixel = 10;
-CCubeNet<240*2/pixel, bool> g_cube;
-
 class CScubo {
     int m_ord = 0;
     int m_val[2] = {};
@@ -74,17 +71,9 @@ public:
             Move(dy, 1);
     }
 
-    int x() {
-        return m_val[0];
-    }
-
-    int y() {
-        return m_val[1];
-    }
-
-    int disp() {
-        return m_screens[m_ord];
-    }
+    int x() { return m_val[0];}
+    int y() { return m_val[1];}
+    int disp() {return m_screens[m_ord];}
 
 #define WC_TEST() static void test()
 #define WC_TEST_CHECK(cond) {if (!(cond)) NativePrint("%s(%d): %s TEST FAIL:", __FILE__, __LINE__, __FUNCTION__, #cond);}
@@ -111,7 +100,7 @@ class CEventLoopEx: public CEventLoop
     int m_grad = 0;
     Get_TRBL_1_0 m_trbl = {};
 
-/*    size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
+    size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
         uint8_t result[3][8];
 
         for (int i = 0; i < 8; i++)
@@ -131,7 +120,7 @@ class CEventLoopEx: public CEventLoop
         buffer[l++] = 0;
         return l;
     }
-*/
+
 
     Get_Gyro_1_0 m_gyro = {};
     Get_Accel_1_0 m_accel = {};
@@ -140,7 +129,7 @@ protected:
     void OnTRBLChanged(const Get_TRBL_1_0& trbl) override
     {
         m_trbl = trbl;
-/*        char buffer[256];
+        char buffer[256];
         print_transpon(m_trbl.CID, buffer);
         NativePrint("OnTRBLChanged CID %s", buffer);
 
@@ -149,7 +138,7 @@ protected:
 
         print_transpon(m_trbl.CFMID, buffer);
         NativePrint("OnTRBLChanged CFMID %s", buffer);
-*/
+
     }
 
     void OnGyroChanged(const Get_Gyro_1_0& gyro) override
@@ -179,17 +168,12 @@ protected:
         {
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
-#if 0
+#if 1
             if (display == 0)
                 Update(disp);
 
             if (display == 1)
             {
-                /*
-                for (uint16_t y = 0; y < g_cube.height; ++y)
-                    for (uint16_t x = 0; x < g_cube.width; ++x)
-                        disp.FillRect(x * pixel, y * pixel, pixel, pixel, g_cube.At(x, y) ? fColor(1,1,1) : fColor(0,0,0));
-                */
                 ++m_nPos %= 240;
                 disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
                 static char buf[64] = {};
@@ -243,10 +227,6 @@ protected:
     {
         for (int y = k * k; y--;)
             b[y] = rand() % 2;
-
-        for (uint16_t y = 0; y < g_cube.height; ++y)
-            for (uint16_t x = 0; x < g_cube.width; ++x)
-                g_cube.At(x, y) = !!(rand() % 2);
     }
 
     void Update(CDisplay& disp) {
