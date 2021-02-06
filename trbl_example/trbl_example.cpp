@@ -33,6 +33,15 @@ protected:
         NativePrint("MY CID IS %d", cid);
         m_cid = cid;
     }
+   
+    virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl) {
+        NativePrint("on trbl changed \n");
+        for (int i = 0; i < 8; i++) {
+            NativePrint("CID %d %d %d", trbl.CID[i][0], trbl.CID[i][1], trbl.CID[i][2]);
+            NativePrint("CFID %d %d %d", trbl.CFID[i][0], trbl.CFID[i][1], trbl.CFID[i][2]);
+            NativePrint("CFMID %d %d %d", trbl.CFMID[i][0], trbl.CFMID[i][1], trbl.CFMID[i][2]);
+        }
+    }
 
 public:
     int Main() override
