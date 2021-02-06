@@ -2,7 +2,7 @@ import os
 import sys
 import re
 
-e_arrays = re.compile(r"new\s+(const)?\s*([a-zA-Z_][_a-zA-Z0-9]+)\s*(\[.+\])+\s*=\s*([\s\S]*?)\s*;")
+e_arrays = re.compile(r"new\s+(const)?\s*([a-zA-Z_][_a-zA-Z0-9]+)\s*([\[\{].*[\}\]])+\s*=\s*([\[\{][\s\S]*?[\]\}])\s*;")
 e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<type>[_a-zA-Z0-9:]+)(?P<isArray>\[\])?\s*(?P<name>[_a-zA-Z0-9:]+)?")
 e_func = re.compile(r"^([_a-zA-Z][_a-zA-Z0-9]+\s+)?([_a-zA-Z][_a-zA-Z0-9]+)\((.*)\)\s*{",flags=re.MULTILINE)
 e_case = re.compile(r"case\s*(\d.*)*\:")
@@ -12,7 +12,8 @@ def scanBasicReplacement(lines):
     linesRes = re.sub(r'#.*$', '', lines,flags=re.MULTILINE)
     linesRes = re.sub(r'forward.*$|native.*$', '', linesRes,flags=re.MULTILINE)
     linesRes = re.sub(r'public\s+', '', linesRes,flags=re.MULTILINE)
-    linesRes = re.sub(r"]\s*=\s*0\s*;", "]={0};", linesRes, flags=re.MULTILINE)
+    #linesRes = re.sub(r"]\s*=\s*0\s*;", "]={0};", linesRes, flags=re.MULTILINE)
+    linesRes = re.sub(r'\{\s*0\s*,?\s*(...)?\s*\}', '0', linesRes,flags=re.MULTILINE)
     linesRes = re.sub(r"bool\:", "bool ", linesRes, flags=re.MULTILINE)
     return linesRes
 
@@ -42,10 +43,32 @@ def scanCase(lines):
 
 def newArray(isPorted,parsed):
     resultLines = ""
-    def doSize(sizeStr):
+    def doSize(sizeStr, count):
         unparsed = list(sizeStr)
         parsed = [x for x in unparsed if x != " "]
-        return "".join(parsed)
+        depth = -1
+        open = False
+        predefined = False
+        result = []
+        for symbol in parsed:
+            if symbol == "[" or symbol == "{":
+                depth += 1
+                open = True
+                result.append("[")
+            elif open == True:
+                if symbol == "]" or symbol == "}":
+                    if predefined == False:
+                        result.extend(list(str(count[depth])))
+                    result.append("]")
+                    open = False
+                else:
+                    result.append(symbol)
+                    predefined = True
+            elif open == False:
+                if symbol == "]" or symbol == "}":
+                    result.append("]")
+
+        return "".join(result)
     def doInit(initStr):
         unparsed = list(initStr)      
         parsed = []
@@ -56,13 +79,48 @@ def newArray(isPorted,parsed):
                 parsed.append("}")
             else:
                 parsed.append(symbol)
+        #a,b,c = 0
+        #for symbol in parsed:
+        #    if (symbol == "{" and a == 0):
+        #        a += 0
+        #    elif ("}"):
+        #        a
         return "".join(parsed)
+    def scanInit(init):
+        unparsed = list(init) 
+        unparsed = [x for x in unparsed if x != " "]     
+        parsed = []    
+        depth = -1
+        maxDepth = 0
+        count = [0,0,0]
+        countCounted = [False,False,False]
+        for symbol in unparsed:
+            if (symbol == "{"):
+                depth += 1 
+                if (countCounted[depth] == False):
+                    count[depth] += 1
+                               
+            if (symbol == ","):
+                if (countCounted[depth] == False):
+                    count[depth] += 1
+            if (symbol == "}"):
+                countCounted[depth] = True
+                depth -= 1
+        #a,b,c = 0
+        #for symbol in parsed:
+        #    if (symbol == "{" and a == 0):
+        #        a += 0
+        #    elif ("}"):
+        #        a
+        return count
+    init = doInit(parsed["initializer"])
+    count = scanInit(init)
     if isPorted == False:
         resultLines += "new" + " "
         resultLines += (parsed["const"] + " ") if not (parsed["const"] is None) else ""
         resultLines += parsed["name"] + doSize(parsed["size"]) + " = " + parsed["initializer"] + ";\n"
     else:
-        resultLines += "cell" + " " + parsed["name"] + doSize(parsed["size"]) + " = " + doInit(parsed["initializer"]) + ";"        
+        resultLines += "new" + " " + parsed["name"] + doSize(parsed["size"],count) + " = " + init + ";"        
     return resultLines
     
 def scanArray(lines):
@@ -76,13 +134,13 @@ def scanArray(lines):
             break
         resultLines += lines[prevSymbol:match.span()[0]] #add previous block of code
         prevSymbol = match.span()[1]        
-        if (prevSymbol == len(lines)):
-            break
+        #if (prevSymbol == len(lines) ):
+        #    break
         parsed = {}
         parsed["const"], parsed["name"], parsed["size"],parsed["initializer"] = match.groups()   
         resultLines += newArray(isPorted=True,parsed=parsed)
     if (len(lines) - 1 != endSymbol):
-        resultLines += lines[prevSymbol:len(lines) - 1]
+        resultLines += lines[prevSymbol:len(lines)]
     return resultLines
 
 def newFunction(isPorted,parsed):
@@ -216,6 +274,11 @@ def CreateFile(fileName):
     headerFile.close()
     portedFile = open(basicFileName + ".c", "w")
     portedFile.write("#include \"" + os.path.basename(basicFileName) + ".h" + "\"\n")
+    portedFile.write("typedef unsigned short uint16_t;\n")
+    portedFile.write("#include \"resources.h\"\n")
+    portedFile.write("#define run pawn_run\n")
+    portedFile.write("#define pow pawn_pow\n\n")
+
     portedFile.write(ported)
     portedFile.close()
 
