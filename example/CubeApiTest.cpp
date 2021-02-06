@@ -1,10 +1,16 @@
 #include "cube_api.h"
 #include <cstdio>
-#include "Resources/happy.bmp.h"
+#include <tuple>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+typedef struct {
+    const void* ptr;
+    int size;
+} resource_t; //FIXME: move to a common header
+
+#include "resources.h"
 
 template<uint16_t _size, class T>
 class CCubeNet
@@ -93,12 +99,30 @@ public:
     }
 };
 
+class CScuboSprite
+{
+    int m_x, m_y, m_w, m_h;
+public:
+    CScuboSprite(int x, int y, int w, int h)
+        : m_x(x), m_y(y), m_w(w), m_h(h)
+    {
+    }
+    CScubo TopLeft() { return CScubo(       m_x,        m_y); }
+    CScubo TopRight() { return CScubo(      m_x + m_w,  m_y); }
+    CScubo BottomLeft() { return CScubo(    m_x,        m_y + m_h); }
+    CScubo BottomRight() { return CScubo(   m_x + m_w,  m_y + m_h); }
+    CScubo Center() { return CScubo(m_x + m_w/2, m_y + m_h/2); }
+
+};
+
 class CEventLoopEx: public CEventLoop
 {
     int m_nPos = 0;
     uint32_t m_nPrevTime = 0;
     int m_grad = 0;
     Get_TRBL_1_0 m_trbl = {};
+    CBitmap m_ball;
+
 
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
         uint8_t result[3][8];
@@ -153,15 +177,21 @@ protected:
         NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
+    auto Circle(int cx, int cy, int r, int grad)
+    {
+        int x = cx + r * cos((90 + grad) * M_PI / 180);
+        int y = cy + r * sin((90 + grad) * M_PI / 180);
+        return std::make_tuple(x, y);
+    }
+
     bool OnTick(uint32_t time) override
     {
-        int cx = 240, cy = 240;
-        int r = 150;
-        int x = cx + r * cos((90 + m_grad) * M_PI / 180);
-        int y = cy + r * sin((90 + m_grad) * M_PI / 180);
-        CScubo scb(x, y);
-        NativePrint("%d:%d:%d->%d:%d:%d", 90 + m_grad, x, y, scb.disp(), scb.x(), scb.y());
-
+        int x, y;
+        std::tie(x, y) = Circle(240, 240, 150, m_grad);
+        CScuboSprite ball(x - 50, y - 50, 100, 100);
+        //NativePrint("%d:%d:%d->%d:%d:%d", 90 + m_grad, x, y, scb.disp(), scb.x(), scb.y());
+        std::tie(x, y) = Circle(x, y, 75, m_grad);
+        CScubo small_circle(x, y);
         ++m_grad %= 270;
 
         for (int display = 0; display < 3; ++display)
@@ -186,23 +216,27 @@ protected:
                 disp.DrawLine(0,0,240,240, 100);
                 disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
                 disp.DrawPixelAlpha(66, 66, 255, 2);
-
-                CBitmap b;
-                if (b.Load(happy_bmp, happy_bmp_len, (int)EPictureFormat::epfRGB565)) {
-                    //NativePrint("TRY DRAW BITMAP %d", b.GetSize());
-                    disp.DrawBitmap(0, 0, b, 1, m_nPos, 0);
-                }
             }
 #endif
             static char buf[64] = {};
             snprintf(buf, sizeof(buf), "D:%d", display);
             disp.DrawText(0, 100, buf, fColor(0, 0, 0), 10, 0);
 
-            if (scb.disp() == display) {
-                snprintf(buf, sizeof(buf), "%d:%d->%d:%d", x, y, scb.x(), scb.y());
-                disp.FillCircle(scb.x(), scb.y(), 50, fColor(0, 1, 1));
-                disp.DrawText(scb.x(), scb.y(), buf, fColor(0, 0, 0), 2, 0);
-            }
+#if 0
+            CScubo tl = ball.TopLeft();
+            CScubo br = ball.BottomRight();
+            if (tl.disp() == display)
+                disp.DrawBitmap(tl.x(), tl.y(), m_ball, 1, 360 - m_grad);
+            else if (br.disp() == display)
+                disp.FillCircle(br.x(), br.y(), 10, fColor(1, 0, 1));
+                //disp.DrawBitmap(br.x() - 100, br.y() - 100, m_ball, 1, 360 - m_grad);
+#else
+            CScubo big_circle = ball.Center();
+            if (big_circle.disp() == display)
+                disp.DrawBitmap(big_circle.x(), big_circle.y(), m_ball, 1, 360 - m_grad);
+            if (small_circle.disp() == display)
+                disp.FillCircle(small_circle.x(), small_circle.y(), 20, fColor(1, 0, 1));
+#endif
 
             if (m_nPrevTime)
             {
@@ -260,6 +294,9 @@ public:
         NativePrint("Hello WOWd\n");
         Randomize();
         NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
+        resource_t res_ball = get_resource(0);
+        m_ball.Load(res_ball.ptr, res_ball.size * 2, epfRLE);
+
         return CEventLoop::Main();
     }
 };
