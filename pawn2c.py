@@ -254,16 +254,13 @@ def MakeSource(lines,isPorted):
 def CreateFile(fileName):
     if (not os.path.isfile(fileName)):
         raise Exception("No file found")
+    pawncc = "pawncc"
     if os.name == 'nt':
-        if (os.path.isfile("pawncc.exe")):
-            os.system("pawncc.exe " + fileName + " -l PAWN2C=")
-        else:
-            raise Exception("No pawncc.exe found")
+        pawncc += ".exe"
+    if os.path.isfile(pawncc):
+        print(subprocess.check_output([pawncc, fileName, "-l", "PAWN2C=1"], stderr=subprocess.STDOUT, shell=True))
     else:
-        if (os.path.isfile("./pawncc")):
-            os.system("./pawncc " + fileName + " -l PAWN2C=")
-        else:
-            raise Exception("No pawncc found")
+        raise Exception("No pawncc.exe found")
 
     basicFileName = re.sub(r"\.pwn|\.lst", "",fileName)
     lines = open(basicFileName + ".lst").read()
@@ -281,6 +278,7 @@ def CreateFile(fileName):
 
     portedFile.write(ported)
     portedFile.close()
+    print("Done")
 
 
 if __name__ == "__main__":
