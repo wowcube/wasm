@@ -43,18 +43,20 @@ protected:
 
 const int g = 10;
 const int k = 240 / g;
-char b[k*k] = {};
+using TLife = char[k*k];
+TLife life[3] = {};
 
-class CScubo {
+template<int side>
+class CScuboT {
     int m_ord = 0;
     int m_val[2] = {};
     int m_screens[3] = {0, 2, 1};
 
     bool Move(int delta, int val)
     {
-        if (delta > 240) {
+        if (delta > side) {
             m_val[val] = m_val[!val];
-            m_val[!val] = 240 - (delta - 240);
+            m_val[!val] = side - (delta - side);
             if (val)
                 m_ord = (m_ord -1 + 3) % 3;
             else
@@ -69,7 +71,7 @@ class CScubo {
 
 public:
 
-    CScubo(int dx, int dy)
+    CScuboT(int dx, int dy)
     {
         if (Move(dx, 0))
             Move(dy, 0);
@@ -85,19 +87,21 @@ public:
 #define WC_TEST_CHECK(cond) {if (!(cond)) NativePrint("%s(%d): %s TEST FAIL:", __FILE__, __LINE__, __FUNCTION__, #cond);}
     WC_TEST() {
         {
-            CScubo scb(241, 241);
+            CScuboT<240> scb(241, 241);
             WC_TEST_CHECK(scb.disp() == 1);
             WC_TEST_CHECK(scb.x() == 239);
             WC_TEST_CHECK(scb.y() == 239);
         }
         {
-            CScubo scb(0, 241);
+            CScuboT<240> scb(0, 241);
             WC_TEST_CHECK(scb.disp() == 1);
             WC_TEST_CHECK(scb.x() == 239);
             WC_TEST_CHECK(scb.y() == 0);
         }
     }
 };
+
+using CScubo = CScuboT<240>;
 
 class CScuboSprite
 {
@@ -179,8 +183,8 @@ protected:
 
     auto Circle(int cx, int cy, int r, int grad)
     {
-        int x = cx + r * cos((90 + grad) * M_PI / 180);
-        int y = cy + r * sin((90 + grad) * M_PI / 180);
+        int x = int(cx + r * cos((90 + grad) * M_PI / 180) + 0.5);
+        int y = int(cy + r * sin((90 + grad) * M_PI / 180) + 0.5);
         return std::make_tuple(x, y);
     }
 
@@ -199,8 +203,8 @@ protected:
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
 #if 1
-            if (display == 0)
-                Update(disp);
+
+            UpdateLife(disp, display);
 
             if (display == 1)
             {
@@ -259,18 +263,35 @@ protected:
 
     void Randomize()
     {
-        for (int y = k * k; y--;)
-            b[y] = rand() % 2;
+        for (int i = 0; i < 3; ++i)
+            for (int y = k * k; y--;)
+                life[i][y] = rand() % 2;
     }
 
-    void Update(CDisplay& disp) {
+    void UpdateLife(CDisplay& disp, int ind) {
+        TLife& b = life[ind];
         char c[k*k] = {};
-        for (int y = k * k; y--;) {
+        for (int i = k * k; i--;) {
             int n = 0;
-            for (int f = 9; f--;) //going around
-                n += b[(y / k + k + f % 3 - 1) % k * k + (y + k + f / 3 - 1) % k];
-            c[y] = (n == 3) || (n - b[y] == 3);
-            Draw(disp, y % k * g, (y / k) * g, g - 1, g - 1, c[y]);
+            int x = i % k;
+            int y = i / k;
+            if (x > 0 && x < k && y > 0 && y < k)
+                for (int f = 9; f--;) //going around
+                    n += b[(i / k + k + f % 3 - 1) % k * k + (i + k + f / 3 - 1) % k];
+            else
+            {
+                for (int f = 9; f--;)
+                {
+                    int dx = f % 3 - 1;
+                    int dy = f % 3 - 1;
+                    CScuboT<k> scb(x + dx, y + dy);
+                    scb.disp();
+                }
+                n += 0;
+            }
+
+            c[i] = (n == 3) || (n - b[i] == 3);
+            Draw(disp, x * g, y * g, g - 1, g - 1, c[i]);
         }
 
         if (0 != memcmp(b, c, sizeof(b)))

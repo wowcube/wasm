@@ -69,21 +69,12 @@ protected:
         print_transpon(m_trbl.CFMID, buffer);
         NativePrint("OnTRBLChanged CFMID %s", buffer);
 
-        uint8_t pkt[20] = { CMD_GEO };// CMD_GEO{8},n_records{8},CID[0]{8},screen[0]{8},...,CID[N]{8},screen[N]{8}
+        auto pkt = GetSharableMem(20);// CMD_GEO{8},n_records{8},CID[0]{8},screen[0]{8},...,CID[N]{8},screen[N]{8}
 
-        pkt[0] = CMD_GEO;
-        pkt[1] = 3; // number of TRBL records: <cubeN,faceN> => top:<cubeN,faceN>,left:<cubeN,faceN> (right and bottom constants and may be calculated)
-        for (int screen = 0; screen < 3; screen++) {
-            uint8_t rb = 2 + screen * 6; // record base
-            pkt[rb + 0] = m_myCID;
-            pkt[rb + 1] = screen;
-            pkt[rb + 2] = rand() % 8;
-            pkt[rb + 3] = rand() % 6;
-            pkt[rb + 4] = rand() % 8;
-            pkt[rb + 5] = rand() % 6;
-        }
+        Get_Legacy_1_0 glTRBL= {Get_Legacy_1_0::eglTRBL, pkt.get(), 20};
+        NativeInvoke(glTRBL);
 
-        pawn_run((int*)pkt, sizeof(pkt)/sizeof(cell), 0);
+        pawn_run((int*)pkt.get(), 20/sizeof(cell), 0);
     }
     void OnGyroChanged(const Get_Gyro_1_0& gyro) override
     {
@@ -149,38 +140,6 @@ protected:
     {
         m_myCID = cid;
         NativePrint("MY CID IS %d", cid);
-        Get_TRBL_1_0 trbl = {};
-        static char fake_trbl[] =
-            R"(
-CID
-7 1 4
-0 2 5
-7 3 1
-5 2 6
-0 5 6
-3 4 1
-3 7 4
-6 2 0
-CFID
-0 1 2
-1 5 2
-2 5 3
-4 3 5
-0 4 1
-5 1 4
-4 0 3
-0 2 3
-CMFID
-0 0 0
-1 2 3
-2 3 1
-0 0 0
-1 2 3
-1 2 3
-1 2 3
-3 1 2
-)";
-        OnTRBLChanged(trbl);
     }
 
 

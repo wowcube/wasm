@@ -205,5 +205,13 @@ typedef struct {
     float axis_Z;
 } Get_Gyro_1_0;
 
+
+typedef struct
+{
+    enum {eglTRBL} kind;
+    void* data;
+    uint16_t size;
+} Get_Legacy_1_0;
+
 #pragma pack(pop)
 #endif

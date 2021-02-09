@@ -57,14 +57,14 @@ protected:
     }
 
     
-    void OnGyroChanged(const Get_Gyro_1_0& _gyro) {
+    void OnGyroChanged(const Get_Gyro_1_0& _gyro) override {
         NativePrint("GYRO CHANGED");
         gyro.x = _gyro.axis_X;
         gyro.y = _gyro.axis_Y;
         gyro.z = _gyro.axis_Z;
         NativePrint("GYRO: X:%f, Y:%f, Z:%f", gyro.x, gyro.y, gyro.z);
     }
-    void OnAccelChanged(const Get_Accel_1_0& _accel) {
+    void OnAccelChanged(const Get_Accel_1_0& _accel) override {
         NativePrint("ACCEL CHANGED");
         accel.x = _accel.axis_X;
         accel.y = _accel.axis_Y;
@@ -78,11 +78,11 @@ protected:
         m_cid = cid;
     }
 
-    virtual void OnMessage(uint32_t size, const Get_Message_1_0& msg){
+    void OnMessage(uint32_t size, const Get_Message_1_0& msg) override{
         NativePrint("WASM OnMessage from: %d, size: %d, message: %s", msg.from_cid, msg.size, (char*)msg.data);
     };
    
-    virtual void OnTRBLChanged(const Get_TRBL_1_0& trbl) {
+    void OnTRBLChanged(const Get_TRBL_1_0& trbl) override {
         NativePrint("on trbl changed \n");
         for (int i = 0; i < 8; i++) {
             NativePrint("CID %d %d %d", trbl.CID[i][0], trbl.CID[i][1], trbl.CID[i][2]);
