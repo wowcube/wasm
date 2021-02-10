@@ -78,7 +78,7 @@ cell angle2pipeangle(cell angle);
 cell set_steam(cell steam, cell base);
 cell draw_level(cell thisFaceN);
 cell ONTICK();
-cell setcurr_level(cell level);
+cell setcurr_level(cell* level);
 cell CheckAngles();
 cell FindNewAngles(cell farCube);
 cell ON_CMD_NET_RX(cell* pkt);
