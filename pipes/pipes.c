@@ -1370,7 +1370,7 @@ cell ONTICK()
                 set_steam(steam_frame[thisFaceN], 1000);
 
             else if((figures[neighborFigure][angle2pipeangle(neighborFigureAngle)][0] == 1) && (figures[thisFigure][angle2pipeangle(thisFigureAngle)][3] == 1) && (thisCubeN == abi_cubeN))
-                abi_CMD_BITMAP(15, 16, 120, 90, 0, 0, 0); 
+                abi_CMD_BITMAP(15, 16, 120, 90, 0, 0); 
 
         }
 
@@ -1379,28 +1379,28 @@ cell ONTICK()
             if((steam_frame[thisFaceN] / 1) % 10 == 9)
                 steam_frame[thisFaceN] -= 9 * 1;
             else
-                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 1) % 10, 120, 120 / 2, 0, 0, 0, 0); 
+                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 1) % 10, 120, 120 / 2, 0, 0, 0); 
         }
         if((steam_frame[thisFaceN] / 10) % 10 > 0) {
             steam_frame[thisFaceN] += 10;
             if((steam_frame[thisFaceN] / 10) % 10 == 9)
                 steam_frame[thisFaceN] -= 9 * 10;
             else
-                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 10) % 10, 240 - 120 / 2, 120, 90, 0, 0, 0); 
+                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 10) % 10, 240 - 120 / 2, 120, 90, 0, 0); 
         }
         if((steam_frame[thisFaceN] / 100) % 10 > 0) {
             steam_frame[thisFaceN] += 100;
             if((steam_frame[thisFaceN] / 100) % 10 == 9)
                 steam_frame[thisFaceN] -= 9 * 100;
             else
-                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 100) % 10, 120, 240 - 120 / 2, 180, 0, 0, 0); 
+                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 100) % 10, 120, 240 - 120 / 2, 180, 0, 0); 
         }
         if((steam_frame[thisFaceN] / 1000) % 10 > 0) {
             steam_frame[thisFaceN] += 1000;
             if((steam_frame[thisFaceN] / 1000) % 10 == 9)
                 steam_frame[thisFaceN] -= 9 * 1000;
             else
-                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 1000) % 10, 120 / 2, 120, 270, 0, 0, 0); 
+                abi_CMD_BITMAP(15+4 + (steam_frame[thisFaceN] / 1000) % 10, 120 / 2, 120, 270, 0, 0); 
         }
 
         if((count_results < 4) && (thisFaceN == faceN_results))
