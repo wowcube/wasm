@@ -3,7 +3,7 @@ typedef unsigned short uint16_t;
 //#include "resources.h"
 #define run pawn_run
 #define pow pawn_pow
-
+#include "resources.h"
 
 
 
