@@ -4,9 +4,7 @@
 #define false 0
 #define true 1
 
-#define NET_SEND_WITH_TX_POOL 0
-#define NET_SEND_WITHOUT_TX_POOL 1
-#define REVERS 0 
+
 
 cell abi_GetCubeN();
 cell abi_SetCubeN(cell cubeN);

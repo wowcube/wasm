@@ -6,6 +6,11 @@ typedef unsigned short uint16_t;
 
 #include "resources.h"
 
+
+#define NET_SEND_WITH_TX_POOL 0
+#define NET_SEND_WITHOUT_TX_POOL 1
+#define REVERS 0 
+
 #define MESSAGE_TYPES 6
 #define RESOURCES_OFFSET 0
 
@@ -640,7 +645,7 @@ cell Draw_Results(cell _type)
     base=moves;
     for(new i=0;i<=count;i++)
     {
-      abi_CMD_BITMAP(4+base%10,  120, 120  + (22+2)/2*count - (22+2)*i, 90, 0, 0,0);
+      abi_CMD_BITMAP(4+base%10,  120, 120  + (22+2)/2*count - (22+2)*i, 90, 0, 0);
       base/=10;
     }
     abi_CMD_BITMAP(0+_type, 70, 120, 90, 0,0);
@@ -1236,130 +1241,131 @@ ABS (value)
     return value < 0 ? value * -1 : value; 
 }
 
+ON_CMD_NET_RX(const pkt[]);
+
 new tick=0;
 new bool initialization = false;
 new bool is_rotation = false;
 
-        //cell run(cell* pkt, cell size, cell* src)
-        //{
-        //  if (initialization == false)
-        //  {
-        //    tick++;
-        //    if (abi_ByteN(pkt, 0) == 100 + 4)
-        //    {
-        //      abi_MTD_Deserialize(pkt);
-        //      _seed += (ABS(abi_MTD_GetFaceGyroX(0)) + ABS(abi_MTD_GetFaceGyroY(0)) + ABS(abi_MTD_GetFaceGyroZ(0)));
-        //    }
+        cell run(cell* pkt, cell size, cell* src)
+        {
+          if (initialization == false)
+          {
+            tick++;
+            if (abi_ByteN(pkt, 0) == 100 + 4)
+            {
+              abi_MTD_Deserialize(pkt);
+              _seed += (ABS(abi_MTD_GetFaceGyroX(0)) + ABS(abi_MTD_GetFaceGyroY(0)) + ABS(abi_MTD_GetFaceGyroZ(0)));
+            }
 
-        //    if (tick<20)
-        //      return;
-        //    initialization=true;
+            if (tick<20)
+              return;
+            initialization=true;
 
-        //    script_ticks=0;
-        //    trbl_init();
-        //    ON_INIT();
-        //    for(new faceN=0;faceN<3;faceN++)
-        //      abi_TRBL_backup[faceN] = abi_topCubeN(abi_cubeN, faceN);
-        //  }
-        //  switch(abi_ByteN(pkt, 0))
-        //  {
-        //    break;case 100+1:
-        //    {
-        //      trbl_on_tick();
-        //      if ((is_rotation == true) || (abi_check_rotate()))
-        //      {
-        //        is_rotation=false;
-        //        trbl_count_rotations = ((trbl_count_rotations == 0xFF) ? 0 : trbl_count_rotations + 1);
-        //        get_rotation_side();
-        //        ON_CHECK_ROTATE();
-        //        script_ticks=0;
-        //        trbl_clear_after_rotation();
-        //      }
-        //      update_trbl_record_for_rotation();
-        //      ONTICK();
-        //      if (script_ticks<1 * 20)
-        //        script_ticks++; 
+            script_ticks=0;
+            trbl_init();
+            ON_INIT();
+            for(new faceN=0;faceN<3;faceN++)
+              abi_TRBL_backup[faceN] = abi_topCubeN(abi_cubeN, faceN);
+          }
+          switch(abi_ByteN(pkt, 0))
+          {
+            break;case 100+1:
+            {
+              trbl_on_tick();
+              if ((is_rotation == true) || (abi_check_rotate()))
+              {
+                is_rotation=false;
+                trbl_count_rotations = ((trbl_count_rotations == 0xFF) ? 0 : trbl_count_rotations + 1);
+                get_rotation_side();
+                ON_CHECK_ROTATE();
+                script_ticks=0;
+                trbl_clear_after_rotation();
+              }
+              update_trbl_record_for_rotation();
+              ONTICK();
+              if (script_ticks<1 * 20)
+                script_ticks++; 
 
-        //    }
+           }
+            break;
+            case 100+2:
+            {
+              is_rotation = abi_check_rotate();
+              abi_TRBL_Deserialize(pkt);
+            }
 
-        //    break;
-        //    case 100+2:
-        //    {
-        //      is_rotation = abi_check_rotate();
-        //      abi_TRBL_Deserialize(pkt);
-        //    }
+            break;
+            case 100+3:
+            {
+              ON_CMD_NET_RX(pkt);
+              switch (abi_ByteN(pkt, 4))
+              {
+                break;
+              case 220+2:
+                {
 
-        //    break;
-        //    case 100+3:
-        //    {
-        //      ON_CMD_NET_RX(pkt);
-        //      switch (abi_ByteN(pkt, 4))
-        //      {
-        //        break;
-        //      case 220+2:
-        //        {
+                  if ((((abi_ByteN(pkt,6) == 0) && (abi_ByteN(pkt,6) > 200)) ||
+                                       (abi_ByteN(pkt,6) >= trbl_count_rotations)) && 
+                                                                (abi_ByteN(pkt,5) != abi_cubeN))
 
-        //          if ((((abi_ByteN(pkt,6) == 0) && (abi_ByteN(pkt,6) > 200)) ||
-        //                               (abi_ByteN(pkt,6) >= trbl_count_rotations)) && 
-        //                                                        (abi_ByteN(pkt,5) != abi_cubeN))
+                  {
 
-        //          {
+                    trbl_count_rotations=abi_ByteN(pkt,6);
+                   abi_TRBL[abi_ByteN(pkt,5)][0]=pkt[2];
+                    abi_TRBL[abi_ByteN(pkt,5)][1]=pkt[3];
+                    abi_TRBL[abi_ByteN(pkt,5)][2]=pkt[4];
+                    ticks_for_trbl_clear[abi_ByteN(pkt, 5)] =  0 ;
+                  }
+                }
 
-        //            trbl_count_rotations=abi_ByteN(pkt,6);
-        //            abi_TRBL[abi_ByteN(pkt,5)][0]=pkt[2];
-        //            abi_TRBL[abi_ByteN(pkt,5)][1]=pkt[3];
-        //            abi_TRBL[abi_ByteN(pkt,5)][2]=pkt[4];
-        //            ticks_for_trbl_clear[abi_ByteN(pkt, 5)] =  0 ;
-        //          }
-        //        }
+                break;case 0 + 4:
+                {
+                  if (local_script != abi_ByteN(pkt, 7))
+                  {
+                    local_script = abi_ByteN(pkt, 7);
 
-        //        break;case 0 + 4:
-        //        {
-        //          if (local_script != abi_ByteN(pkt, 7))
-        //          {
-        //            local_script = abi_ByteN(pkt, 7);
+                    abi_CMD_CHANGE_SCRIPT(local_script);
+                  }
+                }
+                break;
+                case 0 + 5:
+                {
+                  if (0 == abi_cubeN)
+                  {
+                    if ((local_script != abi_ByteN(pkt, 5)) && (abi_ByteN(pkt, 5) != 16))
+                    {
+                      local_script = abi_ByteN(pkt, 5);
 
-        //            abi_CMD_CHANGE_SCRIPT(local_script);
-        //          }
-        //        }
-        //        break;
-        //        case 0 + 5:
-        //        {
-        //          if (0 == abi_cubeN)
-        //          {
-        //            if ((local_script != abi_ByteN(pkt, 5)) && (abi_ByteN(pkt, 5) != 16))
-        //            {
-        //              local_script = abi_ByteN(pkt, 5);
+                     abi_CMD_CHANGE_SCRIPT(local_script);
+                    }
+                  }
+                }
+                break;
+                case 0 + 6:
+                {
+                  if (0 == abi_cubeN)
+                  {
+                      abi_CMD_SLEEP();
+                 }
+               }
+              }
+            }
 
-        //              abi_CMD_CHANGE_SCRIPT(local_script);
-        //            }
-        //          }
-        //        }
-        //        break;
-        //        case 0 + 6:
-        //        {
-        //          if (0 == abi_cubeN)
-        //          {
-        //              abi_CMD_SLEEP();
-        //          }
-        //        }
-        //      }
-        //    }
+            break;
+            case 100+4:
+            {
+             abi_MTD_Deserialize(pkt);
+           }
 
-        //    break;
-        //    case 100+4:
-        //    {
-        //      abi_MTD_Deserialize(pkt);
-        //    }
+           break;
+           case 100+5:
+            {
 
-        //    break;
-        //    case 100+5:
-        //    {
-
-        //      ON_LOAD_GAME_DATA (pkt);
-        //    }
-        //  }
-        //}
+              ON_LOAD_GAME_DATA (pkt);
+           }
+         }
+        }
 
 /*
     const  int EMPTY                 = -999;
@@ -1623,8 +1629,8 @@ MoveFrom (chipOffset, face, moveFrom) {
         abi_CMD_G2D_ADD_SPRITE (ARROW,      false, posArrowX, posArrowY, 0xFF, 0, arrowAngle, 0);
         abi_CMD_G2D_ADD_SPRITE (chipOffset, false, posChipX,  posChipY,  0xFF, 0, curFaceAngle, 0);
 
-        abi_CMD_BITMAP (ARROW,      posArrowX, posArrowY, arrowAngle,   0,0,0);
-        abi_CMD_BITMAP (chipOffset, posChipX,  posChipY,  curFaceAngle, 0,0,0);
+        abi_CMD_BITMAP (ARROW,      posArrowX, posArrowY, arrowAngle,   0,0);
+        abi_CMD_BITMAP (chipOffset, posChipX,  posChipY,  curFaceAngle, 0,0);
 
     }
     (moveFrom == MOVE_FROM_TOP) ? (stepX += MOVE_CHIP_STEP) : (stepY += MOVE_CHIP_STEP);
@@ -1717,6 +1723,10 @@ cell DrawHUD(cell angle)
 
     }
 }
+
+DrawParticles(cell, cell);
+DoRotation(cell);
+
 new devisor = 2;
 DrawFace (chipCurrentValue, face) {
     new wasAnimation = 0;
@@ -1961,6 +1971,8 @@ RememberNeighbours () {
         }
     }
 }
+
+SendAppear(cell, cell, cell, cell);
 
 GenerateNewRandomValue (visitedModules) {
 
