@@ -26,29 +26,11 @@ protected:
             snprintf(buf, sizeof(buf), "MODULE: %d", m_cid);
             disp.DrawText(0, 60, buf, fColor(0, 0, 0), 2, 0);
 
-            snprintf(buf, sizeof(buf), "GYRO:");
-            disp.DrawText(0, 80, buf, fColor(0, 0, 0), 2, 0);
-            
-            snprintf(buf, sizeof(buf), "X: %f", gyro.x);
-            disp.DrawText(0, 100, buf, fColor(0, 0, 0), 2, 0);
-
-            snprintf(buf, sizeof(buf), "Y: %f", gyro.y);
-            disp.DrawText(0, 120, buf, fColor(0, 0, 0), 2, 0);
-
-            snprintf(buf, sizeof(buf), "Z: %f", gyro.z);
+            snprintf(buf, sizeof(buf), "GYRO %.2f:%.2f:%.2f", gyro.x, gyro.y, gyro.z);
             disp.DrawText(0, 140, buf, fColor(0, 0, 0), 2, 0);
 
-            snprintf(buf, sizeof(buf), "ACCL");
+            snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f:%.2f", accel.x, accel.y, accel.z);
             disp.DrawText(0, 160, buf, fColor(0, 0, 0), 2, 0);
-
-            snprintf(buf, sizeof(buf), "X: %f", accel.x);
-            disp.DrawText(0, 180, buf, fColor(0, 0, 0), 2, 0);
-            
-            snprintf(buf, sizeof(buf), "Y: %f", accel.y);
-            disp.DrawText(0, 200, buf, fColor(0, 0, 0), 2, 0);
-
-            snprintf(buf, sizeof(buf), "Z: %f", accel.z);
-            disp.DrawText(0, 220, buf, fColor(0, 0, 0), 2, 0);
 
             disp.DrawLine(120, 0, 120, 120, fColor(1, 0, 0));
             disp.DrawLine(0, 120, 120, 120, fColor(0, 1, 0));

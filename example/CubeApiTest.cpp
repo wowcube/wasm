@@ -54,9 +54,9 @@ class CScuboT {
 
     bool Move(int delta, int val)
     {
-        if (delta > side) {
+        if (delta >= side) {
             m_val[val] = m_val[!val];
-            m_val[!val] = side - (delta - side);
+            m_val[!val] = side - (delta - side) - 1;
             if (val)
                 m_ord = (m_ord -1 + 3) % 3;
             else
@@ -71,7 +71,8 @@ class CScuboT {
 
 public:
 
-    CScuboT(int dx, int dy)
+    CScuboT(int dx, int dy, int ord = 0)
+        : m_ord(ord)
     {
         if (Move(dx, 0))
             Move(dy, 0);
@@ -283,11 +284,10 @@ protected:
                 for (int f = 9; f--;)
                 {
                     int dx = f % 3 - 1;
-                    int dy = f % 3 - 1;
-                    CScuboT<k> scb(x + dx, y + dy);
-                    scb.disp();
+                    int dy = f / 3 - 1;
+                    CScuboT<k> scb(x + dx, y + dy, ind);
+                    n += life[scb.disp()][scb.y() * k + scb.x()];
                 }
-                n += 0;
             }
 
             c[i] = (n == 3) || (n - b[i] == 3);

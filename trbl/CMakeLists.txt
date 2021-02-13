@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(trbl_example LANGUAGES CXX)
+project(trbl LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,5 +23,5 @@ file(GLOB CORE_SRC *.cpp)
 
 include_directories(..)
 
-DualCompilation(trbl_example "${CORE_SRC}" "${CORE_HDR}" "")
+DualCompilation(trbl "${CORE_SRC}" "${CORE_HDR}" "")
 
