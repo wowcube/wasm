@@ -326,13 +326,14 @@ extern "C"
 
     cell abi_CMD_G2D_BEGIN_DISPLAY(cell display, int replace)
     {
-        printf("TODO: abi_CMD_G2D_BEGIN_DISPLAY display %d, replace %d\n", display, replace);
+        //printf("TODO: abi_CMD_G2D_BEGIN_DISPLAY display %d, replace %d\n", display, replace);
         return 0;
     }
 
     cell abi_CMD_G2D_ADD_SPRITE(cell resID, int g2d, cell x, cell y, cell alpha, cell color, cell rotation, cell mirror)
     {
-        printf("TODO: abi_CMD_G2D_ADD_SPRITE  resID %d, g2d %d,  x %d,  y %d,  alpha %d,  color %d,  rotation %d,  mirror%d\n", resID, g2d, x, y, alpha, color, rotation, mirror);
+        //printf("TODO: abi_CMD_G2D_ADD_SPRITE  resID %d, g2d %d,  x %d,  y %d,  alpha %d,  color %d,  rotation %d,  mirror%d\n", resID, g2d, x, y, alpha, color, rotation, mirror);
+        g_runner.DrawBitmap(pawn_tmp_framebuffer, resID, x, y, rotation, mirror, g2d);
         return 0;
     }
 
@@ -344,7 +345,7 @@ extern "C"
 
     cell abi_CMD_G2D_END()
     {
-        printf("TODO: abi_CMD_G2D_END\n");
+        //printf("TODO: abi_CMD_G2D_END\n");
         return 0;
     }
 
