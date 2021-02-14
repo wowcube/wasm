@@ -1247,7 +1247,7 @@ cell ONTICK()
 {
   if(platformCubeId == 0)
   {
-    send_info(false);
+    send_info();
     check_shake(0, 0);
   }
 

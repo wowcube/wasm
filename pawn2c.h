@@ -1,5 +1,7 @@
 #define cell signed
 typedef int stock;
+#define pow pawn_pow
+
 
 
 // from AMX, {N} - N is number of bits
