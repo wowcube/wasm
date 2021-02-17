@@ -3,7 +3,7 @@ typedef unsigned short uint16_t;
 #define run pawn_run
 #define pow pawn_pow
 #include "resources.h"
-
+#include "stdio.h"
 
 
 
@@ -1044,6 +1044,60 @@ new bool is_rotation=false;
 
 cell run(cell* pkt, cell size, cell* src)
 {
+
+  switch(abi_ByteN(pkt, 0))
+  {
+    break;case 100+1:
+      printf("CMD_TICK: ");
+    break;case 100+2:
+      printf("CMD_GEO: ");
+    break;case 100+3:
+    {
+      printf("CMD_NET_RX: ");
+      switch (abi_ByteN(pkt, 4))
+      {
+        break;case 220+2:
+        {
+          printf("P2P_CMD_SEND_TRBL: ");
+        }        
+        break;case 0 + 4:
+        {
+          printf("P2P_CMD_MENU_SEND_INFORMATION: ");
+        }
+        break;case 0 + 5:
+        {
+          printf("P2P_CMD_MENU_CHANGE_SCRIPT: ");
+        }
+        break;case 0 + 6:
+        {
+          printf("P2P_CMD_SLEEP: ");
+        }
+      }
+    }
+    break;case 100+4:
+    {
+      printf("CMD_MTD: ");
+    }
+    break;case 100+5:
+    {
+      printf("CMD_STATE_LOAD: ");
+    }
+  }
+  printf("size %d ", size);
+  printf("RAW: ");
+  printf("pkt ");
+  for (new i = 0; i < size; i++)
+  {
+    printf("%x,", pkt[i]);
+  }
+  printf("src ");
+  for (new i = 0; i < size; i++)
+  {
+    printf("%x,", src[i]);
+  }
+  printf("\n");
+
+
   if (initialization==false)
   {
     tick++;
