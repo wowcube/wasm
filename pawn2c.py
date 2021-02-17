@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import subprocess
 
 e_arrays = re.compile(r"new\s+(const)?\s*([a-zA-Z_][_a-zA-Z0-9]+)\s*([\[\{].*[\}\]])+\s*=\s*([\[\{][\s\S]*?[\]\}])\s*;")
 e_arg = re.compile(r"(?P<isConst>const)?\s*(?P<type>[_a-zA-Z0-9:]+)(?P<isArray>\[\])?\s*(?P<name>[_a-zA-Z0-9:]+)?")
