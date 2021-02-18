@@ -207,6 +207,10 @@ public:
         Flush();
     }
 
+    int Index() const
+    {
+        return m_nDisplay;
+    }
 protected:
     int m_nDisplay = -1;
 };
