@@ -71,8 +71,8 @@ class CScuboT {
 
 public:
 
-    CScuboT(int dx, int dy, int ord = 0)
-        : m_ord(ord)
+    CScuboT(int dx, int dy, int disp = 0)
+        : m_ord((3 - disp) % 3) //display to ord 
     {
         if (Move(dx, 0))
             Move(dy, 0);
@@ -158,6 +158,7 @@ protected:
     void OnTRBLChanged(const Get_TRBL_1_0& trbl) override
     {
         m_trbl = trbl;
+        /*
         char buffer[256];
         print_transpon(m_trbl.CID, buffer);
         NativePrint("OnTRBLChanged CID %s", buffer);
@@ -167,19 +168,19 @@ protected:
 
         print_transpon(m_trbl.CFMID, buffer);
         NativePrint("OnTRBLChanged CFMID %s", buffer);
-
+        */
     }
 
     void OnGyroChanged(const Get_Gyro_1_0& gyro) override
     {
         m_gyro = gyro;
-        NativePrint("OnGyroChanged X:%f Y:%f Z:%f", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
+        //NativePrint("OnGyroChanged X:%f Y:%f Z:%f", gyro.axis_X, gyro.axis_Y, gyro.axis_Z);
     }
 
     void OnAccelChanged(const Get_Accel_1_0& accel) override
     {
         m_accel = accel;
-        NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
+        //NativePrint("OnAccelChanged X:%f Y:%f Z:%f", accel.axis_X, accel.axis_Y, accel.axis_Z);
     }
 
     auto Circle(int cx, int cy, int r, int grad)
@@ -205,23 +206,24 @@ protected:
             disp.Fill(fColor(1,1,1));
 #if 1
 
-            UpdateLife(disp, display);
+            UpdateLife(disp);
 
             if (display == 1)
             {
                 ++m_nPos %= 240;
                 disp.DrawText(120, 120, "Life!", fColor(1,1,1), 30, m_nPos % 360);
                 static char buf[64] = {};
-                snprintf(buf, sizeof(buf), "X:%f Y:%f Z:%f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
-                disp.DrawText(5, 100, buf, fColor(0,1,0), 3, 0);
+                snprintf(buf, sizeof(buf), "accel: %.2f %.2f %.2f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
+                disp.DrawText(0, 20, buf, fColor(0,1,0), 2, 0);
             }
 
             if (display == 2)
             {
                 disp.DrawLine(0,0,240,240, 100);
-                disp.FillRect(m_nPos, m_nPos, 240, 240, fColor(0,1,0));
+                disp.FillRect(m_nPos, m_nPos, 240, 10, fColor(0,1,0));
                 disp.DrawPixelAlpha(66, 66, 255, 2);
             }
+
 #endif
             static char buf[64] = {};
             snprintf(buf, sizeof(buf), "D:%d", display);
@@ -243,13 +245,13 @@ protected:
                 disp.FillCircle(small_circle.x(), small_circle.y(), 20, fColor(1, 0, 1));
 #endif
 
-            if (m_nPrevTime)
+            static char fps[32] = {};
+            if (m_nPrevTime && display == 0)
             {
                 uint32_t diff = time - m_nPrevTime;
-                static char buff[32] = {};
-                snprintf(buff, sizeof(buff), "fps: %f", 1000. / diff);
-                disp.DrawText(0, 0, buff, fColor(1,1,1), 3);
+                snprintf(fps, sizeof(fps), "fps: %.2f", 1000. / diff);
             }
+            disp.DrawText(0, 0, fps, fColor(1, 1, 1), 3);
             m_nPrevTime = time;
 
             //NativePrint("Draw for display %d, time: %d\n", display, time);
@@ -269,33 +271,40 @@ protected:
                 life[i][y] = rand() % 2;
     }
 
-    void UpdateLife(CDisplay& disp, int ind) {
-        TLife& b = life[ind];
+    void UpdateLife(CDisplay& disp) {
+        static uint16_t colors[] = { fColor(1, 0, 0), fColor(0, 0, 1), fColor(0, 1, 0), fColor(0, 0, 0) };
+        TLife& old = life[disp.Index()];
         char c[k*k] = {};
         for (int i = k * k; i--;) {
             int n = 0;
             int x = i % k;
             int y = i / k;
-            if (x > 0 && x < k && y > 0 && y < k)
-                for (int f = 9; f--;) //going around
-                    n += b[(i / k + k + f % 3 - 1) % k * k + (i + k + f / 3 - 1) % k];
-            else
+            //n += b[(i / k + k + f % 3 - 1) % k * k + (i + k + f / 3 - 1) % k];
+            Draw(disp, x * g, y * g, g - 1, g - 1, old[i]);
+
+            for (int f = 9; f--;)
             {
-                for (int f = 9; f--;)
+                int dx = f % 3 - 1;
+                int dy = f / 3 - 1;
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || ny < 0)
                 {
-                    int dx = f % 3 - 1;
-                    int dy = f / 3 - 1;
-                    CScuboT<k> scb(x + dx, y + dy, ind);
+                    //other module
+                }
+                else
+                {
+                    CScuboT<k> scb(nx, ny, disp.Index());
                     n += life[scb.disp()][scb.y() * k + scb.x()];
                 }
             }
 
-            c[i] = (n == 3) || (n - b[i] == 3);
-            Draw(disp, x * g, y * g, g - 1, g - 1, c[i]);
+            c[i] = (n == 3) || (n - old[i] == 3);
         }
 
-        if (0 != memcmp(b, c, sizeof(b)))
-            memcpy(b, c, sizeof(b));
+        if (0 != memcmp(old, c, sizeof(old)))
+            memcpy(old, c, sizeof(old));
         else
             Randomize();
     }
