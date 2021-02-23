@@ -45,10 +45,11 @@ protected:
             disp.DrawText(0, 200, print_it("CFID:", m_trbl.CFID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
             disp.DrawText(0, 220, print_it("FMID:", m_trbl.CFMID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
 
-            static const char* faces[] = {"U", "F", "R", "D", "L", "B"};
+            static const char* faces[] = {"U%d", "F%d", "R%d", "D%d", "L%d", "B%d"};
             const unsigned char face = m_trbl.CFID[m_cid][disp.Index()];
 
-            disp.DrawText(120, 0, (face < 6) ? faces[face] : "?", fColor(0, 0, 0), 4, 0);
+            snprintf(buf, sizeof(buf), (face < 6) ? faces[face] : "?%d", m_trbl.CFMID[m_cid][disp.Index()]);
+            disp.DrawText(120, 0, buf, fColor(0, 0, 0), 4, 0);
 
             disp.DrawLine(120, 0, 120, 120, fColor(1, 0, 0));
             disp.DrawLine(0, 120, 120, 120, fColor(0, 1, 0));
