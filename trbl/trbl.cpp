@@ -41,11 +41,36 @@ protected:
                 return res;
             };
 
+            auto print_side = [](const char* title, auto& arr) {
+                std::string res = title;
+                for (uint8_t cid : arr)
+                    switch (cid) {
+                    case 0:
+                        res += "L ";
+                        break;
+                    case 1:
+                        res += "D ";
+                        break;
+                    case 2:
+                        res += "F ";
+                        break;
+                    case 3:
+                        res += "U ";
+                        break;
+                    case 4:
+                        res += "R ";
+                        break;
+                    case 5:
+                        res += "B ";
+                        break;
+                    }
+                return res;
+            };
             disp.DrawText(0, 180, print_it("CID:", m_trbl.CID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
-            disp.DrawText(0, 200, print_it("CFID:", m_trbl.CFID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
+            disp.DrawText(0, 200, print_side("CFID:", m_trbl.CFID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
             disp.DrawText(0, 220, print_it("FMID:", m_trbl.CFMID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
 
-            static const char* faces[] = {"U%d", "F%d", "R%d", "D%d", "L%d", "B%d"};
+            static const char* faces[] = {"L%d", "D%d", "F%d", "U%d", "R%d", "B%d"};
             const unsigned char face = m_trbl.CFID[m_cid][disp.Index()];
 
             snprintf(buf, sizeof(buf), (face < 6) ? faces[face] : "?%d", m_trbl.CFMID[m_cid][disp.Index()]);
