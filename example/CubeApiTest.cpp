@@ -134,13 +134,13 @@ public:
     WC_TEST() {
         Get_TRBL_1_0 trbl;
         {
-            CScuboT<240> scb(trbl, 241, 241);
+            CScuboT<240> scb(trbl, 240, 240);
             WC_TEST_CHECK(scb.disp() == 1);
             WC_TEST_CHECK(scb.x() == 239);
             WC_TEST_CHECK(scb.y() == 239);
         }
         {
-            CScuboT<240> scb(trbl, 0, 241);
+            CScuboT<240> scb(trbl, 0, 240);
             WC_TEST_CHECK(scb.disp() == 1);
             WC_TEST_CHECK(scb.x() == 239);
             WC_TEST_CHECK(scb.y() == 0);
@@ -267,8 +267,9 @@ protected:
                 return;
             }
         }
-        if (!m_spCrossGeo || m_spCrossGeo->cid() != m_cid)
+        if (!m_spCrossGeo || m_spCrossGeo->cid() != m_cid || m_spCrossGeo->disp() != disp.Index())
             return;
+        disp.FillCircle(m_spCrossGeo->x(), m_spCrossGeo->y(), 50, fColor(1, 1, 1));
     }
 
     bool OnTick(uint32_t time) override
@@ -309,8 +310,14 @@ protected:
 
 #endif
             static char buf[64] = {};
-            snprintf(buf, sizeof(buf), "D:%d", display);
-            disp.DrawText(0, 100, buf, fColor(0, 0, 0), 10, 0);
+            //snprintf(buf, sizeof(buf), "D:%d", display);
+
+            static const char* faces[] = { "L", "D", "F", "U", "R", "B" };
+            const unsigned char face = m_trbl.CFID[m_cid][disp.Index()];
+
+            snprintf(buf, sizeof(buf), "%d:%d %s%d", m_cid, disp.Index(), (face < 6) ? faces[face] : "?", m_trbl.CFMID[m_cid][disp.Index()]);
+
+            disp.DrawText(0, 100, buf, fColor(0, 0, 0), 6, 0);
 
 #if 0
             CScubo tl = ball.TopLeft();
