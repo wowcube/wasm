@@ -68,6 +68,24 @@ int NativeSend(uint8_t to_cid, const char* fmt, ...)
     return res;
 }
 
+template<class T>
+intptr_t unique_type_id()
+{
+    return reinterpret_cast<intptr_t>(&unique_type_id<T>);
+};
+
+template<class T>
+int NativeSendStruct(uint8_t to_cid, const T& str)
+{
+    uint32_t len = sizeof(size_t) + sizeof(T); //len is without trailing 0
+    auto buff = GetSharableMem(len);
+    intptr_t* ptr = reinterpret_cast<intptr_t*>(buff.get());
+    *ptr = unique_type_id<T>();
+    memcpy(ptr + 1, &str, sizeof(T));
+    int32_t res = NativeInvoke(Send_Message_1_0{ to_cid, len, buff.get() });
+    return res;
+}
+
 class CBitmap
 {
 public:
