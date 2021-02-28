@@ -7,8 +7,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <memory>
+#include <cassert>
 
-#define WC_CHECKRET(cond, ret) if (!(cond)) {NativePrint("%s(%d):\t%s\t-\t%s", __FILE__, __LINE__, __FUNCTION__, #cond); return ret;}
+#define WC_CHECKRET(cond, ret) {if (!(cond)) {NativePrint("%s(%d):\t%s\t-\t%s", __FILE__, __LINE__, __FUNCTION__, #cond); assert(!#cond); return ret;}}
 #define WC_NORET ;
 
 #define WCPL() NativePrint("%s(%d):\t%s", __FILE__, __LINE__, __FUNCTION__)
@@ -77,7 +78,7 @@ intptr_t unique_type_id()
 template<class T>
 int NativeSendStruct(uint8_t to_cid, const T& str)
 {
-    uint32_t len = sizeof(size_t) + sizeof(T); //len is without trailing 0
+    uint32_t len = sizeof(intptr_t) + sizeof(T);
     auto buff = GetSharableMem(len);
     intptr_t* ptr = reinterpret_cast<intptr_t*>(buff.get());
     *ptr = unique_type_id<T>();

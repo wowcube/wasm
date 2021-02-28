@@ -1,7 +1,6 @@
 #include "cube_api.h"
 #include <cstdio>
 #include <tuple>
-#include <cassert>
 #include <set>
 
 #define _USE_MATH_DEFINES
@@ -131,7 +130,7 @@ public:
     }
 
 #define WC_TEST() static void test()
-#define WC_TEST_CHECK(cond) {if (!(cond)) NativePrint("%s(%d): %s TEST FAIL:", __FILE__, __LINE__, __FUNCTION__, #cond);}
+#define WC_TEST_CHECK(cond) {if (!(cond)) {NativePrint("%s(%d): %s TEST FAIL:", __FILE__, __LINE__, __FUNCTION__, #cond); assert(!#cond);}}
     WC_TEST() {
         Get_TRBL_1_0 trbl;
         {
@@ -208,6 +207,8 @@ class CEventLoopEx: public CEventLoop
 protected:
     void OnTRBLChanged(const Get_TRBL_1_0& trbl) override
     {
+        if (0 == memcmp(&m_trbl, &trbl, sizeof(Get_TRBL_1_0)))
+            return;
 #ifdef _DEBUG
         std::set<std::pair<int, int>> fo;
         for (int i = 0; i < 8; ++i)
