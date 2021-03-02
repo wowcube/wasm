@@ -59,8 +59,30 @@ public:
     }
 };
 
+void MemTest()
+{
+    NativePrint("MemTest\n");
+    size_t size = 2 * 1024 * 1024;
+    size_t* buff = (size_t*)malloc(size);
+    NativePrint("Allocated: %d\n", size);
+    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff) {
+        buff[i] = i;
+    }
+    NativePrint("Filled\n");
+    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff) {
+        if (buff[i] != i)
+        {
+            NativePrint("Fail\n");
+            break;
+        }
+    }
+    NativePrint("Checked\n");
+    free(buff);
+}
+
 WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
+    MemTest();
     //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();
 }

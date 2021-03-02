@@ -255,6 +255,8 @@ protected:
 
     void CrossGeo(CDisplay& disp)
     {
+        if (0xFF == m_cid || m_trbl.CID[0][0] == m_trbl.CID[1][1]) //not set yet
+            return;
         if (m_cid == 0 && disp.Index() == 0)
         {
             int x, y;
@@ -274,8 +276,6 @@ protected:
 
     bool OnTick(uint32_t time) override
     {
-        if (0xFF == m_cid || m_trbl.CID[0][0] == m_trbl.CID[1][1]) //not set yet
-            return true;
         int x, y;
         std::tie(x, y) = Circle(240, 240, 150, m_grad);
         CScuboSprite ball(m_trbl, x - 50, y - 50, 100, 100);
