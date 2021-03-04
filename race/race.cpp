@@ -64,19 +64,26 @@ void MemTest()
     NativePrint("MemTest\n");
     size_t size = 2 * 1024 * 1024;
     size_t* buff = (size_t*)malloc(size);
-    NativePrint("Allocated: %d\n", size);
-    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff) {
-        buff[i] = i;
+    if (!buff)
+    {
+        NativePrint("FAIL: Can't alloc %d bytes\n", size);
+        return;
     }
-    NativePrint("Filled\n");
-    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff) {
+
+    NativePrint("Allocated: %d bytes\n", size);
+    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff)
+        buff[i] = i;
+
+    NativePrint("Checking...\n");
+    bool passed = true;
+    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff)
         if (buff[i] != i)
         {
-            NativePrint("Fail\n");
+            passed = false;
             break;
         }
-    }
-    NativePrint("Checked\n");
+
+    NativePrint(passed ? "PASSED!!!\n" : "Fail :(\n");
     free(buff);
 }
 
