@@ -12,6 +12,7 @@ class CEventLoopEx: public CEventLoop
 {
     uint8_t m_cid = 0;
     Get_TRBL_1_0 m_trbl;
+    CCubeGraph m_cg;
 
 protected:
 
@@ -22,17 +23,14 @@ protected:
             disp.Fill(fColor(1,1,1));
             
             static char buf[64] = {};
-            snprintf(buf, sizeof(buf), "DISPLAY: %d", display);
-            disp.DrawText(0, 40, buf, fColor(0, 0, 0), 2, 0);
 
-            snprintf(buf, sizeof(buf), "MODULE: %d", m_cid);
-            disp.DrawText(0, 60, buf, fColor(0, 0, 0), 2, 0);
-
+#if 0
             snprintf(buf, sizeof(buf), "GYRO %.2f:%.2f:%.2f", gyro.x, gyro.y, gyro.z);
             disp.DrawText(0, 140, buf, fColor(0, 0, 0), 2, 0);
 
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f:%.2f", accel.x, accel.y, accel.z);
             disp.DrawText(0, 160, buf, fColor(0, 0, 0), 2, 0);
+#endif
 
             auto print_it = [](const char* title, auto& arr) {
                 std::string res = title;
@@ -41,18 +39,31 @@ protected:
                 return res;
             };
 
+            static const char* faces[] = { "L", "D", "F", "U", "R", "B" };
+
+            auto print_face = [](const char* title, auto& arr) {
+                std::string res = title;
+                for (uint8_t x : arr) {
+                    res += faces[x];
+                    res += " ";
+                }
+                return res;
+            };
+
             disp.DrawText(0, 180, print_it("CID:", m_trbl.CID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
-            disp.DrawText(0, 200, print_it("CFID:", m_trbl.CFID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
+            disp.DrawText(0, 200, print_face("CFID:", m_trbl.CFID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
             disp.DrawText(0, 220, print_it("FMID:", m_trbl.CFMID[m_cid]).c_str(), fColor(0, 0, 0), 2, 0);
 
-            static const char* faces[] = {"L%d", "D%d", "F%d", "U%d", "R%d", "B%d"};
             const unsigned char face = m_trbl.CFID[m_cid][disp.Index()];
 
-            snprintf(buf, sizeof(buf), (face < 6) ? faces[face] : "?%d", m_trbl.CFMID[m_cid][disp.Index()]);
-            disp.DrawText(120, 0, buf, fColor(0, 0, 0), 4, 0);
+            snprintf(buf, sizeof(buf), "%d:%d %s%d", m_cid, disp.Index(), ((face < 6) ? faces[face] : "?"), m_trbl.CFMID[m_cid][disp.Index()]);
 
-            disp.DrawLine(120, 0, 120, 120, fColor(1, 0, 0));
-            disp.DrawLine(0, 120, 120, 120, fColor(0, 1, 0));
+            disp.DrawText(10, 10, buf, fColor(0, 0, 0), 4, 0);
+
+            const CCubeGraph::pair_t& pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgLeft);
+
+            disp.DrawLine(120, 0, 120, 239, fColor(1, 0, 0));
+            disp.DrawLine(0, 120, 239, 120, fColor(0, 0, 1));
         }
         return CEventLoop::OnTick(time);
     }
@@ -84,6 +95,8 @@ protected:
     };
    
     void OnTRBLChanged(const Get_TRBL_1_0& trbl) override {
+        if (0 == memcmp(&m_trbl, &trbl, sizeof(Get_TRBL_1_0)))
+            return;
         /*
         NativePrint("on trbl changed \n");
         for (int i = 0; i < 8; i++) {
@@ -93,6 +106,7 @@ protected:
         }
         */
         m_trbl = trbl;
+        m_cg.Init(m_trbl);
         auto pkt = GetSharableMem(20);// CMD_GEO{8},n_records{8},CID[0]{8},screen[0]{8},...,CID[N]{8},screen[N]{8}
 
         Get_Legacy_1_0 glTRBL= {Get_Legacy_1_0::eglTRBL, pkt.get(), 20};

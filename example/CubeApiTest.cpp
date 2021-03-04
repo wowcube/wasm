@@ -13,7 +13,6 @@ typedef struct {
 
 #include "resources.h"
 
-
 const int g = 10;
 const int k = 240 / g;
 using TLife = char[k*k];
@@ -65,7 +64,7 @@ class CScuboT {
             int disp = -1;
             int new_cid = -1;
             std::tie(new_cid, disp) = Face2CID(face, fsi);
-            //assert(m_cid != new_cid);
+            assert(m_cid != new_cid);
             m_cid = new_cid;
             m_ord = disp2ord(disp);
             m_val[val] = m_val[!val]; //flipping X,Y
@@ -174,6 +173,7 @@ class CEventLoopEx: public CEventLoop
     uint32_t m_nPrevTime = 0;
     int m_grad = 0;
     Get_TRBL_1_0 m_trbl = {};
+    CCubeGraph m_cg;
     CBitmap m_ball;
     uint8_t m_cid = 0xFF;
     std::unique_ptr<CScubo> m_spCrossGeo;
@@ -221,6 +221,8 @@ protected:
             }
 #endif
         m_trbl = trbl;
+        if (m_cid == 0)
+            m_cg.Init(m_trbl);
         /*
         char buffer[256];
         print_transpon(m_trbl.CID, buffer);
@@ -315,7 +317,7 @@ protected:
             static const char* faces[] = { "L", "D", "F", "U", "R", "B" };
             const unsigned char face = m_trbl.CFID[m_cid][disp.Index()];
 
-            snprintf(buf, sizeof(buf), "%d:%d %s%d", m_cid, disp.Index(), (face < 6) ? faces[face] : "?", m_trbl.CFMID[m_cid][disp.Index()]);
+            snprintf(buf, sizeof(buf), "%d:%d %s%d", m_cid, disp.Index(), ((face < 6) ? faces[face] : "?"), m_trbl.CFMID[m_cid][disp.Index()]);
 
             disp.DrawText(0, 100, buf, fColor(0, 0, 0), 6, 0);
 

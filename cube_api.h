@@ -234,6 +234,51 @@ protected:
     int m_nDisplay = -1;
 };
 
+
+class CCubeGraph
+{
+public:
+    enum EDir { ecgTop, ecgRight, ecgBottom, ecgLeft };
+
+    struct pair_t {
+        unsigned cid : 4;
+        unsigned disp : 4;
+    };
+
+    void Init(const Get_TRBL_1_0& trbl)
+    {
+        pair_t faces[6][4] = {}; //0..3 is order on the face
+
+        for (unsigned cid = 0; cid < 8; ++cid) // grouping by faces
+            for (unsigned disp = 0; disp < 3; ++disp)
+                faces[trbl.CFID[cid][disp]][trbl.CFMID[cid][disp]] = { cid, disp };
+
+        // every face has 4 pairs in the order from 0 to 3
+        for (int face = 0; face < 6; ++face)
+        {
+            //every next is the left neigbour
+            pair_t last = faces[face][3];
+            for (int ord = 0; ord < 4; ++ord)
+            {
+                const pair_t& pair = faces[face][ord];
+                m_cg[pair.cid][pair.disp].dir[ecgLeft] = last;
+                last = pair;
+            }
+        }
+    }
+
+    const pair_t& GetNeigbour(unsigned cid, unsigned disp, EDir dir)
+    {
+        return m_cg[cid][disp].dir[dir];
+    }
+
+protected:
+    struct cube_graph_t {
+        pair_t dir[4]; //EDir
+    } m_cg[8][3];
+
+};
+
 class CEventLoop
 {
 protected:
