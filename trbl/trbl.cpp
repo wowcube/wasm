@@ -2,16 +2,13 @@
 #include <cstdio>
 #include <string>
 
-struct Vec3f {
-    float x;
-    float y;
-    float z;
-} accel, gyro;
 
 class CEventLoopEx: public CEventLoop
 {
     uint8_t m_cid = 0;
     Get_TRBL_1_0 m_trbl;
+    Get_Gyro_1_0 m_gyro;
+    Get_Accel_1_0 m_accel;
     CCubeGraph m_cg;
 
 protected:
@@ -24,13 +21,11 @@ protected:
             
             static char buf[64] = {};
 
-#if 0
-            snprintf(buf, sizeof(buf), "GYRO %.2f:%.2f:%.2f", gyro.x, gyro.y, gyro.z);
+            snprintf(buf, sizeof(buf), "GYRO %.2f:%.2f:%.2f", m_gyro.axis_X, m_gyro.axis_Y, m_gyro.axis_Z);
             disp.DrawText(0, 140, buf, fColor(0, 0, 0), 2, 0);
 
-            snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f:%.2f", accel.x, accel.y, accel.z);
+            snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f:%.2f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
             disp.DrawText(0, 160, buf, fColor(0, 0, 0), 2, 0);
-#endif
 
             auto print_it = [](const char* title, auto& arr) {
                 std::string res = title;
@@ -62,19 +57,19 @@ protected:
 
             CCubeGraph::pair_t pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgTop);
             snprintf(buf, sizeof(buf), "T: %d:%d", pair.cid, pair.disp);
-            disp.DrawText(10, 60, buf, fColor(0, 0, 0), 3, 0);
+            disp.DrawText(10, 60, buf, fColor(0, 0, 0), 2, 0);
 
             pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgRight);
             snprintf(buf, sizeof(buf), "R: %d:%d", pair.cid, pair.disp);
-            disp.DrawText(10, 90, buf, fColor(0, 0, 0), 3, 0);
+            disp.DrawText(10, 80, buf, fColor(0, 0, 0), 2, 0);
 
             pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgBottom);
             snprintf(buf, sizeof(buf), "B: %d:%d", pair.cid, pair.disp);
-            disp.DrawText(10, 120, buf, fColor(0, 0, 0), 3, 0);
+            disp.DrawText(10, 100, buf, fColor(0, 0, 0), 2, 0);
 
             pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgLeft);
             snprintf(buf, sizeof(buf), "L: %d:%d", pair.cid, pair.disp);
-            disp.DrawText(10, 150, buf, fColor(0, 0, 0), 3, 0);
+            disp.DrawText(10, 120, buf, fColor(0, 0, 0), 2, 0);
 
 
             disp.DrawLine(120, 0, 120, 239, fColor(1, 0, 0));
@@ -84,19 +79,13 @@ protected:
     }
 
     
-    void OnGyroChanged(const Get_Gyro_1_0& _gyro) override {
+    void OnGyroChanged(const Get_Gyro_1_0& gyro) override {
         //NativePrint("GYRO CHANGED");
-        gyro.x = _gyro.axis_X;
-        gyro.y = _gyro.axis_Y;
-        gyro.z = _gyro.axis_Z;
+        m_gyro = gyro;
         //NativePrint("GYRO: X:%f, Y:%f, Z:%f", gyro.x, gyro.y, gyro.z);
     }
-    void OnAccelChanged(const Get_Accel_1_0& _accel) override {
-        //NativePrint("ACCEL CHANGED");
-        accel.x = _accel.axis_X;
-        accel.y = _accel.axis_Y;
-        accel.z = _accel.axis_Z;
-        //NativePrint("ACCEL: X:%f, Y:%f, Z:%f", accel.x, accel.y, accel.z);
+    void OnAccelChanged(const Get_Accel_1_0& accel) override {
+        m_accel = accel;
     }
 
     void OwnCID(uint8_t cid) override
