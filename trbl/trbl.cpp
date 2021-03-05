@@ -60,7 +60,22 @@ protected:
 
             disp.DrawText(10, 10, buf, fColor(0, 0, 0), 4, 0);
 
-            const CCubeGraph::pair_t& pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgLeft);
+            CCubeGraph::pair_t pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgTop);
+            snprintf(buf, sizeof(buf), "T: %d:%d", pair.cid, pair.disp);
+            disp.DrawText(10, 60, buf, fColor(0, 0, 0), 3, 0);
+
+            pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgRight);
+            snprintf(buf, sizeof(buf), "R: %d:%d", pair.cid, pair.disp);
+            disp.DrawText(10, 90, buf, fColor(0, 0, 0), 3, 0);
+
+            pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgBottom);
+            snprintf(buf, sizeof(buf), "B: %d:%d", pair.cid, pair.disp);
+            disp.DrawText(10, 120, buf, fColor(0, 0, 0), 3, 0);
+
+            pair = m_cg.GetNeigbour(m_cid, disp.Index(), CCubeGraph::ecgLeft);
+            snprintf(buf, sizeof(buf), "L: %d:%d", pair.cid, pair.disp);
+            disp.DrawText(10, 150, buf, fColor(0, 0, 0), 3, 0);
+
 
             disp.DrawLine(120, 0, 120, 239, fColor(1, 0, 0));
             disp.DrawLine(0, 120, 239, 120, fColor(0, 0, 1));

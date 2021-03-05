@@ -250,8 +250,11 @@ public:
         pair_t faces[6][4] = {}; //0..3 is order on the face
 
         for (unsigned cid = 0; cid < 8; ++cid) // grouping by faces
-            for (unsigned disp = 0; disp < 3; ++disp)
+            for (unsigned disp = 0; disp < 3; ++disp) {
                 faces[trbl.CFID[cid][disp]][trbl.CFMID[cid][disp]] = { cid, disp };
+                m_cg[cid][disp].dir[ecgRight] = pair_t{cid, (disp - 1 + 3) % 3 };
+                m_cg[cid][disp].dir[ecgBottom] = pair_t{cid, (disp + 1) % 3};
+            }
 
         // every face has 4 pairs in the order from 0 to 3
         for (int face = 0; face < 6; ++face)
@@ -262,6 +265,7 @@ public:
             {
                 const pair_t& pair = faces[face][ord];
                 m_cg[pair.cid][pair.disp].dir[ecgLeft] = last;
+                m_cg[last.cid][last.disp].dir[ecgTop] = pair;
                 last = pair;
             }
         }
