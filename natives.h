@@ -162,6 +162,11 @@ typedef struct {
     int displayNumber;
 } Flush_1_0;
 
+typedef struct {
+    int displayNumber;
+} Select_1_0;
+
+
 typedef enum {epfNone, epfRLE, epfRGB565, epfJPG} EPictureFormat;
 
 typedef struct {
@@ -173,6 +178,8 @@ typedef struct {
     int32_t angle;
     uint32_t size;
     const void* addr;  // MUST be global or static!
+    uint8_t alpha;
+    uint32_t source; //source is which color to consider transparent
 } DrawBitmap_1_0;
 
 

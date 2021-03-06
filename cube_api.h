@@ -98,7 +98,7 @@ public:
     bool Load(const void* ptr, uint32_t size, int fmt)
     {
         Free();
-        switch (fmt) {
+        switch (fmt) {//FIXME: check that epfRGB565 starts from uint16_t w,h;
             case EPictureFormat::epfRGB565:
             case EPictureFormat::epfRLE:
                 m_data = malloc(size);
@@ -178,7 +178,9 @@ class CDisplay
 public:
     CDisplay(int display)
         : m_nDisplay(display)
-    {}
+    {
+        NativeInvoke(Select_1_0{ m_nDisplay});
+    }
 
     int DrawPixelAlpha(uint32_t x, uint32_t y, uint16_t color = 0xFF, uint8_t alpha = 0)
     {
