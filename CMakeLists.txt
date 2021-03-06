@@ -19,7 +19,8 @@ if (UNIX)
 
 endif()
 
-add_subdirectory(example)
+add_subdirectory(life)
+add_subdirectory(ball)
 add_subdirectory(rubic)
 add_subdirectory(race)
 add_subdirectory(trbl)

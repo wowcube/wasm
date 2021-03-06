@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <memory>
 #include <cassert>
+#include <tuple>
 
 #define WC_CHECKRET(cond, ret) {if (!(cond)) {NativePrint("%s(%d):\t%s\t-\t%s", __FILE__, __LINE__, __FUNCTION__, #cond); assert(!#cond); return ret;}}
 #define WC_NORET ;
@@ -280,6 +281,150 @@ protected:
     struct cube_graph_t {
         pair_t dir[4]; //EDir
     } m_cg[8][3];
+
+};
+
+
+template<int side> //width&height of the screen
+class CScuboT {
+    uint8_t m_ord = 0;
+    int m_val[2] = {};
+    uint8_t m_screens[3] = { 0, 2, 1 };
+    uint8_t m_cid = 0;
+    const Get_TRBL_1_0& m_trbl;
+    CCubeGraph m_cg;
+
+    template<class T>
+    void moddec(T& var, int mod) //decrement by module
+    {
+        var = (var - 1 + mod) % mod;
+    }
+
+    auto Face2CID(uint8_t face, uint8_t fsi) //returns -> cid, disp
+    {
+        for (int cid = 0; cid < 8; ++cid)
+            for (int disp = 0; disp < 4; ++disp)
+                if (m_trbl.CFID[cid][disp] == face && m_trbl.CFMID[cid][disp] == fsi)
+                    return std::make_pair(cid, disp);
+        return std::make_pair(-1, -1);
+    }
+
+    bool Move(int delta, int val) //val is index of axis
+    {
+        if (delta >= side && delta < 2 * side) { //jumping to the other screen of the same module, where Y and X exchange
+            m_val[val] = m_val[!val]; //flipping X,Y
+            m_val[!val] = side - (delta - side) - 1; //X end of one screen touches Y end of other and vise versa
+            if (val) //jumping to "previous" screen when 1(Y) is given as movement axis
+                moddec(m_ord, 3);
+            else //jumping to next screen, by their order
+                ++m_ord %= 3; //advance by module
+            return true;
+        }
+        else if (delta < 0) //alas, we go to other cube module
+        {
+            WC_CHECKRET(delta > -side, false);
+            CCubeGraph::pair_t pair = m_cg.GetNeigbour(m_cid, disp(), val ? CCubeGraph::ecgTop : CCubeGraph::ecgLeft);
+            m_cid = pair.cid;
+            m_ord = disp2ord(pair.disp);
+            m_val[val] = m_val[!val]; //flipping X,Y
+            m_val[!val] = -delta; //X end of one screen touches Y end of other and vise versa
+            return true;
+        }
+        else if (delta >= 2 * side) //alas, we go to other cube module
+        {
+            WC_CHECKRET(delta < 3 * side, false);
+            return true;
+        }
+        else //everything happens inside current screen, no jumps required
+        {
+            m_val[val] = delta;
+            return false;
+        }
+    }
+
+    int disp2ord(int disp)
+    {
+        return (3 - disp) % 3;
+    }
+
+public:
+
+    CScuboT(const Get_TRBL_1_0& trbl, int dx, int dy, int disp = 0, int cid = 0)
+        : m_ord(disp2ord(disp)) //display to ord
+        , m_cid(cid)
+        , m_trbl(trbl)
+    {
+        m_cg.Init(m_trbl);
+        if (Move(dx, 0))
+            Move(dy, 0);
+        else
+            Move(dy, 1);
+    }
+
+    struct pack_t //4 bytes
+    {
+        unsigned char cid;
+        unsigned char disp;
+        unsigned char x, y;
+    };
+
+    CScuboT(const Get_TRBL_1_0& trbl, const pack_t& pack)
+        : m_ord(disp2ord(pack.disp)) //display to ord
+        , m_cid(pack.cid)
+        , m_trbl(trbl)
+    {
+        m_val[0] = pack.x;
+        m_val[1] = pack.y;
+        m_cg.Init(m_trbl);
+    }
+    int x() { return m_val[0]; }
+    int y() { return m_val[1]; }
+    int disp() { return m_screens[m_ord]; }
+    int cid() { return m_cid; }
+
+    pack_t pack()
+    {
+        static_assert(side < 256);
+        assert(m_val[0] >= 0 && m_val[1] >= 0);
+        return pack_t{ m_cid, m_screens[m_ord], (uint8_t)m_val[0], (uint8_t)m_val[1] };
+    }
+
+#define WC_TEST() static void test()
+#define WC_TEST_CHECK(cond) {if (!(cond)) {NativePrint("%s(%d): %s TEST FAIL:", __FILE__, __LINE__, __FUNCTION__, #cond); assert(!#cond);}}
+    WC_TEST() {
+        Get_TRBL_1_0 trbl = {};
+        {
+            CScuboT<240> scb(trbl, 240, 240);
+            WC_TEST_CHECK(scb.disp() == 1);
+            WC_TEST_CHECK(scb.x() == 239);
+            WC_TEST_CHECK(scb.y() == 239);
+        }
+        {
+            CScuboT<240> scb(trbl, 0, 240);
+            WC_TEST_CHECK(scb.disp() == 1);
+            WC_TEST_CHECK(scb.x() == 239);
+            WC_TEST_CHECK(scb.y() == 0);
+        }
+    }
+};
+
+using CScubo = CScuboT<240>;
+
+class CScuboSprite
+{
+    int m_x, m_y, m_w, m_h;
+    const Get_TRBL_1_0& m_trbl;
+public:
+    CScuboSprite(const Get_TRBL_1_0& trbl, int x, int y, int w, int h)
+        : m_x(x), m_y(y), m_w(w), m_h(h)
+        , m_trbl(trbl)
+    {
+    }
+    CScubo TopLeft() { return CScubo(m_trbl, m_x, m_y); }
+    CScubo TopRight() { return CScubo(m_trbl, m_x + m_w, m_y); }
+    CScubo BottomLeft() { return CScubo(m_trbl, m_x, m_y + m_h); }
+    CScubo BottomRight() { return CScubo(m_trbl, m_x + m_w, m_y + m_h); }
+    CScubo Center() { return CScubo(m_trbl, m_x + m_w / 2, m_y + m_h / 2); }
 
 };
 
