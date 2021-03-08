@@ -54,7 +54,8 @@ protected:
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f", accel.x, accel.y);
             disp.DrawText(120, 200, buf, fColor(0, 0, 0), 1, 0);
 
-            disp.DrawLine(120, 120, 120 + int(accel.x * 100 + 0.5), 120 + int(accel.y * 100 + 0.5), fColor(0, 1, 0));
+            // crash if x1 y1 < x2 y2
+            //disp.DrawLine(120, 120, 120 + int(accel.x * 100 + 0.5), 120 + int(accel.y * 100 + 0.5), fColor(0, 1, 0));
 
             auto print_it = [](const char* title, auto& arr) {
                 std::string res = title;
