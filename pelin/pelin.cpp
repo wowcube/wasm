@@ -88,7 +88,7 @@ public:
     int Main() override
     {
         InitCache();
-        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
+        $( Send_Message_1_0{ estSelf, 0, NULL} );
         return CEventLoop::Main();
     }
 };

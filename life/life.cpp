@@ -154,7 +154,7 @@ protected:
         intptr_t* ptr = reinterpret_cast<intptr_t*>(buff.get());
         *ptr = unique_type_id<TLife>();
         memcpy(ptr + 1, life, sizeof(life));
-        NativeInvoke(Send_Message_1_0{ estAll, len, buff.get() });
+        $(Send_Message_1_0{ estAll, len, buff.get() });
         NativePrint("Sent random");
         m_sync.finished = 0xFF;
     }
@@ -234,7 +234,7 @@ public:
     int Main() override
     {
         NativePrint("Hello WOWd\n");
-        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
+        $(Send_Message_1_0{ estSelf, 0, NULL});
 
         return CEventLoop::Main();
     }

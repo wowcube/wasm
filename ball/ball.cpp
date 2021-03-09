@@ -204,7 +204,6 @@ public:
     int Main() override
     {
         NativePrint("Hello WOWd\n");
-        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
         resource_t res_ball = get_resource(0);
         m_ball.Load(res_ball.ptr, res_ball.size * 2, epfRLE);
         res_ball = get_resource(1);

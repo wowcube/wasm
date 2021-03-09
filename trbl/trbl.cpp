@@ -128,13 +128,13 @@ protected:
         auto pkt = GetSharableMem(20);// CMD_GEO{8},n_records{8},CID[0]{8},screen[0]{8},...,CID[N]{8},screen[N]{8}
 
         Get_Legacy_1_0 glTRBL= {Get_Legacy_1_0::eglTRBL, pkt.get(), 20};
-        NativeInvoke(glTRBL);
+        $(glTRBL);
     }
 
 public:
     int Main() override
     {
-        NativeInvoke( Send_Message_1_0{ estSelf, 0, NULL} );
+        $( Send_Message_1_0{ estSelf, 0, NULL} );
         return CEventLoop::Main();
     }
 };

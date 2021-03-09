@@ -72,7 +72,7 @@ protected:
         auto pkt = GetSharableMem(20);// CMD_GEO{8},n_records{8},CID[0]{8},screen[0]{8},...,CID[N]{8},screen[N]{8}
 
         Get_Legacy_1_0 glTRBL= {Get_Legacy_1_0::eglTRBL, pkt.get(), 20};
-        NativeInvoke(glTRBL);
+        $(glTRBL);
 
         pawn_run((int*)pkt.get(), 20/sizeof(cell), 0);
     }
@@ -147,7 +147,7 @@ public:
     int Main() override
     {
         NativePrint("Hello WOWd\n");
-        NativeInvoke( Send_Message_1_0{estSelf, 0, NULL} );
+        $( Send_Message_1_0{estSelf, 0, NULL} );
         return CEventLoop::Main();
     }
 
@@ -157,7 +157,7 @@ public:
             return;
         auto copy = GetSharableMem(size);
         memcpy(copy.get(), data, size);
-        NativeInvoke(Send_Message_1_0{m_trbl.CID[m_myCID][line], size, copy.get()});
+        $(Send_Message_1_0{m_trbl.CID[m_myCID][line], size, copy.get()});
     }
 
     void FB_FlushTmpFrameBuffer(int screen, int buff)
