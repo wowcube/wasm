@@ -35,12 +35,10 @@ protected:
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f", accel.x, accel.y);
             disp.DrawText(120, 200, buf, fColor(0, 0, 0), 1, 0);
 
-            uint32_t x = 120 + int(accel.x * 100 + 0.5);
-            bound<uint32_t>(x, 0, 239);
-            uint32_t y = 120 + int(accel.y * 100 + 0.5);
-            bound<uint32_t>(y, 0, 239);
-            // crash if x1 y1 < x2 y2
-            //disp.DrawLine(120, 120, x, y, fColor(0, 1, 0));
+            uint32_t x = bound<uint32_t>(120 + int(accel.x * 100 + 0.5), 0, 239);
+            uint32_t y = bound<uint32_t>(120 + int(accel.y * 100 + 0.5), 0, 239);
+
+            //disp.DrawLine(120, 120, x, y, fColor(0, 1, 0)); // crash if x1 y1 < x2 y2
             disp.FillCircle(x, y, 10, fColor(0, 1, 0));
 
             auto print_it = [](const char* title, auto& arr) {

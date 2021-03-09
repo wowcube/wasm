@@ -18,7 +18,7 @@ protected:
         for (int display = 0; display < 3; ++display) {
             CDisplay disp(display);
             disp.Fill(fColor(1, 1, 1));
-            int height = 240, width = 240;
+            unsigned int height = 240, width = 240;
 
             // Visit every pixel of the image and assign a color generated with Perlin noise
             for (unsigned int i = 0; i < height; ++i) {     // y
@@ -28,7 +28,7 @@ protected:
 
                     // Typical Perlin noise
                     double n = ((time / 2000) % 10 + 10) * m_cache[i * width + j];
-                    n = n - floor(n);
+                    n = float(n - floor(n));
 
 
                     // Map the values to the [0, 255] interval, for simplicity we use 
@@ -65,7 +65,7 @@ protected:
 
     void InitCache()
     {
-        int height = 240, width = 240;
+        unsigned int height = 240, width = 240;
 
 
         // Create a PerlinNoise object with a random permutation vector generated with seed

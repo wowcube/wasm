@@ -435,10 +435,11 @@ struct point_t {
 };
 
 template<class T>
-void bound(T& val, T left, T right)
+T bound(T val, T left, T right)
 {
     if (val > right) val = right;
     if (val < left) val = left;
+    return val;
 }
 
 template<class T>
@@ -457,12 +458,43 @@ point_t AccelGyro(const T& point, int disp) {
     return val[disp];
 };
 
+class CFPS
+{
+    uint32_t m_nPrevTime = 0;
+    float m_fps = 0.;
+    char m_str[32] = {};
+public:
+    void Tick(uint32_t time)
+    {
+        if (m_nPrevTime) {
+            uint32_t diff = time - m_nPrevTime;
+            m_fps = 1000.f / float(diff);
+        }
+        m_nPrevTime = time;
+    }
+
+    const char* c_str()
+    {
+        snprintf(m_str, sizeof(m_str), "fps: %.2f", m_fps);
+        return m_str;
+    }
+
+    operator float() {
+        return m_fps;
+    }
+};
+
 class CEventLoop
 {
 protected:
+
     virtual bool OnTick(uint32_t time)
     {
         return true;
+    }
+
+    float GetFPS()
+    {
     }
 
     virtual void OnTRBLChanged(const Get_TRBL_1_0&) {}

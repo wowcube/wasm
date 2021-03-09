@@ -16,8 +16,7 @@ typedef struct {
 
 class CEventLoopEx: public CEventLoop
 {
-    int m_nPos = 0;
-    uint32_t m_nPrevTime = 0;
+    CFPS m_fps;
     int m_grad270 = 0;
     int m_grad360 = 0;
     Get_TRBL_1_0 m_trbl = {};
@@ -127,6 +126,7 @@ protected:
 
     bool OnTick(uint32_t time) override
     {
+        m_fps.Tick(time);
         int x, y;
         std::tie(x, y) = Circle(240, 240, 150, m_grad270);
         CScuboSprite ball(m_trbl, x - 50, y - 50, 100, 100);
@@ -142,30 +142,11 @@ protected:
             disp.Fill(fColor(0.5,0.5,0.5));
 
             point_t& pt = m_accel_ball[disp.Index()];
-            disp.DrawBitmap(pt.x, pt.y, m_small_ball, 1);
+            disp.DrawBitmap(uint32_t(pt.x), uint32_t(pt.y), m_small_ball, 1);
             const point_t& delta = AccelGyro(m_accel, disp.Index());
-            pt.x += delta.x * 5;
-            bound<float>(pt.x, 0, 239);
-            pt.y += delta.y * 5;
-            bound<float>(pt.y, 0, 239);
-#if 1
+            pt.x = bound<float>(pt.x + delta.x * 5, 0, 239);
+            pt.y = bound<float>(pt.y + delta.y * 5, 0, 239);
 
-            if (display == 1)
-            {
-                static char buf[64] = {};
-                snprintf(buf, sizeof(buf), "accel: %.2f %.2f %.2f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
-                disp.DrawText(0, 20, buf, fColor(0,1,0), 2, 0);
-            }
-
-            if (display == 2)
-            {
-                ++m_nPos %= 240;
-                disp.DrawLine(0,0,240,240, 100);
-                disp.FillRect(m_nPos, m_nPos, 240, 10, fColor(0,1,0));
-                disp.DrawPixelAlpha(66, 66, 255, 2);
-            }
-
-#endif
             static char buf[64] = {};
             //snprintf(buf, sizeof(buf), "D:%d", display);
 
@@ -176,30 +157,23 @@ protected:
 
             disp.DrawText(0, 100, buf, fColor(0, 0, 0), 6, 0);
 
-#if 0
             CScubo tl = ball.TopLeft();
-            CScubo br = ball.BottomRight();
             if (tl.disp() == display)
-                disp.DrawBitmap(tl.x(), tl.y(), m_ball, 1, 360 - m_grad);
-            else if (br.disp() == display)
+                disp.FillCircle(tl.x(), tl.y(), 10, fColor(1, 0, 1));
+
+            CScubo br = ball.BottomRight();
+            if (br.disp() == display)
                 disp.FillCircle(br.x(), br.y(), 10, fColor(1, 0, 1));
                 //disp.DrawBitmap(br.x() - 100, br.y() - 100, m_ball, 1, 360 - m_grad);
-#else
+
             CScubo big_circle = ball.Center();
             if (big_circle.disp() == display)
-                disp.DrawBitmap(big_circle.x(), big_circle.y(), m_ball, 1, 360 - m_grad270);
+                disp.DrawBitmap(big_circle.x(), big_circle.y(), m_ball, 1, m_grad360);
             if (small_circle.disp() == display)
-                disp.FillCircle(small_circle.x(), small_circle.y(), 20, fColor(1, 0, 1));
-#endif
+                disp.DrawBitmap(small_circle.x(), small_circle.y(), m_small_ball, 1);
 
-            static char fps[32] = {};
-            if (m_nPrevTime && display == 0)
-            {
-                uint32_t diff = time - m_nPrevTime;
-                snprintf(fps, sizeof(fps), "fps: %.2f", 1000. / diff);
-            }
-            disp.DrawText(0, 0, fps, fColor(1, 1, 1), 3);
-            m_nPrevTime = time;
+
+            disp.DrawText(0, 0, m_fps.c_str(), fColor(1, 1, 1), 3);
 
             //NativePrint("Draw for display %d, time: %d\n", display, time);
             CrossGeo(disp);

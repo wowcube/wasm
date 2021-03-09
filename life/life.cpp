@@ -23,6 +23,8 @@ class CEventLoopEx: public CEventLoop
         unsigned char finished;
     } m_sync;
 
+    CFPS m_fps;
+
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
         uint8_t result[3][8];
 
@@ -104,6 +106,7 @@ protected:
     {
         if (0xFF == m_cid || m_trbl.CID[0][0] == m_trbl.CID[1][1] || m_sync.finished != 0xFF) //not set yet
             return true;
+        m_fps.Tick(time);
         m_sync.finished = 0;
 
         UpdateLife();
@@ -125,13 +128,7 @@ protected:
 
             disp.DrawText(0, 100, buf, fColor(0, 0, 0), 6, 0);
 
-            static char fps[32] = {};
-            if (m_nPrevTime && display == 0)
-            {
-                uint32_t diff = time - m_nPrevTime;
-                snprintf(fps, sizeof(fps), "fps: %.2f", 1000. / diff);
-            }
-            disp.DrawText(0, 0, fps, fColor(1, 1, 1), 3);
+            disp.DrawText(0, 0, m_fps.c_str(), fColor(1, 1, 1), 3);
             m_nPrevTime = time;
 
         }
