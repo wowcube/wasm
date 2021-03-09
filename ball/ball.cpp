@@ -114,7 +114,7 @@ protected:
             if (pos.cid() == m_cid)
                 m_spCrossGeo = std::make_unique<CScubo>(m_trbl, pos.pack());
             else {
-                NativeSendStruct(pos.cid(), pos.pack());
+                NativeSendStruct(estAll, pos.pack());
                 return;
             }
         }

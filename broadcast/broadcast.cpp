@@ -1,13 +1,13 @@
 #include "../cube_api.h"
 #include <cstdio>
 
-char race[] = "race!";
-char race_ok[] = "race_ok";
+struct sync_t {
+    unsigned char finished;
+} m_sync;
 
 class CEventLoopEx: public CEventLoop
 {
-    uint32_t m_nPrevTime = 0;
-    uint8_t m_myCID = 0;
+    uint8_t m_cid = 0;
 
 protected:
 
@@ -17,22 +17,35 @@ protected:
         {
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
+            for (int i = 0; i < 8; ++i)
+            {
+                if (m_sync.finished & (1 << i))
+                {
+                    disp.FillRect(i * 30, 120, 30, 30, fColor(0, 0, 0));
+                }
+            }
         }
+        m_sync.finished |= 1 << m_cid;
+        NativeSendStruct(estAll, m_sync);
         return CEventLoop::OnTick(time);
     }
 
     void OnMessage(uint32_t size, const Get_Message_1_0& msg) override
     {
-        if (size == sizeof(race) && !strcmp(race, (const char*)msg.data)) {
-            NativeSend(msg.from_cid, race_ok); //confirming we took it
-        }    
+        if (*(uintptr_t*)msg.data == unique_type_id<sync_t>())
+        {
+            const sync_t& sync = *reinterpret_cast<const sync_t*>((uintptr_t*)msg.data + 1);
+            m_sync.finished |= sync.finished;
+            if (sync.finished != m_sync.finished)
+                NativeSendStruct(estAll, m_sync);
+        }
     }
 
     void OwnCID(uint8_t cid) override
     {
-        m_myCID = cid;
+        m_cid = cid;
         if (cid == 0) {
-            NativeSend(estAll, race);
+            NativeSendStruct(estAll, m_sync);
         }
     }
 
@@ -45,38 +58,9 @@ public:
     }
 };
 
-void MemTest()
-{
-    NativePrint("MemTest\n");
-    size_t size = 6 * 1024 * 1024;
-
-    size_t* buff = (size_t*)malloc(size);
-    if (!buff)
-    {
-        NativePrint("MemTest FAIL: Can't alloc %d bytes\n", size);
-        return;
-    }
-
-    NativePrint("MemTest Allocated: %d bytes\n", size);
-    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff)
-        buff[i] = i;
-
-    NativePrint("MemTest Checking...\n");
-    bool passed = true;
-    for (size_t i = 0; i < size / sizeof(size_t); i += 0xff)
-        if (buff[i] != i)
-        {
-            passed = false;
-            break;
-        }
-
-    NativePrint(passed ? "MemTest PASSED!!!\n" : "MemTest Fail :(\n");
-    free(buff);
-}
 
 WASM_EXPORT int run() // native cube code searches for this function and runs as a main()
 {
-    MemTest();
     //whatever you return here will just be recorded into logs
     return CEventLoopEx().Main();
 }
