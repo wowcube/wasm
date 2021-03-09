@@ -25,11 +25,11 @@ protected:
             float x, y;
         };
         auto map = [](const auto& point, int disp) {
-            const float _2G = 2 * 9.81f;
+            const float _2G = -2 * 9.81f;
             point_t val[3] = {
-                {point.axis_Z / _2G, point.axis_Y / _2G}, //Disp 0
-                {point.axis_X / _2G, point.axis_Z / _2G}, //Disp 1
-                {point.axis_Y / _2G, point.axis_X / _2G} //Disp 2
+                {-point.axis_Z / _2G, point.axis_Y / _2G}, //Disp 0
+                {-point.axis_X / _2G, -point.axis_Z / _2G}, //Disp 1
+                {point.axis_Y / _2G, -point.axis_X / _2G} //Disp 2
             };
             return val[disp];
         };
@@ -54,8 +54,11 @@ protected:
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f", accel.x, accel.y);
             disp.DrawText(120, 200, buf, fColor(0, 0, 0), 1, 0);
 
+            uint32_t x = min(max(120 + int(accel.x * 100 + 0.5), 0), 240);
+            uint32_t y = min(max(120 + int(accel.y * 100 + 0.5), 0), 240);
             // crash if x1 y1 < x2 y2
-            //disp.DrawLine(120, 120, 120 + int(accel.x * 100 + 0.5), 120 + int(accel.y * 100 + 0.5), fColor(0, 1, 0));
+            //disp.DrawLine(120, 120, x, y, fColor(0, 1, 0));
+            disp.FillCircle(x, y, 10, fColor(0, 1, 0));
 
             auto print_it = [](const char* title, auto& arr) {
                 std::string res = title;

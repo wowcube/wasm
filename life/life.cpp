@@ -158,6 +158,8 @@ protected:
         *ptr = unique_type_id<TLife>();
         memcpy(ptr + 1, life, sizeof(life));
         NativeInvoke(Send_Message_1_0{ estAll, len, buff.get() });
+        NativePrint("Sent random");
+        m_sync.finished = 0xFF;
     }
 
     void DrawLife(CDisplay& disp) {
@@ -207,11 +209,19 @@ protected:
         if (*(uintptr_t*)msg.data == unique_type_id<sync_t>())
         {
             const sync_t& sync = *reinterpret_cast<const sync_t*>((uintptr_t*)msg.data + 1);
+            m_sync.finished |= sync.finished;
+            if (sync.finished != m_sync.finished)
+                NativeSendStruct(estAll, m_sync);
         }
         else if (*(uintptr_t*)msg.data == unique_type_id<TLife>())
         {
             memcpy(life, (uintptr_t*)msg.data + 1, sizeof(life));
             m_sync.finished = 0xFF;
+            NativePrint("Got Random: %d", m_cid);
+        }
+        else
+        {
+            WC_CHECKRET(!"Unexpected", WC_NORET);
         }
     }
 
