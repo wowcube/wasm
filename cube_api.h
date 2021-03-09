@@ -430,6 +430,33 @@ public:
 
 };
 
+struct point_t {
+    float x, y;
+};
+
+template<class T>
+void bound(T& val, T left, T right)
+{
+    if (val > right) val = right;
+    if (val < left) val = left;
+}
+
+template<class T>
+point_t AccelGyro(const T& point, int disp) {
+    //z01 x12 y02
+    //z: -x for D0, -y for D1
+    //x: -x for D1, -y for D2
+    //y: -x for D2, -y for D0
+
+    const float _2G = -2 * 9.81f;
+    point_t val[3] = {
+        {-point.axis_Z / _2G, point.axis_Y / _2G}, //Disp 0
+        {-point.axis_X / _2G, -point.axis_Z / _2G}, //Disp 1
+        {point.axis_Y / _2G, -point.axis_X / _2G} //Disp 2
+    };
+    return val[disp];
+};
+
 class CEventLoop
 {
 protected:

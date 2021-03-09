@@ -24,6 +24,7 @@ class CEventLoopEx: public CEventLoop
     CBitmap m_ball, m_small_ball;
     uint8_t m_cid = 0xFF;
     std::unique_ptr<CScubo> m_spCrossGeo;
+    point_t m_accel_ball[3] = {};
 
 
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
@@ -110,7 +111,7 @@ protected:
             int x, y;
             std::tie(x, y) = Circle(0, 0, 150, m_grad360);
             CScubo pos(m_trbl, x, y, 0, m_cid);
-            NativePrint("CID:%d, Disp:%d, X:%d, Y:%d", pos.cid(), pos.disp(), pos.x(), pos.y());
+            //NativePrint("CID:%d, Disp:%d, X:%d, Y:%d", pos.cid(), pos.disp(), pos.x(), pos.y());
             if (pos.cid() == m_cid)
                 m_spCrossGeo = std::make_unique<CScubo>(m_trbl, pos.pack());
             else {
@@ -138,7 +139,15 @@ protected:
         for (int display = 0; display < 3; ++display)
         {
             CDisplay disp(display);
-            disp.Fill(fColor(1,1,1));
+            disp.Fill(fColor(0.5,0.5,0.5));
+
+            point_t& pt = m_accel_ball[disp.Index()];
+            disp.DrawBitmap(pt.x, pt.y, m_small_ball, 1);
+            const point_t& delta = AccelGyro(m_accel, disp.Index());
+            pt.x += delta.x * 5;
+            bound<float>(pt.x, 0, 239);
+            pt.y += delta.y * 5;
+            bound<float>(pt.y, 0, 239);
 #if 1
 
             if (display == 1)

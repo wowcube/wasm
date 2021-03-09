@@ -15,25 +15,6 @@ protected:
 
     bool OnTick(uint32_t time) override
     {
-
-        //z01 x12 y02
-        //z: -x for D0, -y for D1
-        //x: -x for D1, -y for D2
-        //y: -x for D2, -y for D0
-        
-        struct point_t {
-            float x, y;
-        };
-        auto map = [](const auto& point, int disp) {
-            const float _2G = -2 * 9.81f;
-            point_t val[3] = {
-                {-point.axis_Z / _2G, point.axis_Y / _2G}, //Disp 0
-                {-point.axis_X / _2G, -point.axis_Z / _2G}, //Disp 1
-                {point.axis_Y / _2G, -point.axis_X / _2G} //Disp 2
-            };
-            return val[disp];
-        };
-
         for (int display = 0; display < 3; ++display) {
             CDisplay disp(display);
             disp.Fill(fColor(1,1,1));
@@ -46,16 +27,18 @@ protected:
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f:%.2f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
             disp.DrawText(0, 160, buf, fColor(0, 0, 0), 2, 0);
 
-            point_t gyro = map(m_gyro, display);
-            point_t accel = map(m_accel, display);
+            point_t gyro = AccelGyro(m_gyro, display);
+            point_t accel = AccelGyro(m_accel, display);
             snprintf(buf, sizeof(buf), "GYRO %.2f:%.2f", gyro.x, gyro.y);
             disp.DrawText(120, 180, buf, fColor(0, 0, 0), 1, 0);
 
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f", accel.x, accel.y);
             disp.DrawText(120, 200, buf, fColor(0, 0, 0), 1, 0);
 
-            uint32_t x = min(max(120 + int(accel.x * 100 + 0.5), 0), 240);
-            uint32_t y = min(max(120 + int(accel.y * 100 + 0.5), 0), 240);
+            uint32_t x = 120 + int(accel.x * 100 + 0.5);
+            bound<uint32_t>(x, 0, 239);
+            uint32_t y = 120 + int(accel.y * 100 + 0.5);
+            bound<uint32_t>(y, 0, 239);
             // crash if x1 y1 < x2 y2
             //disp.DrawLine(120, 120, x, y, fColor(0, 1, 0));
             disp.FillCircle(x, y, 10, fColor(0, 1, 0));
