@@ -13,14 +13,14 @@ typedef struct {
 
 #include "resources.h"
 
-
 class CEventLoopEx: public CEventLoop
 {
     CFPS m_fps;
     int m_grad270 = 0;
     int m_grad360 = 0;
     Get_TRBL_1_0 m_trbl = {};
-    CBitmap m_ball, m_small_ball;
+    CBitmap m_ball;
+    CBitmap m_small_ball;
     uint8_t m_cid = 0xFF;
     std::unique_ptr<CScubo> m_spCrossGeo;
     point_t m_accel_ball[3] = {};
@@ -144,8 +144,8 @@ protected:
             point_t& pt = m_accel_ball[disp.Index()];
             disp.DrawBitmap(uint32_t(pt.x), uint32_t(pt.y), m_small_ball, 1);
             const point_t& delta = AccelGyro(m_accel, disp.Index());
-            pt.x = bound<float>(pt.x + delta.x * 5, 0, 239);
-            pt.y = bound<float>(pt.y + delta.y * 5, 0, 239);
+            pt.x = bound<float>(pt.x + delta.x * 50, 0, 239);
+            pt.y = bound<float>(pt.y + delta.y * 50, 0, 239);
 
             static char buf[64] = {};
             //snprintf(buf, sizeof(buf), "D:%d", display);
@@ -172,10 +172,9 @@ protected:
             if (small_circle.disp() == display)
                 disp.DrawBitmap(small_circle.x(), small_circle.y(), m_small_ball, 1);
 
+            disp.DrawText(0, 0, m_fps.c_str(), fColor(1, 1, 1), 3); 
 
-            disp.DrawText(0, 0, m_fps.c_str(), fColor(1, 1, 1), 3);
-
-            //NativePrint("Draw for display %d, time: %d\n", display, time);
+            NativePrint("Draw for display %d, time: %d\n", display, time);
             CrossGeo(disp);
         }
         return CEventLoop::OnTick(time);
