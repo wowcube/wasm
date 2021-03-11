@@ -19,6 +19,8 @@ if (UNIX)
 
 endif()
 
+include(common.cmake)
+
 add_subdirectory(life)
 add_subdirectory(ball)
 add_subdirectory(rubic)
