@@ -95,7 +95,7 @@ int NativeSend(uint8_t to_cid, const char* fmt, ...)
 typedef intptr_t(*unique_type_id_t)();
 
 template<class T>
-intptr_t unique_type_id()
+uintptr_t unique_type_id()
 {
 #if 0
     union {
@@ -109,7 +109,7 @@ intptr_t unique_type_id()
 #else
     const char* str = __PRETTY_FUNCTION__;
     const char* type_name = typeid(T).name();
-    intptr_t type_id = reinterpret_cast<intptr_t>(&unique_type_id<T>);
+    uintptr_t type_id = reinterpret_cast<intptr_t>(&unique_type_id<T>) - reinterpret_cast<intptr_t>(&unique_type_id<void>);
     return type_id;
 #endif
 };

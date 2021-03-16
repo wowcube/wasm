@@ -31,4 +31,5 @@ add_subdirectory(bonbon)
 add_subdirectory(pelin)
 #add_subdirectory(cocos)
 add_subdirectory(broadcast)
+add_subdirectory(wasm_game)
 

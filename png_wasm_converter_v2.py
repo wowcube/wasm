@@ -114,6 +114,12 @@ def estimate_size(path):
 
 
 getRes = """
+
+typedef struct {
+    const void* ptr;
+    uint16_t size;
+} resource_t;
+
 enum EResource{
 %s,
 er_img_Size
