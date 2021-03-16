@@ -21,9 +21,10 @@ class CEventLoopEx: public CEventLoop
     Get_TRBL_1_0 m_trbl = {};
     CBitmap m_ball;
     CBitmap m_small_ball;
+    CBitmap m_cake;
     uint8_t m_cid = 0xFF;
     std::unique_ptr<CScubo> m_spCrossGeo;
-    point_t m_accel_ball[3] = {};
+    fpoint_t m_accel_ball[3] = {};
 
 
     size_t print_transpon(const uint8_t(&matrix)[8][3], char* buffer) {
@@ -111,12 +112,11 @@ protected:
             std::tie(x, y) = Circle(0, 0, 150, m_grad360);
             CScubo pos(m_trbl, x, y, 0, m_cid);
             //NativePrint("CID:%d, Disp:%d, X:%d, Y:%d", pos.cid(), pos.disp(), pos.x(), pos.y());
+            NativeSendStruct(estAll, pos.pack());
             if (pos.cid() == m_cid)
                 m_spCrossGeo = std::make_unique<CScubo>(m_trbl, pos.pack());
-            else {
-                NativeSendStruct(estAll, pos.pack());
+            else
                 return;
-            }
         }
         if (!m_spCrossGeo || m_spCrossGeo->cid() != m_cid || m_spCrossGeo->disp() != disp.Index())
             return;
@@ -128,8 +128,9 @@ protected:
     {
         m_fps.Tick(time);
         int x, y;
-        std::tie(x, y) = Circle(240, 240, 150, m_grad270);
-        CScuboSprite ball(m_trbl, x - 50, y - 50, 100, 100);
+        std::tie(x, y) = Circle(239, 239, 150, m_grad360);
+        //CScuboSprite cake(m_trbl, x - m_cake.Width() / 2, y - m_cake.Height() / 2, m_cake.Width(), m_cake.Height());
+        CScuboSprite disco(m_trbl, x - m_ball.Width() / 2, y - m_ball.Height() / 2, m_ball.Width(), m_ball.Height());
         //NativePrint("%d:%d:%d->%d:%d:%d", 90 + m_grad, x, y, scb.disp(), scb.x(), scb.y());
         std::tie(x, y) = Circle(x, y, 75, m_grad360);
         CScubo small_circle(m_trbl, x, y);
@@ -141,9 +142,9 @@ protected:
             CDisplay disp(display);
             disp.Fill(fColor(0.5,0.5,0.5));
 
-            point_t& pt = m_accel_ball[disp.Index()];
+            fpoint_t& pt = m_accel_ball[disp.Index()];
             disp.DrawBitmap(uint32_t(pt.x), uint32_t(pt.y), m_small_ball, 1);
-            const point_t& delta = AccelGyro(m_accel, disp.Index());
+            const fpoint_t& delta = AccelGyro(m_accel, disp.Index());
             pt.x = bound<float>(pt.x + delta.x * 50, 0, 239);
             pt.y = bound<float>(pt.y + delta.y * 50, 0, 239);
 
@@ -157,24 +158,12 @@ protected:
 
             disp.DrawText(0, 100, buf, fColor(0, 0, 0), 6, 0);
 
-            CScubo tl = ball.TopLeft();
-            if (tl.disp() == display)
-                disp.FillCircle(tl.x(), tl.y(), 10, fColor(1, 0, 1));
-
-            CScubo br = ball.BottomRight();
-            if (br.disp() == display)
-                disp.FillCircle(br.x(), br.y(), 10, fColor(1, 0, 1));
-                //disp.DrawBitmap(br.x() - 100, br.y() - 100, m_ball, 1, 360 - m_grad);
-
-            CScubo big_circle = ball.Center();
-            if (big_circle.disp() == display)
-                disp.DrawBitmap(big_circle.x(), big_circle.y(), m_ball, 1, m_grad360);
-            if (small_circle.disp() == display)
-                disp.DrawBitmap(small_circle.x(), small_circle.y(), m_small_ball, 1);
+            //cake.Draw(m_cid, disp, m_cake, 1, 0/*m_grad360*/);
+            disco.Draw(m_cid, disp, m_ball, 1, 0/*m_grad360*/);
 
             disp.DrawText(0, 0, m_fps.c_str(), fColor(1, 1, 1), 3); 
 
-            NativePrint("Draw for display %d, time: %d\n", display, time);
+            //NativePrint("Draw for display %d, time: %d\n", display, time);
             CrossGeo(disp);
         }
         return CEventLoop::OnTick(time);
@@ -188,6 +177,8 @@ protected:
 
     void OnMessage(uint32_t size, const Get_Message_1_0& msg) override
     {
+        unique_type_id_t fn = reinterpret_cast<unique_type_id_t>(*(uintptr_t*)msg.data);
+        uintptr_t fnid = unique_type_id<CScubo::pack_t>();
         WC_CHECKRET(*(uintptr_t*)msg.data == unique_type_id<CScubo::pack_t>(), WC_NORET);
         const CScubo::pack_t& pack = *reinterpret_cast<const CScubo::pack_t*>((uintptr_t*)msg.data + 1);
         m_spCrossGeo = std::make_unique<CScubo>(m_trbl, pack);
@@ -203,10 +194,15 @@ public:
     int Main() override
     {
         NativePrint("Hello WOWd\n");
-        resource_t res_ball = get_resource(0);
-        m_ball.Load(res_ball.ptr, res_ball.size * 2, epfRLE);
-        res_ball = get_resource(1);
-        m_small_ball.Load(res_ball.ptr, res_ball.size * 2, epfRLE);
+        resource_t res = get_resource(er_img_disco_ball);
+        m_ball.Load(res.ptr, res.size * 2, epfRLE);
+
+        res = get_resource(er_img_small_ball);
+        m_small_ball.Load(res.ptr, res.size * 2, epfRLE);
+
+        res = get_resource(er_img_cake);
+        m_cake.Load(res.ptr, res.size * 2, epfRLE);
+
 
         return CEventLoop::Main();
     }

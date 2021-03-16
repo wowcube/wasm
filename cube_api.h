@@ -23,6 +23,13 @@
     #define WCPLS(scope) 0
 #endif
 
+struct fpoint_t {
+    float x, y;
+};
+
+struct point_t {
+    int x, y;
+};
 
 template<class T=char>
 std::unique_ptr<T[]> GetSharableMem(uint32_t size)
@@ -81,10 +88,30 @@ int NativeSend(uint8_t to_cid, const char* fmt, ...)
     return res;
 }
 
+#ifdef _WIN32
+    #define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+typedef intptr_t(*unique_type_id_t)();
+
 template<class T>
 intptr_t unique_type_id()
 {
-    return reinterpret_cast<intptr_t>(&unique_type_id<T>);
+#if 0
+    union {
+        char word[4];
+        intptr_t val;
+    } transfrom = {};
+    const char* str = __PRETTY_FUNCTION__;
+    const char* type_name = typeid(T).name();
+    memcpy(transfrom.word, str, 4); 
+    return transfrom.val;
+#else
+    const char* str = __PRETTY_FUNCTION__;
+    const char* type_name = typeid(T).name();
+    intptr_t type_id = reinterpret_cast<intptr_t>(&unique_type_id<T>);
+    return type_id;
+#endif
 };
 
 template<class T>
@@ -111,12 +138,19 @@ public:
         Free();
         switch (fmt) {//FIXME: check that epfRGB565 starts from uint16_t w,h;
             case EPictureFormat::epfRGB565:
-            case EPictureFormat::epfRLE:
+                assert(!"Unsupported");
+                return false;
+            case EPictureFormat::epfRLE: {
+                const uint16_t* pData = reinterpret_cast<const uint16_t*>(ptr);
+                m_width = *pData++;
+                m_height = *pData++;
+                WC_CHECKRET(m_width <= 240 && m_height <= 240, false);
                 m_data = malloc(size);
                 memcpy(m_data, ptr, size);
                 m_size = size;
                 m_format = (EPictureFormat)fmt;
                 return true;
+            }
 
             default:
                 NativePrint("Format not supported");
@@ -129,6 +163,8 @@ public:
     const void* GetAddr() const { return m_data;     }
     uint32_t GetSize() const { return m_size;     }
     EPictureFormat GetFormat() const { return m_format;   }
+    uint16_t Width() { return m_width; }
+    uint16_t Height() { return m_height; }
 
 protected:
     void Free()
@@ -142,6 +178,8 @@ protected:
     void *m_data = nullptr;
     uint32_t m_size = 0;
     EPictureFormat m_format = epfNone;
+    int m_width = 0;
+    int m_height = 0;
 };
 
 
@@ -402,6 +440,10 @@ public:
         return pack_t{ m_cid, m_screens[m_ord], (uint8_t)m_val[0], (uint8_t)m_val[1] };
     }
 
+    bool OnDisplay(int cid, int disp) {
+        return this->cid() == cid && this->disp() == disp;
+    }
+
 #define WC_TEST() static void test()
 #define WC_TEST_CHECK(cond) {if (!(cond)) {NativePrint("%s(%d): %s TEST FAIL:", __FILE__, __LINE__, __FUNCTION__, #cond); assert(!#cond);}}
     WC_TEST() {
@@ -428,7 +470,7 @@ class CScuboSprite
     int m_x, m_y, m_w, m_h;
     const Get_TRBL_1_0& m_trbl;
 public:
-    CScuboSprite(const Get_TRBL_1_0& trbl, int x, int y, int w, int h)
+    CScuboSprite(const Get_TRBL_1_0& trbl, int x, int y, int w, int h) //left, top, width, height
         : m_x(x), m_y(y), m_w(w), m_h(h)
         , m_trbl(trbl)
     {
@@ -439,11 +481,89 @@ public:
     CScubo BottomRight() { return CScubo(m_trbl, m_x + m_w, m_y + m_h); }
     CScubo Center() { return CScubo(m_trbl, m_x + m_w / 2, m_y + m_h / 2); }
 
+    std::unique_ptr<point_t> OnDisplay(int cid, int disp)
+    {
+        {
+            CScubo pt = TopLeft();
+            if (pt.OnDisplay(cid, disp))
+                return std::make_unique<point_t>(point_t{ pt.x(), pt.y() });
+        }
+
+        {
+            CScubo pt = TopRight();
+            if (pt.OnDisplay(cid, disp))
+                return std::make_unique<point_t>(point_t{ pt.x(), pt.y() });
+                //return std::make_unique<point_t>(point_t{ pt.x(), pt.y() + m_w });
+        }
+
+        {
+            CScubo pt = BottomLeft();
+            if (pt.OnDisplay(cid, disp))
+                return std::make_unique<point_t>(point_t{ pt.x(), pt.y() });
+                //return std::make_unique<point_t>(point_t{ pt.x() + m_h, pt.y() });
+        }
+
+        if (0){
+            CScubo pt = BottomRight();
+            if (pt.OnDisplay(cid, disp))
+                return std::make_unique<point_t>(point_t{ pt.x() + m_h, pt.y() + m_w });
+        }
+
+
+        return nullptr;
+        //return TopRight().OnDisplay(cid, disp) || BottomLeft().OnDisplay(cid, disp) || BottomRight().OnDisplay(cid, disp);
+    }
+
+    void Draw(int cid, CDisplay& disp, const CBitmap& bmp, int scale = 1, int angle = 0)
+    {
+        {
+            CScubo pt = TopLeft();
+            if (pt.OnDisplay(cid, disp.Index())) {
+                disp.DrawBitmap(pt.x() + Width() / 2, pt.y() + Height() / 2, bmp, 1, angle);
+                disp.DrawText(0, 40, "TL", fColor(0, 0, 0), 5);
+                disp.FillRect(pt.x(), pt.y(), 20, 20, fColor(1, 0, 0));
+                return;
+            }
+        }
+
+        {
+            CScubo pt = TopRight();
+            if (pt.OnDisplay(cid, disp.Index())) {
+                disp.DrawBitmap(pt.x() + Width() / 2, pt.y() + Height() / 2, bmp, 1, angle + 270);
+                disp.DrawText(0, 40, "TR", fColor(0, 0, 0), 5);
+                disp.FillRect(pt.x(), pt.y(), 20, 20, fColor(0, 1, 0));
+                return;
+            }
+        }
+
+        {
+            CScubo pt = BottomLeft();
+            if (pt.OnDisplay(cid, disp.Index())) {
+                disp.DrawBitmap(pt.x() + Width() / 2, pt.y() + Height() / 2, bmp, 1, angle + 90);
+                disp.DrawText(0, 40, "BL", fColor(0, 0, 0), 5);
+                disp.FillRect(pt.x(), pt.y(), 20, 20, fColor(0, 0, 1));
+                return;
+            }
+        }
+
+
+
+        {
+            CScubo pt = BottomRight();
+            if (pt.OnDisplay(cid, disp.Index())) {
+                disp.DrawBitmap(pt.x() + Width() / 2, pt.y() + Height() / 2, bmp, 1, angle);
+                disp.DrawText(0, 40, "BR", fColor(0, 0, 0), 5);
+                disp.FillRect(pt.x(), pt.y(), 20, 20, fColor(1, 0, 1));
+                return;
+            }
+        }
+
+    }
+
+    int Width() { return m_w; }
+    int Height() { return m_h; }
 };
 
-struct point_t {
-    float x, y;
-};
 
 template<class T>
 T bound(T val, T left, T right)
@@ -454,14 +574,14 @@ T bound(T val, T left, T right)
 }
 
 template<class T>
-point_t AccelGyro(const T& point, int disp) {
+fpoint_t AccelGyro(const T& point, int disp) {
     //z01 x12 y02
     //z: -x for D0, -y for D1
     //x: -x for D1, -y for D2
     //y: -x for D2, -y for D0
 
     const float _2G = -2 * 9.81f;
-    point_t val[3] = {
+    fpoint_t val[3] = {
         {-point.axis_Z / _2G, point.axis_Y / _2G}, //Disp 0
         {-point.axis_X / _2G, -point.axis_Z / _2G}, //Disp 1
         {point.axis_Y / _2G, -point.axis_X / _2G} //Disp 2

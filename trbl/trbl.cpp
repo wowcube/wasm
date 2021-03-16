@@ -27,8 +27,8 @@ protected:
             snprintf(buf, sizeof(buf), "ACCL %.2f:%.2f:%.2f", m_accel.axis_X, m_accel.axis_Y, m_accel.axis_Z);
             disp.DrawText(0, 160, buf, fColor(0, 0, 0), 2, 0);
 
-            point_t gyro = AccelGyro(m_gyro, display);
-            point_t accel = AccelGyro(m_accel, display);
+            fpoint_t gyro = AccelGyro(m_gyro, display);
+            fpoint_t accel = AccelGyro(m_accel, display);
             snprintf(buf, sizeof(buf), "GYRO %.2f:%.2f", gyro.x, gyro.y);
             disp.DrawText(120, 180, buf, fColor(0, 0, 0), 1, 0);
 

@@ -112,7 +112,13 @@ def estimate_size(path):
     fl.write(s)
     fl.close()
 
+
 getRes = """
+enum EResource{
+%s,
+er_img_Size
+};
+
 resource_t get_resource(int idx){
     static resource_t resources[] = {
 %s
@@ -121,18 +127,21 @@ resource_t get_resource(int idx){
 }
 """
 
+
 def convert_dir(path, rle):
     names = []
+    enum = []
     with open(path+'.h', "w") as out:
         for root, dir, files in os.walk(path):  
             for file in sorted(fnmatch.filter(files, '*.png')):
                 print(file)
                 string, name, _len = convert_picture(os.path.join(root,file), rle)
                 names.append("{%s, %d}" % (name, _len))
+                enum.append("er%s" % name.capitalize())
                 out.write(string)
                 out.write('\n')
 
-        out.write(getRes % ',\n'.join(names))
+        out.write(getRes % (',\n'.join(enum), ',\n'.join(names)))
 
 
 
