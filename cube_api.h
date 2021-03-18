@@ -29,7 +29,48 @@ struct fpoint_t {
 
 struct point_t {
     int x, y;
+    point_t(int _x, int _y) : x(_x), y(_y)
+    {}
+    point_t(double _x, double _y)
+    {
+        x = int(_x + 0.5);
+        y = int(_y + 0.5);
+    }
+    point_t(): x(0), y(0) {}
 };
+
+struct rect_t {
+    point_t lt;
+    point_t rb;
+    rect_t() {
+        lt = {};
+        rb = {};
+    }
+    rect_t(const point_t& center, int width, int height)
+    {
+        lt = { center.x - width / 2, center.y - height / 2 };
+        rb = { center.x + width / 2, center.y + height / 2 };
+    }
+};
+
+bool IsPointInCircle(const point_t& center, int r, const point_t& point)
+{
+    // Compare radius of circle with distance of its center from given point 
+    return (point.x - center.x) * (point.x - center.x) + (point.y - center.y) * (point.y - center.y) <= r * r;
+}
+
+bool IsRectOverlap(const rect_t& one, const rect_t& two)
+{
+    // If one rectangle is on left side of other
+    if (one.lt.x >= two.rb.x || two.lt.x >= one.rb.x)
+        return false;
+
+    // If one rectangle is above other
+    if (one.lt.y >= two.rb.y || two.lt.y >= one.rb.y)
+        return false;
+
+    return true;
+}
 
 template<class T=char>
 std::unique_ptr<T[]> GetSharableMem(uint32_t size)
@@ -115,15 +156,21 @@ uintptr_t unique_type_id()
 };
 
 template<class T>
-int NativeSendStruct(uint8_t to_cid, const T& str)
+int NativeSendBlock(uint8_t to_cid, const T* first, uint16_t count)
 {
-    uint32_t len = sizeof(intptr_t) + sizeof(T);
+    uint32_t len = sizeof(intptr_t) + sizeof(T) * count;
     auto buff = GetSharableMem(len);
-    intptr_t* ptr = reinterpret_cast<intptr_t*>(buff.get());
+    uintptr_t* ptr = reinterpret_cast<uintptr_t*>(buff.get());
     *ptr = unique_type_id<T>();
-    memcpy(ptr + 1, &str, sizeof(T));
+    memcpy(ptr + 1, first, sizeof(T) * count);
     int32_t res = NativeInvoke(Send_Message_1_0{ to_cid, len, buff.get() });
     return res;
+}
+
+template<class T>
+int NativeSendStruct(uint8_t to_cid, const T& str)
+{
+    return NativeSendBlock(to_cid, &str, 1);
 }
 
 class CBitmap
