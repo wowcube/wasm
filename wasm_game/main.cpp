@@ -43,9 +43,10 @@ protected:
     {
         if (m_pLastHit == &block)
             return;
-        m_pLastHit = &block;
         switch (block.type)
         {
+        case er_img_brick_blue:
+            return;
         case er_img_brick_solid:
             block.type = er_img_brick_half_broken;
             break;
@@ -58,8 +59,9 @@ protected:
         case er_img_brick_hazard:
             m_bExplosion = true;
             NativeSendStruct(estAll, m_bExplosion);
-            break;
+            return;
         }
+        m_pLastHit = &block;
     }
 
     bool OnTick(uint32_t time) override
@@ -138,6 +140,7 @@ protected:
             const CScubo::pack_t& pack = *reinterpret_cast<const CScubo::pack_t*>((uintptr_t*)msg.data + 1);
             m_host = pack;
             m_pos = { float(pack.x), float(pack.y) };
+            m_pLastHit = nullptr;
         }
         else if (unique_type_id<bool>() == type)
         {
@@ -172,7 +175,7 @@ protected:
             for (int x = 1; x < 6; ++x)
                 for (int y = 1; y < 6; ++y)
                     if (rand() % 4 == 0)
-                        m_blocks.push_back(block_t{ disp, uint8_t((rand() % 2 == 0) ? er_img_brick_solid : er_img_brick_blue), point_t{x * 40, y * 40} });
+                        m_blocks.push_back(block_t{ disp, uint8_t((rand() % 4 == 0) ? er_img_brick_solid : er_img_brick_blue), point_t{x * 40, y * 40} });
     }
 
 public:
