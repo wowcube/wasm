@@ -192,7 +192,7 @@ typedef struct {
     EPictureFormat target_format;
 } Transform_1_0;
 
-typedef enum {esfStop, esfMidi, esfMP3, esfWAV} ESoundFormat;
+typedef enum {esfStop, esfMidi, esfMP3, esfWAV, esfMidiSoundFont } ESoundFormat;
 
 typedef struct {
     uint32_t fmt;
