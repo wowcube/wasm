@@ -237,6 +237,8 @@ public:
     {
         switch (esf) {
             case ESoundFormat::esfMidi:
+            case ESoundFormat::esfWAV:
+            case ESoundFormat::esfMP3:
                 m_data = malloc(size);
                 WC_CHECKRET(m_data, false);
                 memcpy(m_data, ptr, size);
@@ -245,7 +247,7 @@ public:
                 return true;
 
             default:
-                NativePrint("Format not supported");
+                NativePrint("Format esf:%d not supported", esf);
                 return false;
         }
 
