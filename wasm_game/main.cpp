@@ -128,6 +128,7 @@ protected:
                     }
                 }
             }
+            drawTRBLDebug(disp, m_cid, m_trbl);
         }
         return CEventLoop::OnTick(time);
     }

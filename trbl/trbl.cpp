@@ -48,7 +48,7 @@ protected:
                 return res;
             };
 
-            static const char* faces[] = { "L", "D", "F", "U", "R", "B" };
+            static const char* faces[] = { "F", "U", "L", "D", "R", "B" };
 
             auto print_face = [](const char* title, auto& arr) {
                 std::string res = title;

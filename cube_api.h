@@ -705,6 +705,24 @@ protected:
         }
     }
 
+    void drawTRBLDebug(CDisplay &disp, uint8_t cid, const Get_TRBL_1_0 &trbl) {
+        static char buf[64] = {};
+
+        snprintf(buf, sizeof(buf), "DISPN: %d", disp.Index());
+        disp.DrawText(0, 0, buf, fColor(0, 0, 0), 2, 0);
+
+        snprintf(buf, sizeof(buf), "CID: %d", cid);
+        disp.DrawText(0, 20, buf, fColor(0, 0, 0), 2, 0);
+
+        snprintf(buf, sizeof(buf), "CFID: %d", trbl.CFID[cid][disp.Index()]);
+        disp.DrawText(0, 40, buf, fColor(0, 0, 0), 2, 0);
+
+        snprintf(buf, sizeof(buf), "CFMID: %d", trbl.CFMID[cid][disp.Index()]);
+        disp.DrawText(0, 60, buf, fColor(0, 0, 0), 2, 0);
+
+        snprintf(buf, sizeof(buf), "%d %d %d", trbl.CID[cid][0], trbl.CID[cid][1], trbl.CID[cid][2]);
+        disp.DrawText(0, 80, buf, fColor(0, 0, 0), 2, 0);
+    }
     virtual void OnMessage(uint32_t size)
     {
         Get_Message_1_0 msg = {};
