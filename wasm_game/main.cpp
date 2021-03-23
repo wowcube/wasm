@@ -97,8 +97,8 @@ protected:
                 disp.DrawBitmap(std::lround(m_pos.x), std::lround(m_pos.y), ball);
                 const fpoint_t& delta = AccelGyro(m_accel, disp.Index());
                 fpoint_t np = {
-                    bound<float>(m_pos.x + delta.x * 50, -2, 240 - float(ball.Width()) / 2),
-                    bound<float>(m_pos.y + delta.y * 50, -2, 240 - float(ball.Height()) / 2)
+                    bound<float>(m_pos.x + delta.x * 2000, -2, 240 - float(ball.Width()) / 2),
+                    bound<float>(m_pos.y + delta.y * 2000, -2, 240 - float(ball.Height()) / 2)
                 };
 
                 for (auto& obstacle : obstacles)
@@ -120,15 +120,16 @@ protected:
 
                 if (m_pos.x < 0 || m_pos.y < 0)
                 {
-                    CScubo scubo(m_trbl, std::lround(m_pos.x), std::lround(m_pos.y), m_host.disp, m_host.cid);
+                    CScubo scubo(m_trbl, std::lround(m_pos.y), std::lround(m_pos.x), m_host.disp, m_host.cid);
                     CScubo::pack_t pack = scubo.pack();
                     if (m_host.cid != pack.cid) {
                         m_host = pack;
-                        NativeSendStruct(estAll, pack);
+                        //NativeSendStruct(estAll, pack); //FIXME: fix broadcast and enable 
+                        NativeSendStruct(pack.cid, pack);
                     }
                 }
             }
-            drawTRBLDebug(disp, m_cid, m_trbl);
+          //  drawTRBLDebug(disp, m_cid, m_trbl);
         }
         return CEventLoop::OnTick(time);
     }
@@ -140,7 +141,7 @@ protected:
         {
             const CScubo::pack_t& pack = *reinterpret_cast<const CScubo::pack_t*>((uintptr_t*)msg.data + 1);
             m_host = pack;
-            m_pos = { float(pack.x), float(pack.y) };
+            m_pos = { float(pack.y), float(pack.x) };
             m_pLastHit = nullptr;
         }
         else if (unique_type_id<bool>() == type)
